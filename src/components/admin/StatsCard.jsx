@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo" }) => {
+const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", onClick }) => {
     // Static color definitions for Tailwind JIT to detect
     const colorVariants = {
         indigo: {
@@ -28,7 +28,13 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo" }) 
     const currentTheme = colorVariants[color] || colorVariants.indigo;
 
     return (
-        <div className="card relative overflow-hidden group">
+        <div
+            onClick={onClick}
+            className={clsx(
+                "card relative overflow-hidden group",
+                onClick && "cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            )}
+        >
             <div className="flex justify-between items-start">
                 <div>
                     <p className="text-gray-500 text-sm font-medium mb-1">{title}</p>

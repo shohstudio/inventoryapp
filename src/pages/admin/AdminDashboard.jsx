@@ -1,7 +1,10 @@
 import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine } from "react-icons/ri";
 import StatsCard from "../../components/admin/StatsCard";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
+    const navigate = useNavigate();
+
     return (
         <div>
             <div className="mb-8">
@@ -18,6 +21,7 @@ const AdminDashboard = () => {
                     trend={12}
                     trendLabel="o'tgan oyga nisbatan"
                     color="indigo"
+                    onClick={() => navigate("/admin/inventory")}
                 />
                 <StatsCard
                     title="Foydalanuvchilar"
@@ -26,9 +30,10 @@ const AdminDashboard = () => {
                     trend={5}
                     trendLabel="yangi xodimlar"
                     color="blue"
+                    onClick={() => navigate("/admin/users")}
                 />
                 <StatsCard
-                    title="Ta'mirdagi jihozlar"
+                    title="Ta'mir talab jihozlar"
                     value="7"
                     icon={<RiAlertLine size={24} />}
                     trend={-2}
@@ -37,7 +42,7 @@ const AdminDashboard = () => {
                 />
                 <StatsCard
                     title="Umumiy Qiymat"
-                    value="$452k"
+                    value="4.5 mlrd so'm"
                     icon={<RiMoneyDollarCircleLine size={24} />}
                     trend={8.2}
                     trendLabel="o'sish"
@@ -55,7 +60,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="card">
-                    <h3 className="font-bold text-gray-800 mb-4">So'nggi Harakatlar</h3>
+                    <h3 className="font-bold text-gray-800 mb-4">Saytdagi yangiliklar</h3>
                     <div className="space-y-4">
                         {[1, 2, 3, 4, 5].map((i) => (
                             <div key={i} className="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">

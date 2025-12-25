@@ -6,9 +6,9 @@ const InventoryPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [items, setItems] = useState([
-        { id: 1, name: "MacBook Pro M1", model: "A2338", serial: "FVFD1234", category: "Laptop", status: "working", assignedTo: "Ali Valiyev" },
-        { id: 2, name: "Dell Monitor 27\"", model: "P2722H", serial: "CN-0F123", category: "Monitor", status: "working", assignedTo: "Ali Valiyev" },
-        { id: 3, name: "HP LaserJet Pro", model: "M404dn", serial: "PHB12345", category: "Printer", status: "repair", assignedTo: "Ofis" },
+        { id: 1, name: "MacBook Pro M1", model: "A2338", serial: "FVFD1234", category: "Laptop", building: "Bosh Ofis", status: "working", assignedTo: "Ali Valiyev" },
+        { id: 2, name: "Dell Monitor 27\"", model: "P2722H", serial: "CN-0F123", category: "Monitor", building: "IT Bo'limi", status: "working", assignedTo: "Ali Valiyev" },
+        { id: 3, name: "HP LaserJet Pro", model: "M404dn", serial: "PHB12345", category: "Printer", building: "Omborxona", status: "repair", assignedTo: "Ofis" },
     ]);
 
     const handleAddItem = (newItem) => {
@@ -69,6 +69,7 @@ const InventoryPage = () => {
                                 <th className="py-4 px-4 font-medium">Nomi</th>
                                 <th className="py-4 px-4 font-medium">Model</th>
                                 <th className="py-4 px-4 font-medium">Kategoriya</th>
+                                <th className="py-4 px-4 font-medium">Bino</th>
                                 <th className="py-4 px-4 font-medium">Holati</th>
                                 <th className="py-4 px-4 font-medium">Javobgar</th>
                                 <th className="py-4 px-4 font-medium text-right">Amallar</th>
@@ -87,10 +88,11 @@ const InventoryPage = () => {
                                             {item.category}
                                         </span>
                                     </td>
+                                    <td className="py-4 px-4 text-gray-600">{item.building}</td>
                                     <td className="py-4 px-4">
                                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-50 text-green-600' :
-                                                item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
-                                                    'bg-red-50 text-red-600'
+                                            item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
+                                                'bg-red-50 text-red-600'
                                             }`}>
                                             {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mirda' : 'Buzilgan'}
                                         </span>
