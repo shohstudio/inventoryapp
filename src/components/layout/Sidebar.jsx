@@ -4,7 +4,8 @@ import { useAuth } from "../../context/AuthContext";
 import clsx from "clsx";
 
 const Sidebar = ({ isOpen, onClose }) => {
-    const { user } = useAuth(); // Need user to check role
+    const { pathname } = useLocation();
+    const { user, logout } = useAuth(); // Need user to check role
 
     const links = [
         { name: "Dashboard", path: "/admin", icon: <RiDashboardLine size={20} /> },
