@@ -39,7 +39,7 @@ const AdminDashboard = () => {
                     trend={-2}
                     trendLabel="kamaydi"
                     color="orange"
-                    onClick={() => navigate("/admin/inventory")}
+                    onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
                 <StatsCard
                     title="Umumiy Qiymat"

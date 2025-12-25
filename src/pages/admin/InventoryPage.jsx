@@ -126,7 +126,7 @@ const InventoryPage = () => {
                                             item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
                                                 'bg-red-50 text-red-600'
                                             }`}>
-                                            {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mirda' : 'Buzilgan'}
+                                            {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mir talab' : 'Buzilgan'}
                                         </span>
                                     </td>
                                     <td className="py-4 px-4 text-gray-600">{item.assignedTo}</td>
