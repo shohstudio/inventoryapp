@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiCloseCircleLine, RiImage2Line } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const InventoryPage = () => {
     const location = useLocation();
@@ -83,13 +84,34 @@ const InventoryPage = () => {
         localStorage.setItem("inventory_items", JSON.stringify(items));
     }, [items]);
 
+    const { user } = useAuth();
+
     const handleAddItem = (newItem) => {
+        const storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
+        const timestamp = new Date().toISOString();
+        let logAction = "";
+
         if (selectedItem) {
             setItems(items.map(i => i.id === selectedItem.id ? { ...newItem, id: selectedItem.id } : i));
+            logAction = "tahrirladi";
         } else {
             const nextOrderNum = (items.length + 1).toString().padStart(3, '0');
             setItems([...items, { ...newItem, id: Date.now(), orderNumber: nextOrderNum }]);
+            logAction = "qo'shdi";
         }
+
+        // Add Log
+        const newLog = {
+            id: Date.now(),
+            userName: user?.name || "Noma'lum",
+            userRole: user?.role,
+            action: logAction,
+            itemName: newItem.name,
+            timestamp: timestamp
+        };
+
+        const updatedLogs = [newLog, ...storedLogs].slice(0, 50); // Keep last 50 logs
+        localStorage.setItem("inventory_logs", JSON.stringify(updatedLogs));
     };
 
     const openModal = (item = null) => {

@@ -14,6 +14,8 @@ const AdminDashboard = () => {
         totalValue: 0
     });
 
+    const [logs, setLogs] = useState([]);
+
     useEffect(() => {
         // Users
         const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
@@ -37,6 +39,10 @@ const AdminDashboard = () => {
             repairItems,
             totalValue
         });
+
+        // Logs
+        const storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
+        setLogs(storedLogs.slice(0, 5)); // Show recent 5
     }, []);
 
     // Format utility for large numbers
@@ -44,6 +50,20 @@ const AdminDashboard = () => {
         if (num >= 1000000000) return (num / 1000000000).toFixed(1) + " mlrd";
         if (num >= 1000000) return (num / 1000000).toFixed(1) + " mln";
         return num.toLocaleString();
+    };
+
+    const timeAgo = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+
+        if (seconds < 60) return "Hozirgina";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} daqiqa oldin`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} soat oldin`;
+        const days = Math.floor(hours / 24);
+        return `${days} kun oldin`;
     };
 
     return (
@@ -106,19 +126,26 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="card">
-                    <h3 className="font-bold text-gray-800 mb-4">Saytdagi yangiliklar</h3>
+                    <h3 className="font-bold text-gray-800 mb-4">Saytdagi yangiliklar (Logs)</h3>
                     <div className="space-y-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
-                                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-                                    <RiUserLine size={14} />
+                        {logs.length > 0 ? (
+                            logs.map((log) => (
+                                <div key={log.id} className="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
+                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${log.userRole === 'admin' ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600'
+                                        }`}>
+                                        {log.userName.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-800">
+                                            {log.userName} <span className="font-normal text-gray-500">{log.itemName}ni {log.action}</span>
+                                        </p>
+                                        <p className="text-xs text-gray-400">{timeAgo(log.timestamp)}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-sm font-medium text-gray-800">Ali Valiyev <span className="font-normal text-gray-500">MacBook Pro oldi</span></p>
-                                    <p className="text-xs text-gray-400">2 soat oldin</p>
-                                </div>
-                            </div>
-                        ))}
+                            ))
+                        ) : (
+                            <p className="text-sm text-gray-400 text-center py-4">Hozircha yangiliklar yo'q</p>
+                        )}
                     </div>
                 </div>
             </div>
