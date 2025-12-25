@@ -8,7 +8,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
         serial: "",
         inn: "",
         orderNumber: "",
-        category: "Laptop",
+        category: "",
         building: "Bosh Ofis", // Default value
         location: "", // Room/Spot
         status: "working",
@@ -31,7 +31,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                 serial: "",
                 inn: "",
                 orderNumber: "",
-                category: "Laptop",
+                category: "",
                 building: "Bosh Ofis",
                 location: "",
                 status: "working",
@@ -145,19 +145,14 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">Kategoriya</label>
-                            <select
+                            <input
+                                type="text"
                                 name="category"
                                 className="input"
                                 value={formData.category}
                                 onChange={handleChange}
-                            >
-                                <option value="Laptop">Laptop</option>
-                                <option value="Monitor">Monitor</option>
-                                <option value="Printer">Printer</option>
-                                <option value="Phone">Phone</option>
-                                <option value="Furniture">Mebel</option>
-                                <option value="Other">Boshqa</option>
-                            </select>
+                                placeholder="Laptop, Mebel, Printer..."
+                            />
                         </div>
                         <div>
                             <label className="label">Holati</label>
