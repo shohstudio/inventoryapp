@@ -94,17 +94,6 @@ const LoginPage = () => {
                     </button>
                 </form>
 
-                <div className="mt-6 text-center text-sm text-gray-500">
-                    <p className="mb-2">Login ma'lumotlari:</p>
-                    <div className="flex flex-col sm:flex-row justify-center gap-3 mt-2">
-                        <code className="bg-gray-100 px-3 py-1.5 rounded border border-gray-200 block sm:inline-block">
-                            <span className="font-semibold text-indigo-600">admin</span> / admin123
-                        </code>
-                        <code className="bg-gray-100 px-3 py-1.5 rounded border border-gray-200 block sm:inline-block">
-                            <span className="font-semibold text-indigo-600">user</span> / user123
-                        </code>
-                    </div>
-                </div>
             </div>
         </div>
     );
