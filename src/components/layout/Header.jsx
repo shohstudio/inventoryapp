@@ -1,12 +1,15 @@
 import { useAuth } from "../../context/AuthContext";
-import { RiNotification3Line, RiSearchLine } from "react-icons/ri";
+import { RiNotification3Line, RiSearchLine, RiMenuLine } from "react-icons/ri";
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
     const { user } = useAuth();
 
     return (
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-200 fixed top-0 right-0 left-0 md:left-64 z-10 flex items-center justify-between px-6 transition-all duration-300">
+        <header className="h-16 bg-white/80 backdrop-blur-md fixed top-0 right-0 left-0 md:left-64 z-30 transition-all duration-300 border-b border-indigo-50/50 shadow-sm px-6 flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
+                <button onClick={onMenuClick} className="md:hidden text-gray-500 hover:text-indigo-600 transition-colors">
+                    <RiMenuLine size={24} />
+                </button>
                 <div className="relative max-w-md w-full hidden md:block">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                         <RiSearchLine size={18} />

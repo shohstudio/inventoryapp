@@ -1,26 +1,30 @@
 import { Link, useLocation } from "react-router-dom";
-import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine } from "react-icons/ri";
+import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import clsx from "clsx";
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
     const { pathname } = useLocation();
     const { logout } = useAuth();
-
-    const links = [
-        { name: "Dashboard", path: "/admin", icon: <RiDashboardLine size={20} /> },
-        { name: "Invertar", path: "/admin/inventory", icon: <RiBox3Line size={20} /> },
-        { name: "Foydalanuvchilar", path: "/admin/users", icon: <RiUserLine size={20} /> },
-        { name: "Sozlamalar", path: "/admin/settings", icon: <RiSettings4Line size={20} /> },
-    ];
+    // ... links array
 
     return (
-        <div className="w-64 bg-white border-r border-gray-200 h-screen hidden md:flex flex-col fixed left-0 top-0 z-20 transition-all duration-300">
-            <div className="p-6 border-b border-gray-100 flex items-center gap-2">
-                <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">I</div>
-                <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-                    Invertar
-                </span>
+        <div className={`
+            fixed top-0 left-0 h-full bg-white/70 backdrop-blur-xl border-r border-indigo-100/50 shadow-2xl z-40 transition-transform duration-300 ease-in-out
+            md:translate-x-0 w-64
+            ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        `}>
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">I</div>
+                    <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+                        Invertar
+                    </span>
+                </div>
+                {/* Mobile Close Button */}
+                <button onClick={onClose} className="md:hidden text-gray-500 hover:text-gray-700">
+                    <RiCloseLine size={24} />
+                </button>
             </div>
 
             <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

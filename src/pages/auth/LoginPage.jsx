@@ -30,11 +30,11 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 relative overflow-hidden">
             {/* Background Decor */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none">
+            <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
                 <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-300 rounded-full mix-blend-overlay filter blur-3xl animate-pulse" style={{ animationDelay: "2s" }}></div>
+                <div className="absolute bottom-10 right-10 w-96 h-96 bg-fuchsia-300 rounded-full mix-blend-overlay filter blur-3xl animate-pulse" style={{ animationDelay: "2s" }}></div>
             </div>
 
             <div className="glass p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md relative z-10 mx-4">

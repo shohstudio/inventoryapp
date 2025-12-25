@@ -3,40 +3,54 @@
 @tailwind utilities;
 
 :root {
-  /* Dynamic Color Palette (Light Mode Default) */
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --bg-app: #f3f4f6;
+  /* Dynamic Color Palette (Bright & Vibrant) */
+  --primary: #3b82f6;
+  /* Blue-500 */
+  --primary-hover: #2563eb;
+  /* Blue-600 */
+  --bg-app: #f0f9ff;
+  /* Sky-50 */
   --bg-card: #ffffff;
-  --text-main: #1f2937;
+  --text-main: #111827;
+  /* Gray-900 */
   --text-muted: #6b7280;
-  --border: #e5e7eb;
+  /* Gray-500 */
+  --border: #e0f2fe;
+  /* Sky-100 */
 
-  /* Status Colors */
+  /* Status Colors (Vibrant) */
   --success: #10b981;
+  /* Emerald-500 */
   --warning: #f59e0b;
+  /* Amber-500 */
   --danger: #ef4444;
+  /* Red-500 */
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Shadows (Softer, colored) */
+  --shadow-sm: 0 1px 2px 0 rgb(59 130 246 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(59 130 246 / 0.1), 0 2px 4px -2px rgb(59 130 246 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(59 130 246 / 0.1), 0 4px 6px -4px rgb(59 130 246 / 0.1);
 
   /* Radius */
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1.5rem;
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* Dark Mode Preference */
+/* Dark Mode Preference (Kept optional/minimal for now, focusing on bright light mode) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-app: #111827;
-    --bg-card: #1f2937;
-    --text-main: #f9fafb;
-    --text-muted: #9ca3af;
-    --border: #374151;
+    --bg-app: #0f172a;
+    /* Slate-900 */
+    --bg-card: #1e293b;
+    /* Slate-800 */
+    --text-main: #f8fafc;
+    /* Slate-50 */
+    --text-muted: #94a3b8;
+    /* Slate-400 */
+    --border: #334155;
+    /* Slate-700 */
   }
 }
 
