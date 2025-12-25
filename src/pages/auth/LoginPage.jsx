@@ -37,7 +37,7 @@ const LoginPage = () => {
                 <div className="absolute bottom-10 right-10 w-96 h-96 bg-yellow-300 rounded-full mix-blend-overlay filter blur-3xl animate-pulse" style={{ animationDelay: "2s" }}></div>
             </div>
 
-            <div className="glass p-8 rounded-2xl shadow-2xl w-full max-w-md relative z-10 m-4">
+            <div className="glass p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md relative z-10 mx-4">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800 mb-2">Xush kelibsiz!</h1>
                     <p className="text-gray-600">Inventory System ga kirish</p>
@@ -95,10 +95,14 @@ const LoginPage = () => {
                 </form>
 
                 <div className="mt-6 text-center text-sm text-gray-500">
-                    <p>Login ma'lumotlari:</p>
-                    <div className="flex justify-center gap-4 mt-2">
-                        <code className="bg-gray-100 px-2 py-1 rounded">admin / admin123</code>
-                        <code className="bg-gray-100 px-2 py-1 rounded">user / user123</code>
+                    <p className="mb-2">Login ma'lumotlari:</p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-3 mt-2">
+                        <code className="bg-gray-100 px-3 py-1.5 rounded border border-gray-200 block sm:inline-block">
+                            <span className="font-semibold text-indigo-600">admin</span> / admin123
+                        </code>
+                        <code className="bg-gray-100 px-3 py-1.5 rounded border border-gray-200 block sm:inline-block">
+                            <span className="font-semibold text-indigo-600">user</span> / user123
+                        </code>
                     </div>
                 </div>
             </div>
