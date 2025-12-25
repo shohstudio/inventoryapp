@@ -207,8 +207,8 @@ const InventoryPage = () => {
                         <thead>
                             <tr className="border-b border-gray-100 text-gray-500 text-sm">
                                 <th className="py-4 px-4 font-medium">Tartib raqami</th>
-                                <th className="py-4 px-4 font-medium">INN</th>
                                 <th className="py-4 px-4 font-medium">Nomi</th>
+                                <th className="py-4 px-4 font-medium">INN</th>
                                 <th className="py-4 px-4 font-medium">Sotib olingan yili</th>
                                 <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
                                 <th className="py-4 px-4 font-medium">Bino</th>
@@ -221,11 +221,11 @@ const InventoryPage = () => {
                             {filteredItems.map((item) => (
                                 <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                                     <td className="py-4 px-4 text-gray-600 font-medium">#{item.orderNumber}</td>
-                                    <td className="py-4 px-4 text-gray-600 font-mono text-xs">{item.inn}</td>
                                     <td className="py-4 px-4">
                                         <div className="font-medium text-gray-900">{item.name}</div>
                                         <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
                                     </td>
+                                    <td className="py-4 px-4 text-gray-600 font-mono text-xs">{item.inn}</td>
                                     <td className="py-4 px-4 text-gray-600">{item.purchaseYear}</td>
                                     <td className="py-4 px-4 text-gray-900 font-medium">{item.price} so'm</td>
                                     <td className="py-4 px-4">
