@@ -23,7 +23,7 @@ function App() {
 
           <Route path="/admin/*" element={<ProtectedRoute roles={["admin", "accounter"]}><AdminLayout /></ProtectedRoute>}>
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="profile" element={<ProfilePage />} />
