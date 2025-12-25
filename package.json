@@ -2,6 +2,7 @@
   "name": "inventory-app",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://shohstudio.github.io/inventoryapp",
   "type": "module",
   "scripts": {
     "dev": "vite",
