@@ -1,0 +1,136 @@
+import { useState } from "react";
+import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldUserLine, RiDeleteBinLine } from "react-icons/ri";
+import UserModal from "../../components/admin/UserModal";
+
+const UsersPage = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [users, setUsers] = useState([
+        { id: 1, name: "Admin User", email: "admin@example.com", role: "admin", status: "active", department: "IT Department" },
+        { id: 2, name: "Ali Valiyev", email: "ali@example.com", role: "employee", status: "active", department: "HR" },
+        { id: 3, name: "Vali Aliyev", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales" },
+        { id: 4, name: "Guli Karimova", email: "guli@example.com", role: "employee", status: "active", department: "Marketing" },
+    ]);
+
+    const handleSaveUser = (newUser) => {
+        // In a real app, you would handle password hashing here
+        if (selectedUser) {
+            setUsers(users.map(u => u.id === selectedUser.id ? { ...newUser, id: selectedUser.id } : u));
+        } else {
+            setUsers([...users, { ...newUser, id: Date.now() }]);
+        }
+    };
+
+    const handleDeleteUser = (id) => {
+        if (window.confirm("Rostdan ham bu foydalanuvchini o'chirmoqchimisiz?")) {
+            setUsers(users.filter(u => u.id !== id));
+        }
+    };
+
+    const openModal = (user = null) => {
+        setSelectedUser(user);
+        setIsModalOpen(true);
+    };
+
+    return (
+        <div>
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
+                        Foydalanuvchilar
+                    </h1>
+                    <p className="text-gray-500">Tizim foydalanuvchilari ro'yxati</p>
+                </div>
+                <button
+                    onClick={() => openModal()}
+                    className="btn btn-primary shadow-lg shadow-indigo-200"
+                >
+                    <RiAddLine size={20} />
+                    Yangi Foydalanuvchi
+                </button>
+            </div>
+
+            <div className="card border-0 shadow-lg shadow-gray-100/50">
+                <div className="mb-6 relative max-w-md">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <RiSearchLine size={18} />
+                    </span>
+                    <input
+                        type="text"
+                        placeholder="Ism yoki email orqali qidirish..."
+                        className="input pl-10"
+                    />
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-gray-100 text-gray-500 text-sm">
+                                <th className="py-4 px-4 font-medium">Foydalanuvchi</th>
+                                <th className="py-4 px-4 font-medium">Bo'lim</th>
+                                <th className="py-4 px-4 font-medium">Rol</th>
+                                <th className="py-4 px-4 font-medium">Holati</th>
+                                <th className="py-4 px-4 font-medium text-right">Amallar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map((user) => (
+                                <tr key={user.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
+                                    <td className="py-4 px-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                                                {user.name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <div className="font-medium text-gray-900">{user.name}</div>
+                                                <div className="text-xs text-gray-400">{user.email}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-4 text-gray-600">{user.department}</td>
+                                    <td className="py-4 px-4">
+                                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                                            {user.role === 'admin' ? <RiShieldUserLine className="text-indigo-500" /> : <RiUserLine />}
+                                            <span className="capitalize">{user.role}</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-4">
+                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
+                                            }`}>
+                                            {user.status === 'active' ? 'Faol' : 'Nofaol'}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-4 text-right flex justify-end gap-2">
+                                        <button
+                                            onClick={() => openModal(user)}
+                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                            title="Tahrirlash"
+                                        >
+                                            <RiMore2Fill size={20} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteUser(user.id)}
+                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                            title="O'chirish"
+                                        >
+                                            <RiDeleteBinLine size={20} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <UserModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveUser}
+                user={selectedUser}
+            />
+        </div>
+    );
+};
+
+export default UsersPage;
