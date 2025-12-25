@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiCloseCircleLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiCloseCircleLine, RiImage2Line } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import { useLocation } from "react-router-dom";
 
@@ -207,6 +207,7 @@ const InventoryPage = () => {
                                 <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
                                 <th className="py-4 px-4 font-medium">Bino</th>
                                 <th className="py-4 px-4 font-medium">Holati</th>
+                                <th className="py-4 px-4 font-medium">Rasm</th>
                                 <th className="py-4 px-4 font-medium text-right">Amallar</th>
                             </tr>
                         </thead>
@@ -231,6 +232,21 @@ const InventoryPage = () => {
                                             {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mir talab' : 'Buzilgan'}
                                         </span>
                                     </td>
+                                    <td className="py-4 px-4">
+                                        {item.images && item.images.length > 0 ? (
+                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                <img
+                                                    src={item.images[0]}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <RiImage2Line size={20} />
+                                            </div>
+                                        )}
+                                    </td>
                                     <td className="py-4 px-4 text-right">
                                         <button
                                             onClick={() => openModal(item)}
@@ -243,7 +259,7 @@ const InventoryPage = () => {
                             ))}
                             {filteredItems.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-8 text-gray-500">
+                                    <td colSpan="7" className="text-center py-8 text-gray-500">
                                         Jihozlar topilmadi
                                     </td>
                                 </tr>
