@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiCloseCircleLine, RiImage2Line } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiCloseCircleLine, RiImage2Line, RiQrCodeLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
+import QRScannerModal from "../../components/admin/QRScannerModal";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -22,6 +22,39 @@ const InventoryPage = () => {
             setFilters(prev => ({ ...prev, status: location.state.filter }));
         }
     }, [location.state]);
+    const [showModal, setShowModal] = useState(false);
+    const [showQRScanner, setShowQRScanner] = useState(false);
+
+    useEffect(() => {
+        // Users
+        const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
+        // No need to set user count here, just loading items
+
+        // The items state is already initialized from localStorage or mock data
+        // const storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
+        // If empty and not initialized, you might want to load mock data or keep empty
+        // For now trusting storedItems or empty array
+        // if (storedItems.length > 0) {
+        //    setItems(storedItems);
+        // }
+    }, []);
+
+    const handleScanSuccess = (decodedText) => {
+        // Search by ID, OrderNumber or Serial
+        const foundItem = items.find(item =>
+            String(item.id) === decodedText ||
+            item.orderNumber === decodedText ||
+            item.inn === decodedText ||
+            item.serial?.toLowerCase() === decodedText.toLowerCase()
+        );
+
+        if (foundItem) {
+            openModal(foundItem);
+        } else {
+            alert(`Jihoz topilmadi. QR Kod: ${decodedText}`);
+        }
+        setShowQRScanner(false);
+    };
 
     const [items, setItems] = useState(() => {
         const storedItems = localStorage.getItem("inventory_items");
@@ -154,166 +187,150 @@ const InventoryPage = () => {
             <div className="card border-0 shadow-lg shadow-gray-100/50">
                 {/* Search & Filter Controls */}
                 <div className="flex flex-col gap-4 mb-6">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <RiSearchLine size={18} />
-                            </span>
+
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`btn gap-2 transition-colors ${showFilters ? 'btn-primary' : 'btn-outline text-gray-600'}`}
+                    >
+                        <RiFilter3Line />
+                        Filter
+                    </button>
+                </div>
+
+                {/* Collapsible Filter Panel */}
+                {showFilters && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">Kategoriya</label>
+                            <select
+                                className="input w-full"
+                                value={filters.category}
+                                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                            >
+                                <option value="">Barchasi</option>
+                                {uniqueCategories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">Bino</label>
+                            <select
+                                className="input w-full"
+                                value={filters.building}
+                                onChange={(e) => setFilters(prev => ({ ...prev, building: e.target.value }))}
+                            >
+                                <option value="">Barchasi</option>
+                                {uniqueBuildings.map(build => (
+                                    <option key={build} value={build}>{build}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">Joylashgan joyi</label>
                             <input
                                 type="text"
-                                placeholder="Nomi, model yoki seriya raqami..."
-                                className="input pl-10"
+                                className="input w-full"
+                                placeholder="Xona yoki bo'lim..."
+                                value={filters.location}
+                                onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
                             />
                         </div>
-
-                        {/* Active Filter Indicator */}
-                        {filters.status !== 'all' && (
-                            <button
-                                onClick={() => setFilters(prev => ({ ...prev, status: 'all' }))}
-                                className="btn bg-orange-50 text-orange-600 hover:bg-orange-100 border-none gap-2"
-                            >
-                                <RiFilter3Line />
-                                Faqat ta'mir talab
-                                <RiCloseCircleLine size={18} />
-                            </button>
-                        )}
-
-                        <button
-                            onClick={() => setShowFilters(!showFilters)}
-                            className={`btn gap-2 transition-colors ${showFilters ? 'btn-primary' : 'btn-outline text-gray-600'}`}
-                        >
-                            <RiFilter3Line />
-                            Filter
-                        </button>
                     </div>
-
-                    {/* Collapsible Filter Panel */}
-                    {showFilters && (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
-                            <div>
-                                <label className="block text-xs font-medium text-gray-500 mb-1">Kategoriya</label>
-                                <select
-                                    className="input w-full"
-                                    value={filters.category}
-                                    onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                                >
-                                    <option value="">Barchasi</option>
-                                    {uniqueCategories.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-gray-500 mb-1">Bino</label>
-                                <select
-                                    className="input w-full"
-                                    value={filters.building}
-                                    onChange={(e) => setFilters(prev => ({ ...prev, building: e.target.value }))}
-                                >
-                                    <option value="">Barchasi</option>
-                                    {uniqueBuildings.map(build => (
-                                        <option key={build} value={build}>{build}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-gray-500 mb-1">Joylashgan joyi</label>
-                                <input
-                                    type="text"
-                                    className="input w-full"
-                                    placeholder="Xona yoki bo'lim..."
-                                    value={filters.location}
-                                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-                                />
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {/* Table */}
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-gray-100 text-gray-500 text-sm">
-                                <th className="py-4 px-4 font-medium">Tartib raqami</th>
-                                <th className="py-4 px-4 font-medium">Nomi</th>
-                                <th className="py-4 px-4 font-medium">INN</th>
-                                <th className="py-4 px-4 font-medium">Sotib olingan yili</th>
-                                <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
-                                <th className="py-4 px-4 font-medium">Bino</th>
-                                <th className="py-4 px-4 font-medium">Holati</th>
-                                <th className="py-4 px-4 font-medium">Rasm</th>
-                                <th className="py-4 px-4 font-medium text-right">Amallar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredItems.map((item) => (
-                                <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
-                                    <td className="py-4 px-4 text-gray-600 font-medium">#{item.orderNumber}</td>
-                                    <td className="py-4 px-4">
-                                        <div className="font-medium text-gray-900">{item.name}</div>
-                                        <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
-                                    </td>
-                                    <td className="py-4 px-4 text-gray-600 font-mono text-xs">{item.inn}</td>
-                                    <td className="py-4 px-4 text-gray-600">{item.purchaseYear}</td>
-                                    <td className="py-4 px-4 text-gray-900 font-medium">{item.price} so'm</td>
-                                    <td className="py-4 px-4">
-                                        <div className="text-gray-900">{item.building}</div>
-                                        <div className="text-xs text-gray-400">{item.location}</div>
-                                    </td>
-                                    <td className="py-4 px-4">
-                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-50 text-green-600' :
-                                            item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
-                                                'bg-red-50 text-red-600'
-                                            }`}>
-                                            {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mir talab' : 'Buzilgan'}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-4">
-                                        {item.images && item.images.length > 0 ? (
-                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
-                                                <img
-                                                    src={item.images[0]}
-                                                    alt={item.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                                                <RiImage2Line size={20} />
-                                            </div>
-                                        )}
-                                    </td>
-                                    <td className="py-4 px-4 text-right">
-                                        <button
-                                            onClick={() => openModal(item)}
-                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
-                                        >
-                                            <RiMore2Fill size={20} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {filteredItems.length === 0 && (
-                                <tr>
-                                    <td colSpan="9" className="text-center py-8 text-gray-500">
-                                        Jihozlar topilmadi
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                )}
             </div>
 
-            <ItemModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSave={handleAddItem}
-                item={selectedItem}
+            {/* Table */}
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="border-b border-gray-100 text-gray-500 text-sm">
+                            <th className="py-4 px-4 font-medium">Tartib raqami</th>
+                            <th className="py-4 px-4 font-medium">Nomi</th>
+                            <th className="py-4 px-4 font-medium">INN</th>
+                            <th className="py-4 px-4 font-medium">Sotib olingan yili</th>
+                            <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
+                            <th className="py-4 px-4 font-medium">Bino</th>
+                            <th className="py-4 px-4 font-medium">Holati</th>
+                            <th className="py-4 px-4 font-medium">Rasm</th>
+                            <th className="py-4 px-4 font-medium text-right">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredItems.map((item) => (
+                            <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
+                                <td className="py-4 px-4 text-gray-600 font-medium">#{item.orderNumber}</td>
+                                <td className="py-4 px-4">
+                                    <div className="font-medium text-gray-900">{item.name}</div>
+                                    <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
+                                </td>
+                                <td className="py-4 px-4 text-gray-600 font-mono text-xs">{item.inn}</td>
+                                <td className="py-4 px-4 text-gray-600">{item.purchaseYear}</td>
+                                <td className="py-4 px-4 text-gray-900 font-medium">{item.price} so'm</td>
+                                <td className="py-4 px-4">
+                                    <div className="text-gray-900">{item.building}</div>
+                                    <div className="text-xs text-gray-400">{item.location}</div>
+                                </td>
+                                <td className="py-4 px-4">
+                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-50 text-green-600' :
+                                        item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
+                                            'bg-red-50 text-red-600'
+                                        }`}>
+                                        {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mir talab' : 'Buzilgan'}
+                                    </span>
+                                </td>
+                                <td className="py-4 px-4">
+                                    {item.images && item.images.length > 0 ? (
+                                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                            <img
+                                                src={item.images[0]}
+                                                alt={item.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                            <RiImage2Line size={20} />
+                                        </div>
+                                    )}
+                                </td>
+                                <td className="py-4 px-4 text-right">
+                                    <button
+                                        onClick={() => openModal(item)}
+                                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                    >
+                                        <RiMore2Fill size={20} />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        {filteredItems.length === 0 && (
+                            <tr>
+                                <td colSpan="9" className="text-center py-8 text-gray-500">
+                                    Jihozlar topilmadi
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+            {/* Modals */}
+            {isModalOpen && (
+                <ItemModal
+                    item={selectedItem}
+                    onClose={() => setIsModalOpen(false)}
+                    onSave={handleAddItem}
+                />
+            )}
+
+            <QRScannerModal
+                isOpen={showQRScanner}
+                onClose={() => setShowQRScanner(false)}
+                onScanSuccess={handleScanSuccess}
             />
         </div>
     );
+
 };
 
 export default InventoryPage;
