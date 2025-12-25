@@ -1,10 +1,21 @@
-import { useState } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill } from "react-icons/ri";
+import { useState, useEffect } from "react";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiCloseCircleLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
+import { useLocation } from "react-router-dom";
 
 const InventoryPage = () => {
+    const location = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [filterStatus, setFilterStatus] = useState("all");
+
+    // Check for navigation state (filter)
+    useEffect(() => {
+        if (location.state?.filter) {
+            setFilterStatus(location.state.filter);
+        }
+    }, [location.state]);
+
     const [items, setItems] = useState([
         { id: 1, name: "MacBook Pro M1", model: "A2338", serial: "FVFD1234", category: "Laptop", building: "Bosh Ofis", status: "working", assignedTo: "Ali Valiyev" },
         { id: 2, name: "Dell Monitor 27\"", model: "P2722H", serial: "CN-0F123", category: "Monitor", building: "IT Bo'limi", status: "working", assignedTo: "Ali Valiyev" },
@@ -24,6 +35,12 @@ const InventoryPage = () => {
         setIsModalOpen(true);
     };
 
+    // Filter logic
+    const filteredItems = items.filter(item => {
+        if (filterStatus === "all") return true;
+        return item.status === filterStatus;
+    });
+
     return (
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -31,7 +48,9 @@ const InventoryPage = () => {
                     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
                         Invertar
                     </h1>
-                    <p className="text-gray-500">Barcha jihozlar ro'yxati</p>
+                    <p className="text-gray-500">
+                        {filterStatus === 'repair' ? "Ta'mir talab jihozlar" : "Barcha jihozlar ro'yxati"}
+                    </p>
                 </div>
                 <button
                     onClick={() => openModal()}
@@ -55,6 +74,19 @@ const InventoryPage = () => {
                             className="input pl-10"
                         />
                     </div>
+
+                    {/* Active Filter Indicator */}
+                    {filterStatus !== 'all' && (
+                        <button
+                            onClick={() => setFilterStatus('all')}
+                            className="btn bg-orange-50 text-orange-600 hover:bg-orange-100 border-none gap-2"
+                        >
+                            <RiFilter3Line />
+                            Faqat ta'mir talab
+                            <RiCloseCircleLine size={18} />
+                        </button>
+                    )}
+
                     <button className="btn btn-outline gap-2 text-gray-600">
                         <RiFilter3Line />
                         Filter
@@ -76,7 +108,7 @@ const InventoryPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {items.map((item) => (
+                            {filteredItems.map((item) => (
                                 <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                                     <td className="py-4 px-4">
                                         <div className="font-medium text-gray-900">{item.name}</div>
