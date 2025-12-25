@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine } from "react-icons/ri";
 import StatsCard from "../../components/admin/StatsCard";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [userCount, setUserCount] = useState(0);
     const [inventoryStats, setInventoryStats] = useState({
         totalItems: 0,
@@ -62,15 +64,19 @@ const AdminDashboard = () => {
                     color="indigo"
                     onClick={() => navigate("/admin/inventory")}
                 />
-                <StatsCard
-                    title="Foydalanuvchilar"
-                    value={userCount}
-                    icon={<RiUserLine size={24} />}
-                    trend={5}
-                    trendLabel="yangi xodimlar"
-                    color="blue"
-                    onClick={() => navigate("/admin/users")}
-                />
+
+                {user?.role === 'admin' && (
+                    <StatsCard
+                        title="Foydalanuvchilar"
+                        value={userCount}
+                        icon={<RiUserLine size={24} />}
+                        trend={5}
+                        trendLabel="yangi xodimlar"
+                        color="blue"
+                        onClick={() => navigate("/admin/users")}
+                    />
+                )}
+
                 <StatsCard
                     title="Ta'mir talab jihozlar"
                     value={inventoryStats.repairItems}

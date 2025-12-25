@@ -4,13 +4,13 @@ import { useAuth } from "../../context/AuthContext";
 import clsx from "clsx";
 
 const Sidebar = ({ isOpen, onClose }) => {
-    const { pathname } = useLocation();
-    const { logout } = useAuth();
+    const { user } = useAuth(); // Need user to check role
 
     const links = [
         { name: "Dashboard", path: "/admin", icon: <RiDashboardLine size={20} /> },
         { name: "Invertar", path: "/admin/inventory", icon: <RiBox3Line size={20} /> },
-        { name: "Foydalanuvchilar", path: "/admin/users", icon: <RiUserLine size={20} /> },
+        // Only show Users link to admin
+        ...(user?.role === 'admin' ? [{ name: "Foydalanuvchilar", path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
         { name: "Profil", path: "/admin/profile", icon: <RiUserSettingsLine size={20} /> },
         { name: "Sozlamalar", path: "/admin/settings", icon: <RiSettings4Line size={20} /> },
     ];
