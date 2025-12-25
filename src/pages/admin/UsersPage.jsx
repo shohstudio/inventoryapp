@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, RiDeleteBinLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, RiDeleteBinLine, RiCalculatorLine } from "react-icons/ri";
 import UserModal from "../../components/admin/UserModal";
 
 const UsersPage = () => {
@@ -105,8 +105,16 @@ const UsersPage = () => {
                                     <td className="py-4 px-4 text-gray-600">{user.department}</td>
                                     <td className="py-4 px-4">
                                         <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                                            {user.role === 'admin' ? <RiShieldKeyholeLine className="text-indigo-500" /> : <RiUserLine />}
-                                            <span className="capitalize">{user.role}</span>
+                                            {user.role === 'admin' ? (
+                                                <RiShieldKeyholeLine className="text-indigo-500" />
+                                            ) : user.role === 'accounter' ? (
+                                                <RiCalculatorLine className="text-blue-500" />
+                                            ) : (
+                                                <RiUserLine />
+                                            )}
+                                            <span className="capitalize">
+                                                {user.role === 'accounter' ? 'Hisobchi' : user.role}
+                                            </span>
                                         </div>
                                     </td>
                                     <td className="py-4 px-4">

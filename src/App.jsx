@@ -21,19 +21,12 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute roles={["admin"]}>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
+          <Route path="/admin/*" element={<ProtectedRoute roles={["admin", "accounter"]}><AdminLayout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardPage />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="profile" element={<ProfilePage />} />
-            <Route path="settings" element={<div className="p-4">Settings Page (Coming Soon)</div>} />
           </Route>
 
           <Route

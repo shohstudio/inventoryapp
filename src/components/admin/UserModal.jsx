@@ -141,6 +141,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                             >
                                 <option value="employee">Xodim</option>
                                 <option value="admin">Admin</option>
+                                <option value="accounter">Hisobchi</option>
                             </select>
                         </div>
                         <div>
