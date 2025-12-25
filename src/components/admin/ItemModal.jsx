@@ -115,7 +115,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">Seriya raqami</label>
                             <input
@@ -137,17 +137,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 value={formData.inn}
                                 onChange={handleChange}
                                 placeholder="123456789"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">Tartib raqami</label>
-                            <input
-                                type="text"
-                                name="orderNumber"
-                                className="input"
-                                value={formData.orderNumber}
-                                onChange={handleChange}
-                                placeholder="001"
                             />
                         </div>
                     </div>

@@ -80,7 +80,8 @@ const InventoryPage = () => {
         if (selectedItem) {
             setItems(items.map(i => i.id === selectedItem.id ? { ...newItem, id: selectedItem.id } : i));
         } else {
-            setItems([...items, { ...newItem, id: Date.now() }]);
+            const nextOrderNum = (items.length + 1).toString().padStart(3, '0');
+            setItems([...items, { ...newItem, id: Date.now(), orderNumber: nextOrderNum }]);
         }
     };
 
@@ -205,6 +206,8 @@ const InventoryPage = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-gray-100 text-gray-500 text-sm">
+                                <th className="py-4 px-4 font-medium">Tartib raqami</th>
+                                <th className="py-4 px-4 font-medium">INN</th>
                                 <th className="py-4 px-4 font-medium">Nomi</th>
                                 <th className="py-4 px-4 font-medium">Sotib olingan yili</th>
                                 <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
@@ -217,6 +220,8 @@ const InventoryPage = () => {
                         <tbody>
                             {filteredItems.map((item) => (
                                 <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
+                                    <td className="py-4 px-4 text-gray-600 font-medium">#{item.orderNumber}</td>
+                                    <td className="py-4 px-4 text-gray-600 font-mono text-xs">{item.inn}</td>
                                     <td className="py-4 px-4">
                                         <div className="font-medium text-gray-900">{item.name}</div>
                                         <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
@@ -262,7 +267,7 @@ const InventoryPage = () => {
                             ))}
                             {filteredItems.length === 0 && (
                                 <tr>
-                                    <td colSpan="7" className="text-center py-8 text-gray-500">
+                                    <td colSpan="9" className="text-center py-8 text-gray-500">
                                         Jihozlar topilmadi
                                     </td>
                                 </tr>
