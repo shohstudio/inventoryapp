@@ -19,14 +19,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    // const hashedPassword = await hashPassword(password); // Temporarily disabling hashing for simple list check
+    const hashedPassword = await hashPassword(password);
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
 
         // Find user
-        const foundUser = storedUsers.find(u => u.email === username && u.password === password);
+        const foundUser = storedUsers.find(u => u.email === username && u.password === hashedPassword);
 
         if (foundUser) {
           if (foundUser.status === 'inactive') {
@@ -39,12 +39,12 @@ export const AuthProvider = ({ children }) => {
           resolve(userData);
         } else {
           // Fallback for initial admin if list is empty or messed up
-          if (username === "admin" && password === "admin") {
+          if (username === "admin" && hashedPassword === "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918") {
             const adminData = { id: 1, name: "Admin User", role: "admin", email: "admin" };
             setUser(adminData);
             localStorage.setItem("inventory_user", JSON.stringify(adminData));
             resolve(adminData);
-          } else if (username === "user" && password === "user") {
+          } else if (username === "user" && hashedPassword === "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb") {
             const userData = { id: 2, name: "Ali Valiyev", role: "employee", email: "user" };
             setUser(userData);
             localStorage.setItem("inventory_user", JSON.stringify(userData));

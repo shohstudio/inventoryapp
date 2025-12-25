@@ -9,10 +9,10 @@ const UsersPage = () => {
         try {
             const storedUsers = localStorage.getItem("inventory_users_list");
             return storedUsers ? JSON.parse(storedUsers) : [
-                { id: 1, name: "Admin User", email: "admin", role: "admin", status: "active", department: "IT Department", password: "admin" },
-                { id: 2, name: "Ali Valiyev", email: "user", role: "employee", status: "active", department: "HR", password: "user" },
-                { id: 3, name: "Vali Aliyev", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", password: "123" },
-                { id: 4, name: "Guli Karimova", email: "guli@example.com", role: "employee", status: "active", department: "Marketing", password: "123" },
+                { id: 1, name: "Admin User", email: "admin", role: "admin", status: "active", department: "IT Department", password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918" },
+                { id: 2, name: "Ali Valiyev", email: "user", role: "employee", status: "active", department: "HR", password: "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb" },
+                { id: 3, name: "Vali Aliyev", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" },
+                { id: 4, name: "Guli Karimova", email: "guli@example.com", role: "employee", status: "active", department: "Marketing", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" },
             ];
         } catch (error) {
             console.error("Failed to parse users from localStorage:", error);
