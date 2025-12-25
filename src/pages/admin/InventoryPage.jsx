@@ -7,12 +7,18 @@ const InventoryPage = () => {
     const location = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [filterStatus, setFilterStatus] = useState("all");
+    const [showFilters, setShowFilters] = useState(false);
+    const [filters, setFilters] = useState({
+        status: 'all',
+        category: '',
+        building: '',
+        location: ''
+    });
 
     // Check for navigation state (filter)
     useEffect(() => {
         if (location.state?.filter) {
-            setFilterStatus(location.state.filter);
+            setFilters(prev => ({ ...prev, status: location.state.filter }));
         }
     }, [location.state]);
 
@@ -37,9 +43,15 @@ const InventoryPage = () => {
 
     // Filter logic
     const filteredItems = items.filter(item => {
-        if (filterStatus === "all") return true;
-        return item.status === filterStatus;
+        if (filters.status !== "all" && item.status !== filters.status) return false;
+        if (filters.category && item.category !== filters.category) return false;
+        if (filters.building && item.building !== filters.building) return false;
+        if (filters.location && !item.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+        return true;
     });
+
+    const uniqueCategories = [...new Set(items.map(item => item.category))];
+    const uniqueBuildings = [...new Set(items.map(item => item.building))];
 
     return (
         <div>
@@ -49,7 +61,7 @@ const InventoryPage = () => {
                         Invertar
                     </h1>
                     <p className="text-gray-500">
-                        {filterStatus === 'repair' ? "Ta'mir talab jihozlar" : "Barcha jihozlar ro'yxati"}
+                        {filters.status === 'repair' ? "Ta'mir talab jihozlar" : "Barcha jihozlar ro'yxati"}
                     </p>
                 </div>
                 <button
@@ -62,35 +74,82 @@ const InventoryPage = () => {
             </div>
 
             <div className="card border-0 shadow-lg shadow-gray-100/50">
-                {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                    <div className="relative flex-1">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                            <RiSearchLine size={18} />
-                        </span>
-                        <input
-                            type="text"
-                            placeholder="Nomi, model yoki seriya raqami..."
-                            className="input pl-10"
-                        />
-                    </div>
+                {/* Search & Filter Controls */}
+                <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative flex-1">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                <RiSearchLine size={18} />
+                            </span>
+                            <input
+                                type="text"
+                                placeholder="Nomi, model yoki seriya raqami..."
+                                className="input pl-10"
+                            />
+                        </div>
 
-                    {/* Active Filter Indicator */}
-                    {filterStatus !== 'all' && (
+                        {/* Active Filter Indicator */}
+                        {filters.status !== 'all' && (
+                            <button
+                                onClick={() => setFilters(prev => ({ ...prev, status: 'all' }))}
+                                className="btn bg-orange-50 text-orange-600 hover:bg-orange-100 border-none gap-2"
+                            >
+                                <RiFilter3Line />
+                                Faqat ta'mir talab
+                                <RiCloseCircleLine size={18} />
+                            </button>
+                        )}
+
                         <button
-                            onClick={() => setFilterStatus('all')}
-                            className="btn bg-orange-50 text-orange-600 hover:bg-orange-100 border-none gap-2"
+                            onClick={() => setShowFilters(!showFilters)}
+                            className={`btn gap-2 transition-colors ${showFilters ? 'btn-primary' : 'btn-outline text-gray-600'}`}
                         >
                             <RiFilter3Line />
-                            Faqat ta'mir talab
-                            <RiCloseCircleLine size={18} />
+                            Filter
                         </button>
-                    )}
+                    </div>
 
-                    <button className="btn btn-outline gap-2 text-gray-600">
-                        <RiFilter3Line />
-                        Filter
-                    </button>
+                    {/* Collapsible Filter Panel */}
+                    {showFilters && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Kategoriya</label>
+                                <select
+                                    className="input w-full"
+                                    value={filters.category}
+                                    onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                                >
+                                    <option value="">Barchasi</option>
+                                    {uniqueCategories.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Bino</label>
+                                <select
+                                    className="input w-full"
+                                    value={filters.building}
+                                    onChange={(e) => setFilters(prev => ({ ...prev, building: e.target.value }))}
+                                >
+                                    <option value="">Barchasi</option>
+                                    {uniqueBuildings.map(build => (
+                                        <option key={build} value={build}>{build}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Joylashgan joyi</label>
+                                <input
+                                    type="text"
+                                    className="input w-full"
+                                    placeholder="Xona yoki bo'lim..."
+                                    value={filters.location}
+                                    onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Table */}
@@ -99,11 +158,10 @@ const InventoryPage = () => {
                         <thead>
                             <tr className="border-b border-gray-100 text-gray-500 text-sm">
                                 <th className="py-4 px-4 font-medium">Nomi</th>
-                                <th className="py-4 px-4 font-medium">Model</th>
-                                <th className="py-4 px-4 font-medium">Kategoriya</th>
+                                <th className="py-4 px-4 font-medium">Sotib olingan yili</th>
+                                <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
                                 <th className="py-4 px-4 font-medium">Bino</th>
                                 <th className="py-4 px-4 font-medium">Holati</th>
-                                <th className="py-4 px-4 font-medium">Javobgar</th>
                                 <th className="py-4 px-4 font-medium text-right">Amallar</th>
                             </tr>
                         </thead>
@@ -112,15 +170,14 @@ const InventoryPage = () => {
                                 <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
                                     <td className="py-4 px-4">
                                         <div className="font-medium text-gray-900">{item.name}</div>
-                                        <div className="text-xs text-gray-400">{item.serial}</div>
+                                        <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
                                     </td>
-                                    <td className="py-4 px-4 text-gray-600">{item.model}</td>
+                                    <td className="py-4 px-4 text-gray-600">{item.purchaseYear}</td>
+                                    <td className="py-4 px-4 text-gray-900 font-medium">{item.price} so'm</td>
                                     <td className="py-4 px-4">
-                                        <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                            {item.category}
-                                        </span>
+                                        <div className="text-gray-900">{item.building}</div>
+                                        <div className="text-xs text-gray-400">{item.location}</div>
                                     </td>
-                                    <td className="py-4 px-4 text-gray-600">{item.building}</td>
                                     <td className="py-4 px-4">
                                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-50 text-green-600' :
                                             item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
@@ -129,7 +186,6 @@ const InventoryPage = () => {
                                             {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mir talab' : 'Buzilgan'}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-4 text-gray-600">{item.assignedTo}</td>
                                     <td className="py-4 px-4 text-right">
                                         <button
                                             onClick={() => openModal(item)}
@@ -140,6 +196,13 @@ const InventoryPage = () => {
                                     </td>
                                 </tr>
                             ))}
+                            {filteredItems.length === 0 && (
+                                <tr>
+                                    <td colSpan="6" className="text-center py-8 text-gray-500">
+                                        Jihozlar topilmadi
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                 </div>
