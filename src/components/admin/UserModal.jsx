@@ -5,6 +5,7 @@ import { hashPassword } from "../../utils/crypto";
 const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const [formData, setFormData] = useState({
         name: "",
+        username: "",
         email: "",
         role: "employee",
         department: "",
@@ -18,6 +19,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         } else {
             setFormData({
                 name: "",
+                username: "", // New field
                 email: "",
                 role: "employee",
                 department: "",
@@ -77,7 +79,20 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                     </div>
 
                     <div>
-                        <label className="label">Email (Login)</label>
+                        <label className="label">Login</label>
+                        <input
+                            type="text"
+                            name="username"
+                            className="input"
+                            required
+                            value={formData.username}
+                            onChange={handleChange}
+                            placeholder="vali123"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="label">Email</label>
                         <input
                             type="email"
                             name="email"
