@@ -24,7 +24,7 @@ const InventoryPage = () => {
             setFilters(prev => ({ ...prev, status: location.state.filter }));
         }
     }, [location.state]);
-    const [showModal, setShowModal] = useState(false);
+
     const [showQRScanner, setShowQRScanner] = useState(false);
 
     useEffect(() => {
@@ -184,7 +184,7 @@ const InventoryPage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-                        Invertar
+                        Invertar <span className="text-xs text-gray-400 font-normal">v1.2</span>
                     </h1>
                     <p className="text-gray-500">
                         {filters.status === 'repair' ? "Ta'mir talab jihozlar" : "Barcha jihozlar ro'yxati"}
