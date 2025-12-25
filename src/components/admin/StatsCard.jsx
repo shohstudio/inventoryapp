@@ -1,6 +1,32 @@
 import clsx from "clsx";
 
 const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo" }) => {
+    // Static color definitions for Tailwind JIT to detect
+    const colorVariants = {
+        indigo: {
+            iconBg: "bg-indigo-500 text-indigo-600 group-hover:bg-indigo-100",
+            blob: "bg-indigo-500",
+            text: "text-indigo-600"
+        },
+        blue: {
+            iconBg: "bg-blue-500 text-blue-600 group-hover:bg-blue-100",
+            blob: "bg-blue-500",
+            text: "text-blue-600"
+        },
+        orange: {
+            iconBg: "bg-orange-500 text-orange-600 group-hover:bg-orange-100",
+            blob: "bg-orange-500",
+            text: "text-orange-600"
+        },
+        green: {
+            iconBg: "bg-emerald-500 text-emerald-600 group-hover:bg-emerald-100",
+            blob: "bg-emerald-500",
+            text: "text-emerald-600"
+        }
+    };
+
+    const currentTheme = colorVariants[color] || colorVariants.indigo;
+
     return (
         <div className="card relative overflow-hidden group">
             <div className="flex justify-between items-start">
@@ -10,7 +36,7 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo" }) 
                 </div>
                 <div className={clsx(
                     "p-3 rounded-xl bg-opacity-10 transition-colors",
-                    `bg-${color}-500 text-${color}-600 group-hover:bg-${color}-100`
+                    currentTheme.iconBg
                 )}>
                     {icon}
                 </div>
@@ -29,7 +55,7 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo" }) 
             {/* Decorative Background Blob */}
             <div className={clsx(
                 "absolute -bottom-4 -right-4 w-24 h-24 rounded-full opacity-5 blur-2xl transition-all group-hover:opacity-10",
-                `bg-${color}-500`
+                currentTheme.blob
             )}></div>
         </div>
     );
