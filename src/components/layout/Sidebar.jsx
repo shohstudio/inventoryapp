@@ -6,7 +6,13 @@ import clsx from "clsx";
 const Sidebar = ({ isOpen, onClose }) => {
     const { pathname } = useLocation();
     const { logout } = useAuth();
-    // ... links array
+
+    const links = [
+        { name: "Dashboard", path: "/admin", icon: <RiDashboardLine size={20} /> },
+        { name: "Invertar", path: "/admin/inventory", icon: <RiBox3Line size={20} /> },
+        { name: "Foydalanuvchilar", path: "/admin/users", icon: <RiUserLine size={20} /> },
+        { name: "Sozlamalar", path: "/admin/settings", icon: <RiSettings4Line size={20} /> },
+    ];
 
     return (
         <div className={`
