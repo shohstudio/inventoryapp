@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { RiHomeLine, RiFileListLine, RiAlertLine, RiLogoutBoxRLine } from "react-icons/ri";
+import { RiHomeLine, RiFileListLine, RiAlertLine, RiLogoutBoxRLine, RiUserLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import clsx from "clsx";
 
@@ -11,6 +11,7 @@ const EmployeeLayout = () => {
         { name: "Asosiy", path: "/employee", icon: <RiHomeLine size={24} /> },
         { name: "Mening jihozlarim", path: "/employee/items", icon: <RiFileListLine size={24} /> },
         { name: "Muammo xabar berish", path: "/employee/report", icon: <RiAlertLine size={24} /> },
+        { name: "Profil", path: "/employee/profile", icon: <RiUserLine size={24} /> },
     ];
 
     return (

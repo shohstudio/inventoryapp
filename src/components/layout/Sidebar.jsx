@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine } from "react-icons/ri";
+import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import clsx from "clsx";
 
@@ -11,6 +11,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         { name: "Dashboard", path: "/admin", icon: <RiDashboardLine size={20} /> },
         { name: "Invertar", path: "/admin/inventory", icon: <RiBox3Line size={20} /> },
         { name: "Foydalanuvchilar", path: "/admin/users", icon: <RiUserLine size={20} /> },
+        { name: "Profil", path: "/admin/profile", icon: <RiUserSettingsLine size={20} /> },
         { name: "Sozlamalar", path: "/admin/settings", icon: <RiSettings4Line size={20} /> },
     ];
 

@@ -10,16 +10,11 @@ import AdminLayout from "./components/layout/AdminLayout";
 import InventoryPage from "./pages/admin/InventoryPage";
 import UsersPage from "./pages/admin/UsersPage";
 import EmployeeLayout from "./components/layout/EmployeeLayout";
-import MyItemsPage from "./pages/employee/MyItemsPage";
-import ReportIssuePage from "./pages/employee/ReportIssuePage";
+import ProfilePage from "./pages/common/ProfilePage";
 
-function App() {
-  return (
-    <HashRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
+// ... existing imports ...
 
+// In App component:
           <Route
             path="/admin/*"
             element={
@@ -31,6 +26,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="users" element={<UsersPage />} />
+            <Route path="profile" element={<ProfilePage />} />
             <Route path="settings" element={<div className="p-4">Settings Page (Coming Soon)</div>} />
           </Route>
 
@@ -45,13 +41,14 @@ function App() {
             <Route index element={<EmployeeDashboard />} />
             <Route path="items" element={<MyItemsPage />} />
             <Route path="report" element={<ReportIssuePage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
 
-          {/* Default Redirect */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AuthProvider>
-    </HashRouter>
+{/* Default Redirect */ }
+<Route path="/" element={<Navigate to="/login" replace />} />
+        </Routes >
+      </AuthProvider >
+    </HashRouter >
   );
 }
 
