@@ -37,7 +37,8 @@ const InventoryPage = () => {
             assignedTo: "Ali Valiyev",
             purchaseYear: "2021",
             price: "14 000 000",
-            images: []
+            images: [],
+            pdf: null
         },
         {
             id: 2,
@@ -53,7 +54,8 @@ const InventoryPage = () => {
             assignedTo: "Ali Valiyev",
             purchaseYear: "2022",
             price: "3 500 000",
-            images: []
+            images: [],
+            pdf: "warranty_dell_p2722h.pdf"
         },
         {
             id: 3,
@@ -69,7 +71,8 @@ const InventoryPage = () => {
             assignedTo: "Ofis",
             purchaseYear: "2020",
             price: "4 200 000",
-            images: []
+            images: [],
+            pdf: null
         },
     ]);
 

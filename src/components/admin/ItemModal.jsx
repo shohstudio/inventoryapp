@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiCloseLine, RiSave3Line } from "react-icons/ri";
+import { RiCloseLine, RiSave3Line, RiFilePdfLine } from "react-icons/ri";
 
 const ItemModal = ({ isOpen, onClose, onSave, item }) => {
     const [formData, setFormData] = useState({
@@ -13,14 +13,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
         location: "", // Room/Spot
         status: "working",
         assignedTo: "",
-        images: []
+        images: [],
+        pdf: null
     });
 
     useEffect(() => {
         if (item) {
             setFormData({
                 ...item,
-                images: item.images || []
+                images: item.images || [],
+                pdf: item.pdf || null
             });
         } else {
             setFormData({
@@ -34,7 +36,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                 location: "",
                 status: "working",
                 assignedTo: "",
-                images: []
+                images: [],
+                pdf: null
             });
         }
     }, [item, isOpen]);
@@ -50,6 +53,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files).map(file => URL.createObjectURL(file));
             setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
+        }
+    };
+
+    const handlePdfChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            setFormData(prev => ({ ...prev, pdf: e.target.files[0] }));
         }
     };
 
