@@ -10,11 +10,17 @@ import AdminLayout from "./components/layout/AdminLayout";
 import InventoryPage from "./pages/admin/InventoryPage";
 import UsersPage from "./pages/admin/UsersPage";
 import EmployeeLayout from "./components/layout/EmployeeLayout";
+import MyItemsPage from "./pages/employee/MyItemsPage";
+import ReportIssuePage from "./pages/employee/ReportIssuePage";
 import ProfilePage from "./pages/common/ProfilePage";
 
-// ... existing imports ...
+function App() {
+  return (
+    <HashRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
 
-// In App component:
           <Route
             path="/admin/*"
             element={
@@ -44,11 +50,11 @@ import ProfilePage from "./pages/common/ProfilePage";
             <Route path="profile" element={<ProfilePage />} />
           </Route>
 
-{/* Default Redirect */ }
-<Route path="/" element={<Navigate to="/login" replace />} />
-        </Routes >
-      </AuthProvider >
-    </HashRouter >
+          {/* Default Redirect */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </AuthProvider>
+    </HashRouter>
   );
 }
 
