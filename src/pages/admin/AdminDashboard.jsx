@@ -1,9 +1,16 @@
+import { useState, useEffect } from "react";
 import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine } from "react-icons/ri";
 import StatsCard from "../../components/admin/StatsCard";
 import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
+    const [userCount, setUserCount] = useState(0);
+
+    useEffect(() => {
+        const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
+        setUserCount(storedUsers.length);
+    }, []);
 
     return (
         <div>
@@ -25,7 +32,7 @@ const AdminDashboard = () => {
                 />
                 <StatsCard
                     title="Foydalanuvchilar"
-                    value="48"
+                    value={userCount}
                     icon={<RiUserLine size={24} />}
                     trend={5}
                     trendLabel="yangi xodimlar"
