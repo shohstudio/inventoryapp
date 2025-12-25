@@ -6,13 +6,20 @@ const UsersPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState(() => {
-        const storedUsers = localStorage.getItem("inventory_users_list");
-        return storedUsers ? JSON.parse(storedUsers) : [
-            { id: 1, name: "Admin User", email: "admin", role: "admin", status: "active", department: "IT Department", password: "admin" }, // Added mock password for simplicity
-            { id: 2, name: "Ali Valiyev", email: "user", role: "employee", status: "active", department: "HR", password: "user" },
-            { id: 3, name: "Vali Aliyev", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", password: "123" },
-            { id: 4, name: "Guli Karimova", email: "guli@example.com", role: "employee", status: "active", department: "Marketing", password: "123" },
-        ];
+        try {
+            const storedUsers = localStorage.getItem("inventory_users_list");
+            return storedUsers ? JSON.parse(storedUsers) : [
+                { id: 1, name: "Admin User", email: "admin", role: "admin", status: "active", department: "IT Department", password: "admin" },
+                { id: 2, name: "Ali Valiyev", email: "user", role: "employee", status: "active", department: "HR", password: "user" },
+                { id: 3, name: "Vali Aliyev", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", password: "123" },
+                { id: 4, name: "Guli Karimova", email: "guli@example.com", role: "employee", status: "active", department: "Marketing", password: "123" },
+            ];
+        } catch (error) {
+            console.error("Failed to parse users from localStorage:", error);
+            return [
+                { id: 1, name: "Admin User", email: "admin", role: "admin", status: "active", department: "IT Department", password: "admin" },
+            ];
+        }
     });
 
     useEffect(() => {
