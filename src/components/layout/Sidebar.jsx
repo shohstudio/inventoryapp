@@ -13,7 +13,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         // Only show Users link to admin
         ...(user?.role === 'admin' ? [{ name: "Foydalanuvchilar", path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
         { name: "Profil", path: "/admin/profile", icon: <RiUserSettingsLine size={20} /> },
-        { name: "Sozlamalar", path: "/admin/settings", icon: <RiSettings4Line size={20} /> },
+        ...(user?.role === 'admin' ? [{ name: "Sozlamalar", path: "/admin/settings", icon: <RiSettings4Line size={20} /> }] : []),
     ];
 
     return (
