@@ -6,11 +6,43 @@ import { useNavigate } from "react-router-dom";
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const [userCount, setUserCount] = useState(0);
+    const [inventoryStats, setInventoryStats] = useState({
+        totalItems: 0,
+        repairItems: 0,
+        totalValue: 0
+    });
 
     useEffect(() => {
+        // Users
         const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
         setUserCount(storedUsers.length);
+
+        // Inventory
+        const storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
+
+        const totalItems = storedItems.length;
+        const repairItems = storedItems.filter(item => item.status === 'repair').length;
+
+        // Calculate total value
+        // Price format is like "14 000 000" or "14 000 000 so'm" -> clean it
+        const totalValue = storedItems.reduce((acc, item) => {
+            const cleanPrice = item.price ? parseInt(item.price.replace(/[^0-9]/g, '')) : 0;
+            return acc + (isNaN(cleanPrice) ? 0 : cleanPrice);
+        }, 0);
+
+        setInventoryStats({
+            totalItems,
+            repairItems,
+            totalValue
+        });
     }, []);
+
+    // Format utility for large numbers
+    const formatValue = (num) => {
+        if (num >= 1000000000) return (num / 1000000000).toFixed(1) + " mlrd";
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + " mln";
+        return num.toLocaleString();
+    };
 
     return (
         <div>
@@ -23,7 +55,7 @@ const AdminDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatsCard
                     title="Jami Jihozlar"
-                    value="1,245"
+                    value={inventoryStats.totalItems}
                     icon={<RiBox3Line size={24} />}
                     trend={12}
                     trendLabel="o'tgan oyga nisbatan"
@@ -41,7 +73,7 @@ const AdminDashboard = () => {
                 />
                 <StatsCard
                     title="Ta'mir talab jihozlar"
-                    value="7"
+                    value={inventoryStats.repairItems}
                     icon={<RiAlertLine size={24} />}
                     trend={-2}
                     trendLabel="kamaydi"
@@ -50,7 +82,7 @@ const AdminDashboard = () => {
                 />
                 <StatsCard
                     title="Umumiy Qiymat"
-                    value="4.5 mlrd so'm"
+                    value={`${formatValue(inventoryStats.totalValue)} so'm`}
                     icon={<RiMoneyDollarCircleLine size={24} />}
                     trend={8.2}
                     trendLabel="o'sish"

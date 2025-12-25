@@ -22,59 +22,66 @@ const InventoryPage = () => {
         }
     }, [location.state]);
 
-    const [items, setItems] = useState([
-        {
-            id: 1,
-            name: "MacBook Pro M1",
-            model: "A2338",
-            serial: "FVFD1234",
-            inn: "123456789",
-            orderNumber: "001",
-            category: "Laptop",
-            building: "Bosh Ofis",
-            location: "2-qavat, 203-xona",
-            status: "working",
-            assignedTo: "Ali Valiyev",
-            purchaseYear: "2021",
-            price: "14 000 000",
-            images: [],
-            pdf: null
-        },
-        {
-            id: 2,
-            name: "Dell Monitor 27\"",
-            model: "P2722H",
-            serial: "CN-0F123",
-            inn: "987654321",
-            orderNumber: "002",
-            category: "Monitor",
-            building: "IT Bo'limi",
-            location: "1-qavat, Server xonasi",
-            status: "working",
-            assignedTo: "Ali Valiyev",
-            purchaseYear: "2022",
-            price: "3 500 000",
-            images: [],
-            pdf: "warranty_dell_p2722h.pdf"
-        },
-        {
-            id: 3,
-            name: "HP LaserJet Pro",
-            model: "M404dn",
-            serial: "PHB12345",
-            inn: "456123789",
-            orderNumber: "003",
-            category: "Printer",
-            building: "Omborxona",
-            location: "Zaxira ombori",
-            status: "repair",
-            assignedTo: "Ofis",
-            purchaseYear: "2020",
-            price: "4 200 000",
-            images: [],
-            pdf: null
-        },
-    ]);
+    const [items, setItems] = useState(() => {
+        const storedItems = localStorage.getItem("inventory_items");
+        return storedItems ? JSON.parse(storedItems) : [
+            {
+                id: 1,
+                name: "MacBook Pro M1",
+                model: "A2338",
+                serial: "FVFD1234",
+                inn: "123456789",
+                orderNumber: "001",
+                category: "Laptop",
+                building: "Bosh Ofis",
+                location: "2-qavat, 203-xona",
+                status: "working",
+                assignedTo: "Ali Valiyev",
+                purchaseYear: "2021",
+                price: "14 000 000",
+                images: [],
+                pdf: null
+            },
+            {
+                id: 2,
+                name: "Dell Monitor 27\"",
+                model: "P2722H",
+                serial: "CN-0F123",
+                inn: "987654321",
+                orderNumber: "002",
+                category: "Monitor",
+                building: "IT Bo'limi",
+                location: "1-qavat, Server xonasi",
+                status: "working",
+                assignedTo: "Ali Valiyev",
+                purchaseYear: "2022",
+                price: "3 500 000",
+                images: [],
+                pdf: "warranty_dell_p2722h.pdf"
+            },
+            {
+                id: 3,
+                name: "HP LaserJet Pro",
+                model: "M404dn",
+                serial: "PHB12345",
+                inn: "456123789",
+                orderNumber: "003",
+                category: "Printer",
+                building: "Omborxona",
+                location: "Zaxira ombori",
+                status: "repair",
+                assignedTo: "Ofis",
+                purchaseYear: "2020",
+                price: "4 200 000",
+                images: [],
+                pdf: null
+            },
+        ];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("inventory_items", JSON.stringify(items));
+    }, [items]);
 
     const handleAddItem = (newItem) => {
         if (selectedItem) {
