@@ -17,32 +17,59 @@ const AdminDashboard = () => {
     const [logs, setLogs] = useState([]);
 
     useEffect(() => {
-        // Users
-        const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
-        setUserCount(storedUsers.length);
+        try {
+            // Users
+            let storedUsers = [];
+            try {
+                storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
+                if (!Array.isArray(storedUsers)) storedUsers = [];
+            } catch (e) {
+                console.error("Failed to parse users", e);
+            }
+            setUserCount(storedUsers.length);
 
-        // Inventory
-        const storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
+            // Inventory
+            let storedItems = [];
+            try {
+                storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
+                if (!Array.isArray(storedItems)) storedItems = [];
+            } catch (e) {
+                console.error("Failed to parse items", e);
+            }
 
-        const totalItems = storedItems.length;
-        const repairItems = storedItems.filter(item => item.status === 'repair').length;
+            const totalItems = storedItems.length;
+            const repairItems = storedItems.filter(item => item && item.status === 'repair').length;
 
-        // Calculate total value
-        // Price format is like "14 000 000" or "14 000 000 so'm" -> clean it
-        const totalValue = storedItems.reduce((acc, item) => {
-            const cleanPrice = item.price ? parseInt(item.price.replace(/[^0-9]/g, '')) : 0;
-            return acc + (isNaN(cleanPrice) ? 0 : cleanPrice);
-        }, 0);
+            // Calculate total value
+            const totalValue = storedItems.reduce((acc, item) => {
+                if (!item || !item.price) return acc;
+                try {
+                    const priceStr = String(item.price);
+                    const cleanPrice = parseInt(priceStr.replace(/[^0-9]/g, ''));
+                    return acc + (isNaN(cleanPrice) ? 0 : cleanPrice);
+                } catch (e) {
+                    return acc;
+                }
+            }, 0);
 
-        setInventoryStats({
-            totalItems,
-            repairItems,
-            totalValue
-        });
+            setInventoryStats({
+                totalItems,
+                repairItems,
+                totalValue
+            });
 
-        // Logs
-        const storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
-        setLogs(storedLogs.slice(0, 5)); // Show recent 5
+            // Logs
+            let storedLogs = [];
+            try {
+                storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
+                if (!Array.isArray(storedLogs)) storedLogs = [];
+            } catch (e) {
+                console.error("Failed to parse logs", e);
+            }
+            setLogs(storedLogs.slice(0, 5));
+        } catch (error) {
+            console.error("Dashboard Error:", error);
+        }
     }, []);
 
     // Format utility for large numbers
