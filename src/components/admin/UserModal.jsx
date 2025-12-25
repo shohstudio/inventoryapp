@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line } from "react-icons/ri";
+import { hashPassword } from "../../utils/crypto";
 
 const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const [formData, setFormData] = useState({
@@ -33,9 +34,19 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave(formData);
+
+        let dataToSave = { ...formData };
+        if (formData.password) {
+            const hashedPassword = await hashPassword(formData.password);
+            dataToSave.password = hashedPassword;
+        } else {
+            // Remove empty password field if editing and not changing password
+            if (user) delete dataToSave.password;
+        }
+
+        onSave(dataToSave);
         onClose();
     };
 
