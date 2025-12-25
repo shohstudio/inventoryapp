@@ -17,9 +17,9 @@ const InventoryPage = () => {
     }, [location.state]);
 
     const [items, setItems] = useState([
-        { id: 1, name: "MacBook Pro M1", model: "A2338", serial: "FVFD1234", category: "Laptop", building: "Bosh Ofis", status: "working", assignedTo: "Ali Valiyev" },
-        { id: 2, name: "Dell Monitor 27\"", model: "P2722H", serial: "CN-0F123", category: "Monitor", building: "IT Bo'limi", status: "working", assignedTo: "Ali Valiyev" },
-        { id: 3, name: "HP LaserJet Pro", model: "M404dn", serial: "PHB12345", category: "Printer", building: "Omborxona", status: "repair", assignedTo: "Ofis" },
+        { id: 1, name: "MacBook Pro M1", model: "A2338", serial: "FVFD1234", category: "Laptop", building: "Bosh Ofis", location: "2-qavat, 203-xona", status: "working", assignedTo: "Ali Valiyev", purchaseYear: "2021", price: "14 000 000" },
+        { id: 2, name: "Dell Monitor 27\"", model: "P2722H", serial: "CN-0F123", category: "Monitor", building: "IT Bo'limi", location: "1-qavat, Server xonasi", status: "working", assignedTo: "Ali Valiyev", purchaseYear: "2022", price: "3 500 000" },
+        { id: 3, name: "HP LaserJet Pro", model: "M404dn", serial: "PHB12345", category: "Printer", building: "Omborxona", location: "Zaxira ombori", status: "repair", assignedTo: "Ofis", purchaseYear: "2020", price: "4 200 000" },
     ]);
 
     const handleAddItem = (newItem) => {
