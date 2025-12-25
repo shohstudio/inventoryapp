@@ -9,6 +9,7 @@ const InventoryPage = () => {
     const location = useLocation();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
         status: 'all',
@@ -155,6 +156,19 @@ const InventoryPage = () => {
 
     // Filter logic
     const filteredItems = items.filter(item => {
+        // Search Filter
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            const matchesSearch =
+                item.name.toLowerCase().includes(query) ||
+                item.model.toLowerCase().includes(query) ||
+                item.serial?.toLowerCase().includes(query) ||
+                item.inn?.includes(query) ||
+                item.orderNumber.includes(query);
+
+            if (!matchesSearch) return false;
+        }
+
         if (filters.status !== "all" && item.status !== filters.status) return false;
         if (filters.category && item.category !== filters.category) return false;
         if (filters.building && item.building !== filters.building) return false;
@@ -188,6 +202,25 @@ const InventoryPage = () => {
             <div className="card border-0 shadow-lg shadow-gray-100/50">
                 {/* Search & Filter Controls */}
                 <div className="flex flex-col gap-4 mb-6">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative flex-1">
+                            <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Qidirish (Nomi, Model, Seriya, INN)..."
+                                className="input pl-10 w-full"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <button
+                            onClick={() => setShowQRScanner(true)}
+                            className="btn bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 px-3"
+                            title="QR Kod orqali qidirish"
+                        >
+                            <RiQrCodeLine size={20} />
+                        </button>
+                    </div>
 
                     <button
                         onClick={() => setShowFilters(!showFilters)}
