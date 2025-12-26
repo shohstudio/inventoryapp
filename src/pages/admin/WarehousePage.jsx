@@ -108,7 +108,7 @@ const WarehousePage = () => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                         <RiArchiveLine className="text-orange-500" />
-                        Omborxona <span className="text-xs text-red-500 font-bold">v1.2 (DEBUG)</span>
+                        Omborxona <span className="text-xs text-gray-400 font-normal">v1.3</span>
                     </h1>
                     <p className="text-gray-500">
                         Zaxiradagi va hisobga olinmagan jihozlar
@@ -201,6 +201,7 @@ const WarehousePage = () => {
                                         {item.warranty}
                                     </span>
                                 </td>
+                                <td className="py-4 px-4 text-gray-900 font-medium">{item.quantity || 1} ta</td>
                                 <td className="py-4 px-4 text-gray-900 font-bold">{item.price} so'm</td>
                                 <td className="py-4 px-4">
                                     {item.images && item.images.length > 0 ? (

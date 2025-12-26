@@ -11,6 +11,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
         supplier: "", // Olingan magazin
         warranty: "", // Kafolat muddati
         price: "",
+        quantity: "1",
         images: []
     });
 
@@ -30,6 +31,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                 supplier: "",
                 warranty: "",
                 price: "",
+                quantity: "1",
                 images: []
             });
         }
@@ -172,6 +174,21 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 value={formData.price}
                                 onChange={handleChange}
                                 placeholder="So'm"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="label">Soni</label>
+                            <input
+                                type="number"
+                                name="quantity"
+                                className="input"
+                                value={formData.quantity}
+                                onChange={handleChange}
+                                min="1"
+                                placeholder="1"
                             />
                         </div>
                     </div>
