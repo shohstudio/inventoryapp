@@ -4,6 +4,7 @@ import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
 import { useAuth } from "../../context/AuthContext";
 
 const WarehousePage = () => {
+    const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");

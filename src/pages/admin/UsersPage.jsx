@@ -3,6 +3,7 @@ import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, 
 import UserModal from "../../components/admin/UserModal";
 
 const UsersPage = () => {
+    const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState(() => {
