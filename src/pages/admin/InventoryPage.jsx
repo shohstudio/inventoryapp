@@ -359,7 +359,7 @@ const InventoryPage = () => {
                                         }`}>
                                         {item.status === 'working' ? 'Ishchi' :
                                             item.status === 'repair' ? 'Ta\'mir talab' :
-                                                item.status === 'written-off' ? 'Spisat qilingan' :
+                                                item.status === 'written-off' ? 'Ro\'yxatdan chiqarilgan' :
                                                     'Buzilgan'}
                                     </span>
                                 </td>

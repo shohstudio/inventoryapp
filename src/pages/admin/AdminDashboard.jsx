@@ -140,7 +140,7 @@ const AdminDashboard = () => {
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
                 <StatsCard
-                    title="Spisat qilingan"
+                    title="Ro'yxatdan chiqarilgan"
                     value={inventoryStats.writtenOffItems}
                     icon={<RiDeleteBinLine size={24} />}
                     trend={inventoryStats.writtenOffItems > 0 ? "+1" : "0"}
