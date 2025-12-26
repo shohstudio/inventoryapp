@@ -10,7 +10,9 @@ const ProfilePage = () => {
         name: user?.name || "Foydalanuvchi",
         phone: user?.phone || "+998 90 123 45 67",
         email: user?.email || "user@inv.uz",
-        role: user?.role === 'admin' ? "Administrator" : "Xodim"
+        role: user?.role === 'admin' ? "Administrator" : "Xodim",
+        pinfl: user?.pinfl || "",
+        department: user?.department || ""
     });
 
     const [passwords, setPasswords] = useState({
@@ -114,18 +116,48 @@ const ProfilePage = () => {
                                         />
                                     </div>
                                 </div>
+                                <div className="relative">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                        <RiMailLine size={18} />
+                                    </span>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={profile.email}
+                                        disabled={true}
+                                        className="input pl-10 bg-gray-50 cursor-not-allowed text-gray-500"
+                                    />
+                                </div>
+
                                 <div>
-                                    <label className="label">Email (Login)</label>
+                                    <label className="label">JSHSHIR (PINFL)</label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                            <RiMailLine size={18} />
+                                            <RiShieldKeyholeLine size={18} />
                                         </span>
                                         <input
-                                            type="email"
-                                            name="email"
-                                            value={profile.email}
+                                            type="text"
+                                            name="pinfl"
+                                            value={profile.pinfl}
                                             disabled={true}
-                                            className="input pl-10 bg-gray-50 cursor-not-allowed text-gray-500"
+                                            className="input pl-10 bg-gray-50 cursor-not-allowed text-gray-500 font-mono"
+                                            placeholder="Kiritilmagan"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="label">Bo'lim / Lavozimi</label>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                                            <RiUserStarLine size={18} />
+                                        </span>
+                                        <input
+                                            type="text"
+                                            name="department"
+                                            value={profile.department}
+                                            onChange={handleProfileChange}
+                                            disabled={!isEditing}
+                                            className="input pl-10"
                                         />
                                     </div>
                                 </div>
@@ -192,8 +224,8 @@ const ProfilePage = () => {
                     </form>
                 </div>
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

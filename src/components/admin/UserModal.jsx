@@ -10,6 +10,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         role: "employee",
         department: "",
         status: "active",
+        pinfl: "",
         password: ""
     });
 
@@ -24,6 +25,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 role: "employee",
                 department: "",
                 status: "active",
+                pinfl: "",
                 password: ""
             });
         }
@@ -157,6 +159,24 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                                 <option value="inactive">Nofaol</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div>
+                        <label className="label">JSHSHIR (PINFL)</label>
+                        <input
+                            type="text"
+                            name="pinfl"
+                            className="input"
+                            value={formData.pinfl}
+                            onChange={(e) => {
+                                const val = e.target.value.replace(/\D/g, '').slice(0, 14);
+                                setFormData(prev => ({ ...prev, pinfl: val }));
+                            }}
+                            placeholder="14 xonali raqam"
+                            minLength={14}
+                            maxLength={14}
+                            required
+                        />
                     </div>
 
                     <div className="pt-4 flex justify-end gap-3">

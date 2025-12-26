@@ -13,6 +13,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         location: "",
         status: "working",
         assignedTo: "",
+        assignedRole: "",
+        assignedPINFL: "",
         images: [],
         pdf: null
     });
@@ -21,6 +23,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (item) {
             setFormData({
                 ...item,
+                assignedPINFL: item.assignedPINFL || "",
+                assignedRole: item.assignedRole || "",
                 images: item.images || [],
                 pdf: item.pdf || null
             });
@@ -37,6 +41,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 location: "",
                 status: "working",
                 assignedTo: "",
+                assignedRole: "",
+                assignedPINFL: "",
                 images: initialData.images || [], // Inherit images
                 pdf: null,
                 price: initialData.price || "" // Inherit price
@@ -53,6 +59,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 location: "",
                 status: "working",
                 assignedTo: "",
+                assignedRole: "",
+                assignedPINFL: "",
                 images: [],
                 pdf: null
             });
@@ -212,16 +220,50 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                         </div>
                     </div>
 
-                    <div>
-                        <label className="label">Javobgar shaxs</label>
-                        <input
-                            type="text"
-                            name="assignedTo"
-                            className="input"
-                            value={formData.assignedTo}
-                            onChange={handleChange}
-                            placeholder="F.I.SH"
-                        />
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                            <RiUserLine /> Javobgar shaxs ma'lumotlari
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="label">F.I.SH</label>
+                                <input
+                                    type="text"
+                                    name="assignedTo"
+                                    className="input bg-white"
+                                    value={formData.assignedTo}
+                                    onChange={handleChange}
+                                    placeholder="Ali Valiyev"
+                                />
+                            </div>
+                            <div>
+                                <label className="label">Lavozimi</label>
+                                <input
+                                    type="text"
+                                    name="assignedRole"
+                                    className="input bg-white"
+                                    value={formData.assignedRole}
+                                    onChange={handleChange}
+                                    placeholder="Hisobchi"
+                                />
+                            </div>
+                            <div>
+                                <label className="label">JSHSHIR (PINFL)</label>
+                                <input
+                                    type="text"
+                                    name="assignedPINFL"
+                                    className="input bg-white"
+                                    value={formData.assignedPINFL}
+                                    onChange={(e) => {
+                                        const val = e.target.value.replace(/\D/g, '').slice(0, 14);
+                                        setFormData(prev => ({ ...prev, assignedPINFL: val }));
+                                    }}
+                                    placeholder="14 xonali raqam"
+                                    minLength={14}
+                                    maxLength={14}
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Image Upload Section */}
