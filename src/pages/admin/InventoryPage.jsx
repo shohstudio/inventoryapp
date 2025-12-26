@@ -194,10 +194,8 @@ const InventoryPage = () => {
         setIsModalOpen(true); // Open the regular ItemModal, it will use selectedWarehouseItem as initialData
     };
 
-    const openModal = (item = null) => {
-        setSelectedItem(item);
-        setIsModalOpen(true);
-    };
+    // Correct `openModal` is already defined above at line 185.
+    // Duplicate removed.
 
     // Filter logic
     const filteredItems = items.filter(item => {
