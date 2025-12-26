@@ -30,70 +30,107 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-cyan-400 via-blue-500 to-purple-500 relative overflow-hidden">
-            {/* Background Decor */}
-            <div className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
-                <div className="absolute top-10 left-10 w-72 h-72 bg-white rounded-full mix-blend-overlay filter blur-3xl animate-pulse"></div>
-                <div className="absolute bottom-10 right-10 w-96 h-96 bg-fuchsia-300 rounded-full mix-blend-overlay filter blur-3xl animate-pulse" style={{ animationDelay: "2s" }}></div>
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-slate-900">
+            {/* Dynamic Animated Background */}
+            <div className="absolute inset-0 w-full h-full">
+                <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-70 animate-blob"></div>
+                <div className="absolute top-[-10%] right-[-10%] w-96 h-96 bg-cyan-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-70 animate-blob animation-delay-2000"></div>
+                <div className="absolute -bottom-32 left-20 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-70 animate-blob animation-delay-4000"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-70 animate-blob"></div>
             </div>
 
-            <div className="glass p-6 md:p-8 rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-md relative z-10 mx-4">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">Xush kelibsiz!</h1>
-                    <p className="text-gray-600">Inventory System ga kirish</p>
+            {/* Grid Pattern Overlay */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+
+            <div className="container relative z-10 mx-auto px-4 flex justify-center perspective-1000">
+                <div className="w-full max-w-md bg-white/10 dark:bg-slate-900/40 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 rounded-3xl shadow-2xl p-8 md:p-12 transform transition-all duration-500 hover:scale-[1.01] hover:shadow-cyan-500/20">
+
+                    {/* Floating Icons Decoration */}
+                    <div className="absolute -top-12 -left-12 w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl rotate-12 flex items-center justify-center shadow-lg animate-float">
+                        <RiUserLine className="text-white text-4xl" />
+                    </div>
+                    <div className="absolute -bottom-10 -right-10 w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl -rotate-12 flex items-center justify-center shadow-lg animate-float animation-delay-2000">
+                        <RiLockPasswordLine className="text-white text-3xl" />
+                    </div>
+
+                    <div className="text-center mb-10 relative">
+                        <div className="inline-block p-4 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 mb-4 animate-pulse">
+                            <h1 className="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-200 drop-shadow-sm">
+                                INVENTAR
+                            </h1>
+                        </div>
+                        <p className="text-gray-300 text-lg font-light tracking-wide">Tizimga kirish</p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {error && (
+                            <div className="bg-red-500/10 border border-red-500/20 text-red-200 p-4 rounded-xl text-sm font-medium flex items-center gap-2 animate-[slideUp_0.3s_ease-out]">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="space-y-2 group">
+                            <label className="text-sm font-medium text-gray-300 ml-1 group-focus-within:text-cyan-400 transition-colors">Login</label>
+                            <div className="relative group focus-within:transform focus-within:scale-[1.02] transition-all duration-300">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-cyan-400 transition-colors">
+                                    <RiUserLine size={22} />
+                                </span>
+                                <input
+                                    type="text"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-medium tracking-wide shadow-inner"
+                                    placeholder="Foydalanuvchi nomi"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 group">
+                            <label className="text-sm font-medium text-gray-300 ml-1 group-focus-within:text-cyan-400 transition-colors">Parol</label>
+                            <div className="relative group focus-within:transform focus-within:scale-[1.02] transition-all duration-300">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-cyan-400 transition-colors">
+                                    <RiLockPasswordLine size={22} />
+                                </span>
+                                <input
+                                    type="password"
+                                    className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-medium tracking-wide shadow-inner"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className={`w-full py-4 mt-4 rounded-xl font-bold text-lg text-white shadow-xl shadow-indigo-500/30 transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 relative overflow-hidden group ${isLoading ? "bg-gray-600 cursor-not-allowed" : "bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 bg-[length:200%_auto] hover:bg-right"
+                                }`}
+                        >
+                            <div className="absolute inset-0 w-full h-full bg-white/20 group-hover:translate-x-full transition-transform duration-700 -skew-x-12 -translate-x-full"></div>
+                            {isLoading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Tekshirilmoqda...
+                                </span>
+                            ) : (
+                                "Tizimga Kirish"
+                            )}
+                        </button>
+                    </form>
+
+                    <div className="mt-8 text-center">
+                        <p className="text-xs text-gray-500">
+                            Muammo bormi? <span className="text-cyan-400 hover:underline cursor-pointer">Admin bilan bog'laning</span>
+                        </p>
+                    </div>
                 </div>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {error && (
-                        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium border border-red-100">
-                            {error}
-                        </div>
-                    )}
-
-                    <div>
-                        <label className="label">Login</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <RiUserLine size={20} />
-                            </span>
-                            <input
-                                type="text"
-                                className="input pl-10"
-                                placeholder="admin"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="label">Parol</label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                <RiLockPasswordLine size={20} />
-                            </span>
-                            <input
-                                type="password"
-                                className="input pl-10"
-                                placeholder="******"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className={`w-full py-3 rounded-lg bg-indigo-600 text-white font-semibold shadow-lg hover:bg-indigo-700 transition-all transform hover:-translate-y-0.5 active:translate-y-0 ${isLoading ? "opacity-70 cursor-not-allowed" : ""
-                            }`}
-                    >
-                        {isLoading ? "Kirish..." : "Kirish"}
-                    </button>
-                </form>
-
             </div>
         </div>
     );
