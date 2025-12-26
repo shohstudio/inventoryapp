@@ -69,8 +69,12 @@ const WarehousePage = () => {
     };
 
     const openModal = (item = null) => {
-        setSelectedItem(item);
-        setIsModalOpen(true);
+        const openModal = (item = null) => {
+            // Debugging functionality
+            console.log("Opening modal", item);
+            setSelectedItem(item);
+            setIsModalOpen(true);
+        };
     };
 
     // Filter logic
