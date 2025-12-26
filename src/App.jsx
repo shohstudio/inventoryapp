@@ -15,46 +15,48 @@ import MyItemsPage from "./pages/employee/MyItemsPage";
 import ReportIssuePage from "./pages/employee/ReportIssuePage";
 import ProfilePage from "./pages/common/ProfilePage";
 
-import { LanguageProvider } from "./context/LanguageContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
   return (
     <HashRouter>
       <AuthProvider>
         <LanguageProvider>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
+          <ThemeProvider>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
 
-            <Route path="/admin/*" element={<ProtectedRoute roles={["admin", "accounter", "warehouseman"]}><AdminLayout /></ProtectedRoute>}>
-              <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="inventory" element={<InventoryPage />} />
-              <Route path="warehouse" element={<WarehousePage />} />
-              <Route path="users" element={
-                <ProtectedRoute roles={["admin"]}>
-                  <UsersPage />
-                </ProtectedRoute>
-              } />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
+              <Route path="/admin/*" element={<ProtectedRoute roles={["admin", "accounter", "warehouseman"]}><AdminLayout /></ProtectedRoute>}>
+                <Route index element={<Navigate to="dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="inventory" element={<InventoryPage />} />
+                <Route path="warehouse" element={<WarehousePage />} />
+                <Route path="users" element={
+                  <ProtectedRoute roles={["admin"]}>
+                    <UsersPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="profile" element={<ProfilePage />} />
+              </Route>
 
-            <Route
-              path="/employee/*"
-              element={
-                <ProtectedRoute roles={["employee"]}>
-                  <EmployeeLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<EmployeeDashboard />} />
-              <Route path="items" element={<MyItemsPage />} />
-              <Route path="report" element={<ReportIssuePage />} />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
+              <Route
+                path="/employee/*"
+                element={
+                  <ProtectedRoute roles={["employee"]}>
+                    <EmployeeLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<EmployeeDashboard />} />
+                <Route path="items" element={<MyItemsPage />} />
+                <Route path="report" element={<ReportIssuePage />} />
+                <Route path="profile" element={<ProfilePage />} />
+              </Route>
 
-            {/* Default Redirect */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-          </Routes>
+              {/* Default Redirect */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </ThemeProvider>
         </LanguageProvider>
       </AuthProvider>
     </HashRouter>

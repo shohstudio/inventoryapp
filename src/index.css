@@ -38,6 +38,28 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+.dark {
+  /* Dynamic Color Palette (Dark Mode) */
+  --primary: #60a5fa;
+  /* Blue-400 */
+  --primary-hover: #3b82f6;
+  /* Blue-500 */
+  --bg-app: #0f172a;
+  /* Slate-900 */
+  --bg-card: #1e293b;
+  /* Slate-800 */
+  --text-main: #f3f4f6;
+  /* Gray-100 */
+  --text-muted: #9ca3af;
+  /* Gray-400 */
+  --border: #334155;
+  /* Slate-700 */
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+}
+
 @layer base {
   * {
     margin: 0;
@@ -76,8 +98,13 @@
     /* Brighter blue-tinted shadow */
     border: 1px solid var(--border);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: var(--bg-card);
+    /* Fallback */
+  }
+
+  /* Specific gradient for light mode if desired, but let's stick to base variables or scope it */
+  :root:not(.dark) .card {
     background: linear-gradient(145deg, #ffffff 0%, #f0f9ff 100%);
-    /* Subtle white-to-blue gradient */
   }
 
   .card:hover {

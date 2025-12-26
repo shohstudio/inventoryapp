@@ -3,10 +3,12 @@ import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine, RiDeleteB
 import StatsCard from "../../components/admin/StatsCard";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
+    const { t } = useLanguage();
     const [userCount, setUserCount] = useState(0);
     const [inventoryStats, setInventoryStats] = useState({
         totalItems: 0,

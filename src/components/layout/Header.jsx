@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
-import { RiNotification3Line, RiSearchLine, RiMenuLine, RiLogoutBoxLine, RiUserLine, RiArrowDownSLine } from "react-icons/ri";
+import { useTheme } from "../../context/ThemeContext";
+import { RiNotification3Line, RiSearchLine, RiMenuLine, RiLogoutBoxLine, RiUserLine, RiArrowDownSLine, RiSunLine, RiMoonLine } from "react-icons/ri";
 
 const Header = ({ onMenuClick }) => {
     const { user, logout } = useAuth();
     const { language, setLanguage, t } = useLanguage();
+    const { theme, toggleTheme } = useTheme();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -16,7 +18,7 @@ const Header = ({ onMenuClick }) => {
     };
 
     return (
-        <header className="h-16 bg-white/80 backdrop-blur-md fixed top-0 right-0 left-0 md:left-64 z-30 transition-all duration-300 border-b border-indigo-50/50 shadow-sm px-6 flex items-center justify-between">
+        <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md fixed top-0 right-0 left-0 md:left-64 z-30 transition-all duration-300 border-b border-indigo-50/50 dark:border-slate-700 shadow-sm px-6 flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
                 <button onClick={onMenuClick} className="md:hidden text-gray-500 hover:text-indigo-600 transition-colors">
                     <RiMenuLine size={24} />
@@ -28,7 +30,7 @@ const Header = ({ onMenuClick }) => {
                     <input
                         type="text"
                         placeholder={t('search')}
-                        className="w-full pl-10 pr-4 py-2 rounded-full border-none bg-gray-100 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition-all text-sm outline-none"
+                        className="w-full pl-10 pr-4 py-2 rounded-full border-none bg-gray-100 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-indigo-100 transition-all text-sm outline-none dark:text-gray-100 placeholder-gray-400"
                     />
                 </div>
             </div>
@@ -36,8 +38,16 @@ const Header = ({ onMenuClick }) => {
             <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 mr-2">
                     <button
+                        onClick={toggleTheme}
+                        className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-gray-100 dark:hover:text-indigo-400 dark:hover:bg-slate-800 transition-all"
+                        title={theme === 'dark' ? "Light Mode" : "Dark Mode"}
+                    >
+                        {theme === 'dark' ? <RiSunLine size={20} /> : <RiMoonLine size={20} />}
+                    </button>
+                    <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1"></div>
+                    <button
                         onClick={() => setLanguage('uz')}
-                        className={`p-1.5 rounded-lg transition-all ${language === 'uz' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 grayscale hover:grayscale-0'}`}
+                        className={`p-1.5 rounded-lg transition-all ${language === 'uz' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 dark:hover:bg-slate-800 grayscale hover:grayscale-0'}`}
                         title="O'zbekcha (Lotin)"
                     >
                         <span className="text-xl">🇺🇿</span>
