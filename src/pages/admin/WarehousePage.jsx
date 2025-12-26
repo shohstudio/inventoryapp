@@ -240,6 +240,7 @@ const WarehousePage = () => {
             {/* Modals */}
             {isModalOpen && (
                 <WarehouseItemModal
+                    isOpen={isModalOpen}
                     item={selectedItem}
                     onClose={() => setIsModalOpen(false)}
                     onSave={handleAddItem}
