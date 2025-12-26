@@ -102,14 +102,14 @@ const AdminDashboard = () => {
     return (
         <div>
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-800">Boshqaruv Paneli</h1>
+                <h1 className="text-2xl font-bold text-gray-800">{t('dashboard')}</h1>
                 <p className="text-gray-500">Bugungi statistika va muhim o'zgarishlar</p>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatsCard
-                    title="Jami Jihozlar"
+                    title={t('total_items')}
                     value={inventoryStats.totalItems}
                     icon={<RiBox3Line size={24} />}
                     trend={12}
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
 
                 {user?.role === 'admin' && (
                     <StatsCard
-                        title="Foydalanuvchilar"
+                        title={t('users')}
                         value={userCount}
                         icon={<RiUserLine size={24} />}
                         trend={5}
@@ -131,7 +131,7 @@ const AdminDashboard = () => {
                 )}
 
                 <StatsCard
-                    title="Ta'mir talab jihozlar"
+                    title={t('repair_items')}
                     value={inventoryStats.repairItems}
                     icon={<RiAlertLine size={24} />}
                     trend={-2}
@@ -140,7 +140,7 @@ const AdminDashboard = () => {
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
                 <StatsCard
-                    title="Ro'yxatdan chiqarilgan"
+                    title={t('written_off_items')}
                     value={inventoryStats.writtenOffItems}
                     icon={<RiDeleteBinLine size={24} />}
                     trend={inventoryStats.writtenOffItems > 0 ? "+1" : "0"}
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
                     onClick={() => navigate("/admin/inventory", { state: { filter: "written-off" } })}
                 />
                 <StatsCard
-                    title="Umumiy Qiymat"
+                    title={t('total_value')}
                     value={`${formatValue(inventoryStats.totalValue)} so'm`}
                     icon={<RiMoneyDollarCircleLine size={24} />}
                     trend={8.2}
@@ -168,7 +168,7 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="card">
-                    <h3 className="font-bold text-gray-800 mb-4">Saytdagi yangiliklar (Logs)</h3>
+                    <h3 className="font-bold text-gray-800 mb-4">{t('actions')}</h3>
                     <div className="space-y-4">
                         {logs.length > 0 ? (
                             logs.map((log) => (
@@ -186,7 +186,7 @@ const AdminDashboard = () => {
                                 </div>
                             ))
                         ) : (
-                            <p className="text-sm text-gray-400 text-center py-4">Hozircha yangiliklar yo'q</p>
+                            <p className="text-sm text-gray-400 text-center py-4">{t('no_data')}</p>
                         )}
                     </div>
                 </div>

@@ -109,10 +109,10 @@ const WarehousePage = () => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                         <RiArchiveLine className="text-orange-500" />
-                        Omborxona <span className="text-xs text-gray-400 font-normal">v1.3</span>
+                        {t('warehouse')} <span className="text-xs text-gray-400 font-normal">v1.3</span>
                     </h1>
                     <p className="text-gray-500">
-                        Zaxiradagi va hisobga olinmagan jihozlar
+                        {t('inventory_subtitle')}
                     </p>
                 </div>
                 <button
@@ -120,7 +120,7 @@ const WarehousePage = () => {
                     className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
                 >
                     <RiAddLine size={20} />
-                    Omborga qo'shish
+                    {t('warehouse_add')}
                 </button>
             </div>
 
@@ -132,7 +132,7 @@ const WarehousePage = () => {
                             <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Ombordan qidirish..."
+                                placeholder={t('search')}
                                 className="input pl-10 w-full focus:ring-orange-500 focus:border-orange-500"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -146,7 +146,7 @@ const WarehousePage = () => {
                         className={`btn gap-2 transition-colors ${showFilters ? 'bg-orange-50 text-orange-600 border-orange-200' : 'btn-outline text-gray-600'}`}
                     >
                         <RiFilter3Line />
-                        Filter
+                        {t('filter')}
                     </button>
                 </div>
 

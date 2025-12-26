@@ -52,16 +52,16 @@ const UsersPage = () => {
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-                        Foydalanuvchilar
+                        {t('users')}
                     </h1>
-                    <p className="text-gray-500">Tizim foydalanuvchilari ro'yxati</p>
+                    <p className="text-gray-500">Tizim foydalanuvchilarini boshqarish</p>
                 </div>
                 <button
                     onClick={() => openModal()}
                     className="btn btn-primary shadow-lg shadow-indigo-200"
                 >
                     <RiAddLine size={20} />
-                    Yangi Foydalanuvchi
+                    {t('add_new')}
                 </button>
             </div>
 
@@ -72,7 +72,7 @@ const UsersPage = () => {
                     </span>
                     <input
                         type="text"
-                        placeholder="Ism yoki email orqali qidirish..."
+                        placeholder={t('search')}
                         className="input pl-10"
                     />
                 </div>
@@ -81,11 +81,11 @@ const UsersPage = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="border-b border-gray-100 text-gray-500 text-sm">
-                                <th className="py-4 px-4 font-medium">Foydalanuvchi</th>
+                                <th className="py-4 px-4 font-medium">{t('name')}</th>
                                 <th className="py-4 px-4 font-medium">Bo'lim</th>
-                                <th className="py-4 px-4 font-medium">Rol</th>
+                                <th className="py-4 px-4 font-medium">Role</th>
                                 <th className="py-4 px-4 font-medium">Holati</th>
-                                <th className="py-4 px-4 font-medium text-right">Amallar</th>
+                                <th className="py-4 px-4 font-medium text-right">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -114,7 +114,7 @@ const UsersPage = () => {
                                                 <RiUserLine />
                                             )}
                                             <span className="capitalize">
-                                                {user.role === 'accounter' ? 'Hisobchi' : user.role}
+                                                {t(`role_${user.role}`)}
                                             </span>
                                         </div>
                                     </td>
