@@ -15,6 +15,7 @@ import MyItemsPage from "./pages/employee/MyItemsPage";
 import ReportIssuePage from "./pages/employee/ReportIssuePage";
 import ProfilePage from "./pages/common/ProfilePage";
 
+import { LanguageProvider } from "./context/LanguageContext";
 import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
