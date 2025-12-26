@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine } from "react-icons/ri";
-import ItemModal from "../../components/admin/ItemModal";
+import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
 import { useAuth } from "../../context/AuthContext";
 
 const WarehousePage = () => {
@@ -147,29 +147,6 @@ const WarehousePage = () => {
                                 ))}
                             </select>
                         </div>
-                        <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Bino</label>
-                            <select
-                                className="input w-full"
-                                value={filters.building}
-                                onChange={(e) => setFilters(prev => ({ ...prev, building: e.target.value }))}
-                            >
-                                <option value="">Barchasi</option>
-                                {uniqueBuildings.map(build => (
-                                    <option key={build} value={build}>{build}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Joylashgan joyi</label>
-                            <input
-                                type="text"
-                                className="input w-full"
-                                placeholder="Xona yoki bo'lim..."
-                                value={filters.location}
-                                onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-                            />
-                        </div>
                     </div>
                 )}
             </div>
@@ -180,12 +157,12 @@ const WarehousePage = () => {
                     <thead>
                         <tr className="border-b border-gray-100 text-gray-500 text-sm">
                             <th className="py-4 px-4 font-medium">Tartib raqami</th>
-                            <th className="py-4 px-4 font-medium">Nomi</th>
-                            <th className="py-4 px-4 font-medium">INN</th>
-                            <th className="py-4 px-4 font-medium">Sotib olingan yili</th>
-                            <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
-                            <th className="py-4 px-4 font-medium">Bino</th>
-                            <th className="py-4 px-4 font-medium">Holati</th>
+                            <th className="py-4 px-4 font-medium">Nomi / Model</th>
+                            <th className="py-4 px-4 font-medium">Kelgan Kuni</th>
+                            <th className="py-4 px-4 font-medium">Ishlab chiqarilgan</th>
+                            <th className="py-4 px-4 font-medium">Magazin (Yetkazib beruvchi)</th>
+                            <th className="py-4 px-4 font-medium">Kafolat</th>
+                            <th className="py-4 px-4 font-medium">Narxi</th>
                             <th className="py-4 px-4 font-medium">Rasm</th>
                             <th className="py-4 px-4 font-medium text-right">Amallar</th>
                         </tr>
@@ -198,25 +175,15 @@ const WarehousePage = () => {
                                     <div className="font-medium text-gray-900">{item.name}</div>
                                     <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
                                 </td>
-                                <td className="py-4 px-4 text-gray-600 font-mono text-xs">{item.inn}</td>
-                                <td className="py-4 px-4 text-gray-600">{item.purchaseYear}</td>
-                                <td className="py-4 px-4 text-gray-900 font-medium">{item.price} so'm</td>
+                                <td className="py-4 px-4 text-gray-600">{item.arrivalDate}</td>
+                                <td className="py-4 px-4 text-gray-600">{item.manufactureYear}</td>
+                                <td className="py-4 px-4 text-indigo-600 font-medium">{item.supplier}</td>
                                 <td className="py-4 px-4">
-                                    <div className="text-gray-900">{item.building}</div>
-                                    <div className="text-xs text-gray-400">{item.location}</div>
-                                </td>
-                                <td className="py-4 px-4">
-                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-50 text-green-600' :
-                                        item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
-                                            item.status === 'written-off' ? 'bg-gray-100 text-gray-500 line-through' :
-                                                'bg-red-50 text-red-600'
-                                        }`}>
-                                        {item.status === 'working' ? 'Ishchi' :
-                                            item.status === 'repair' ? 'Ta\'mir talab' :
-                                                item.status === 'written-off' ? 'Spisat qilingan' :
-                                                    'Buzilgan'}
+                                    <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
+                                        {item.warranty}
                                     </span>
                                 </td>
+                                <td className="py-4 px-4 text-gray-900 font-bold">{item.price} so'm</td>
                                 <td className="py-4 px-4">
                                     {item.images && item.images.length > 0 ? (
                                         <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
@@ -254,7 +221,7 @@ const WarehousePage = () => {
             </div>
             {/* Modals */}
             {isModalOpen && (
-                <ItemModal
+                <WarehouseItemModal
                     item={selectedItem}
                     onClose={() => setIsModalOpen(false)}
                     onSave={handleAddItem}
