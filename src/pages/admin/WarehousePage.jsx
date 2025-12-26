@@ -27,31 +27,45 @@ const WarehousePage = () => {
     const { user } = useAuth();
 
     const handleAddItem = (newItem) => {
-        const storedLogs = JSON.parse(localStorage.getItem("warehouse_logs") || "[]"); // Separate logs
-        const timestamp = new Date().toISOString();
-        let logAction = "";
+        try {
+            const storedLogs = JSON.parse(localStorage.getItem("warehouse_logs") || "[]");
+            const timestamp = new Date().toISOString();
+            let logAction = "";
 
-        if (selectedItem) {
-            setItems(items.map(i => i.id === selectedItem.id ? { ...newItem, id: selectedItem.id } : i));
-            logAction = "tahrirladi";
-        } else {
-            const nextOrderNum = (items.length + 1).toString().padStart(3, '0');
-            setItems([...items, { ...newItem, id: Date.now(), orderNumber: nextOrderNum }]);
-            logAction = "qo'shdi";
+            if (selectedItem) {
+                setItems(items.map(i => i.id === selectedItem.id ? { ...newItem, id: selectedItem.id } : i));
+                logAction = "tahrirladi";
+            } else {
+                const nextOrderNum = (items.length + 1).toString().padStart(3, '0');
+                // Ensure newItem fields have defaults if missing
+                const itemToAdd = {
+                    ...newItem,
+                    status: 'working', // Default status for filtering compatibility
+                    id: Date.now(),
+                    orderNumber: nextOrderNum
+                };
+                setItems([...items, itemToAdd]);
+                logAction = "qo'shdi";
+            }
+
+            // Add Log
+            const newLog = {
+                id: Date.now(),
+                userName: user?.name || "Noma'lum",
+                userRole: user?.role,
+                action: logAction,
+                itemName: newItem.name,
+                timestamp: timestamp
+            };
+
+            const updatedLogs = [newLog, ...storedLogs].slice(0, 50);
+            localStorage.setItem("warehouse_logs", JSON.stringify(updatedLogs));
+            // Success feedback could be a toast, but for now we proceed silently or use a simple alert if requested
+            // alert("Muvaffaqiyatli saqlandi!"); 
+        } catch (error) {
+            console.error("Error adding item:", error);
+            alert("Xatolik yuz berdi: " + error.message);
         }
-
-        // Add Log (Optional: if we want to track warehouse history separately)
-        const newLog = {
-            id: Date.now(),
-            userName: user?.name || "Noma'lum",
-            userRole: user?.role,
-            action: logAction,
-            itemName: newItem.name,
-            timestamp: timestamp
-        };
-
-        const updatedLogs = [newLog, ...storedLogs].slice(0, 50);
-        localStorage.setItem("warehouse_logs", JSON.stringify(updatedLogs));
     };
 
     const openModal = (item = null) => {
