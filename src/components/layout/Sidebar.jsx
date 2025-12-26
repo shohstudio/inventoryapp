@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine } from "react-icons/ri";
+import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine, RiArchiveLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import clsx from "clsx";
 
@@ -10,6 +10,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     const links = [
         { name: "Dashboard", path: "/admin", icon: <RiDashboardLine size={20} /> },
         { name: "Invertar", path: "/admin/inventory", icon: <RiBox3Line size={20} /> },
+        { name: "Ombor", path: "/admin/warehouse", icon: <RiArchiveLine size={20} /> },
         // Only show Users link to admin
         ...(user?.role === 'admin' ? [{ name: "Foydalanuvchilar", path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
         { name: "Profil", path: "/admin/profile", icon: <RiUserSettingsLine size={20} /> },

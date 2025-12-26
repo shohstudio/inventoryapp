@@ -8,6 +8,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import AdminLayout from "./components/layout/AdminLayout";
 import InventoryPage from "./pages/admin/InventoryPage";
+import WarehousePage from "./pages/admin/WarehousePage";
 import UsersPage from "./pages/admin/UsersPage";
 import EmployeeLayout from "./components/layout/EmployeeLayout";
 import MyItemsPage from "./pages/employee/MyItemsPage";
@@ -25,6 +26,7 @@ function App() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="inventory" element={<InventoryPage />} />
+            <Route path="warehouse" element={<WarehousePage />} />
             <Route path="users" element={
               <ProtectedRoute roles={["admin"]}>
                 <UsersPage />
