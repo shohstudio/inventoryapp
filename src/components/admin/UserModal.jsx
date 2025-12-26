@@ -56,8 +56,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
-                <div className="flex justify-between items-center p-6 border-b border-gray-100">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
                     <h2 className="text-xl font-bold text-gray-800">
                         {user ? "Foydalanuvchini tahrirlash" : "Yangi xodim qo'shish"}
                     </h2>
