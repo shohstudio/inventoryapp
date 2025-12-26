@@ -344,6 +344,7 @@ const InventoryPage = () => {
             {/* Modals */}
             {isModalOpen && (
                 <ItemModal
+                    isOpen={isModalOpen}
                     item={selectedItem}
                     onClose={() => setIsModalOpen(false)}
                     onSave={handleAddItem}
