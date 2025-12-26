@@ -1,7 +1,7 @@
 {
   "name": "inventory-app",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "homepage": "https://shohstudio.github.io/inventoryapp",
   "type": "module",
   "scripts": {
