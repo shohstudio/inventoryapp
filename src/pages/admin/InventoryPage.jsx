@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLanguage } from "../../context/LanguageContext";
 import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionModal";
@@ -8,6 +9,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const InventoryPage = () => {
     const location = useLocation();
+    const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -227,10 +229,10 @@ const InventoryPage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-                        Invertar <span className="text-xs text-gray-400 font-normal">v1.2</span>
+                        {t('inventory_title')} <span className="text-xs text-gray-400 font-normal">v1.2</span>
                     </h1>
                     <p className="text-gray-500">
-                        {filters.status === 'repair' ? "Ta'mir talab jihozlar" : "Barcha jihozlar ro'yxati"}
+                        {filters.status === 'repair' ? t('repair_subtitle') : t('inventory_subtitle')}
                     </p>
                 </div>
                 <div className="flex gap-2">
@@ -239,14 +241,14 @@ const InventoryPage = () => {
                         className="btn bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
                     >
                         <RiStackLine size={20} className="mr-2" />
-                        Ombordan biriktirish
+                        {t('attach_warehouse')}
                     </button>
                     <button
                         onClick={() => openModal()}
                         className="btn btn-primary shadow-lg shadow-indigo-200"
                     >
                         <RiAddLine size={20} />
-                        Yangi qo'shish
+                        {t('add_new')}
                     </button>
                 </div>
             </div>
@@ -325,15 +327,15 @@ const InventoryPage = () => {
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="border-b border-gray-100 text-gray-500 text-sm">
-                            <th className="py-4 px-4 font-medium">Tartib raqami</th>
-                            <th className="py-4 px-4 font-medium">Nomi</th>
-                            <th className="py-4 px-4 font-medium">INN</th>
-                            <th className="py-4 px-4 font-medium">Sotib olingan yili</th>
-                            <th className="py-4 px-4 font-medium">Xozirgi qiymati</th>
-                            <th className="py-4 px-4 font-medium">Bino</th>
-                            <th className="py-4 px-4 font-medium">Holati</th>
-                            <th className="py-4 px-4 font-medium">Rasm</th>
-                            <th className="py-4 px-4 font-medium text-right">Amallar</th>
+                            <th className="py-4 px-4 font-medium">{t('order_number')}</th>
+                            <th className="py-4 px-4 font-medium">{t('name')}</th>
+                            <th className="py-4 px-4 font-medium">{t('inn')}</th>
+                            <th className="py-4 px-4 font-medium">{t('purchase_year')}</th>
+                            <th className="py-4 px-4 font-medium">{t('current_value')}</th>
+                            <th className="py-4 px-4 font-medium">{t('building')}</th>
+                            <th className="py-4 px-4 font-medium">{t('status')}</th>
+                            <th className="py-4 px-4 font-medium">{t('image')}</th>
+                            <th className="py-4 px-4 font-medium text-right">{t('actions')}</th>
                         </tr>
                     </thead>
                     <tbody>

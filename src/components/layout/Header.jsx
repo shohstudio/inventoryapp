@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 import { RiNotification3Line, RiSearchLine, RiMenuLine, RiLogoutBoxLine, RiUserLine, RiArrowDownSLine } from "react-icons/ri";
 
 const Header = ({ onMenuClick }) => {
     const { user, logout } = useAuth();
+    const { language, setLanguage, t } = useLanguage();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -25,13 +27,37 @@ const Header = ({ onMenuClick }) => {
                     </span>
                     <input
                         type="text"
-                        placeholder="Qidirish..."
+                        placeholder={t('search')}
                         className="w-full pl-10 pr-4 py-2 rounded-full border-none bg-gray-100 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition-all text-sm outline-none"
                     />
                 </div>
             </div>
 
             <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 mr-2">
+                    <button
+                        onClick={() => setLanguage('uz')}
+                        className={`p-1.5 rounded-lg transition-all ${language === 'uz' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 grayscale hover:grayscale-0'}`}
+                        title="O'zbekcha (Lotin)"
+                    >
+                        <span className="text-xl">🇺🇿</span>
+                    </button>
+                    <button
+                        onClick={() => setLanguage('oz')}
+                        className={`p-1.5 rounded-lg transition-all ${language === 'oz' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 grayscale hover:grayscale-0'}`}
+                        title="O'zbekcha (Kirill)"
+                    >
+                        <span className="text-xl font-serif">Ўз</span>
+                    </button>
+                    <button
+                        onClick={() => setLanguage('ru')}
+                        className={`p-1.5 rounded-lg transition-all ${language === 'ru' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 grayscale hover:grayscale-0'}`}
+                        title="Русский"
+                    >
+                        <span className="text-xl">🇷🇺</span>
+                    </button>
+                </div>
+
                 <button className="relative p-2 text-gray-500 hover:text-indigo-600 transition-colors">
                     <RiNotification3Line size={20} />
                     <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
