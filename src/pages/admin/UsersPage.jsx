@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, RiDeleteBinLine, RiCalculatorLine } from "react-icons/ri";
 import UserModal from "../../components/admin/UserModal";
+import { useLanguage } from "../../context/LanguageContext";
 
 const UsersPage = () => {
     const { t } = useLanguage();

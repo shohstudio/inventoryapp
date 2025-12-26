@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine } from "react-icons/ri";
 import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
 import { useAuth } from "../../context/AuthContext";
+import { useLanguage } from "../../context/LanguageContext";
 
 const WarehousePage = () => {
     const { t } = useLanguage();
