@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine } from "react-icons/ri";
 
-const ItemModal = ({ isOpen, onClose, onSave, item }) => {
+const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const [formData, setFormData] = useState({
         name: "",
         model: "",
@@ -9,8 +9,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
         inn: "",
         orderNumber: "",
         category: "",
-        building: "Bosh Ofis", // Default value
-        location: "", // Room/Spot
+        building: "Bosh Ofis",
+        location: "",
         status: "working",
         assignedTo: "",
         images: [],
@@ -23,6 +23,23 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                 ...item,
                 images: item.images || [],
                 pdf: item.pdf || null
+            });
+        } else if (initialData) {
+            // Pre-fill from warehouse data
+            setFormData({
+                name: initialData.name || "",
+                model: initialData.model || "",
+                serial: "", // Warehouse items might not have serials yet, or user needs to input it
+                inn: "",
+                orderNumber: "",
+                category: initialData.category || "",
+                building: "Bosh Ofis",
+                location: "",
+                status: "working",
+                assignedTo: "",
+                images: initialData.images || [], // Inherit images
+                pdf: null,
+                price: initialData.price || "" // Inherit price
             });
         } else {
             setFormData({
@@ -40,7 +57,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                 pdf: null
             });
         }
-    }, [item, isOpen]);
+    }, [item, initialData, isOpen]);
 
     if (!isOpen) return null;
 

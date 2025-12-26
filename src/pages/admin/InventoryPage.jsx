@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiCloseCircleLine, RiImage2Line, RiQrCodeLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
+import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionModal";
 import QRScannerModal from "../../components/admin/QRScannerModal";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -116,18 +117,52 @@ const InventoryPage = () => {
 
     const { user } = useAuth();
 
+    const [isWarehouseModalOpen, setIsWarehouseModalOpen] = useState(false);
+    const [selectedWarehouseItem, setSelectedWarehouseItem] = useState(null);
+
     const handleAddItem = (newItem) => {
         const storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
         const timestamp = new Date().toISOString();
         let logAction = "";
+
+        // NEW: Handle Warehouse Update if item came from warehouse
+        if (selectedWarehouseItem) {
+            const warehouseItems = JSON.parse(localStorage.getItem("warehouse_items") || "[]");
+            const updatedWarehouseItems = warehouseItems.map(wItem => {
+                if (wItem.id === selectedWarehouseItem.id) {
+                    return { ...wItem, quantity: Math.max(0, parseInt(wItem.quantity) - 1) };
+                }
+                return wItem;
+            });
+            localStorage.setItem("warehouse_items", JSON.stringify(updatedWarehouseItems));
+
+            // Add Log for Warehouse
+            const warehouseLogs = JSON.parse(localStorage.getItem("warehouse_logs") || "[]");
+            warehouseLogs.unshift({
+                id: Date.now() + 1, // Slight offset
+                userName: user?.name,
+                userRole: user?.role,
+                action: "inventarga o'tkazdi",
+                itemName: newItem.name,
+                timestamp: timestamp
+            });
+            localStorage.setItem("warehouse_logs", JSON.stringify(warehouseLogs.slice(0, 50)));
+        }
 
         if (selectedItem) {
             setItems(items.map(i => i.id === selectedItem.id ? { ...newItem, id: selectedItem.id } : i));
             logAction = "tahrirladi";
         } else {
             const nextOrderNum = (items.length + 1).toString().padStart(3, '0');
-            setItems([...items, { ...newItem, id: Date.now(), orderNumber: nextOrderNum }]);
-            logAction = "qo'shdi";
+            // Inherit price from warehouse item if available and not overridden
+            const finalItem = {
+                ...newItem,
+                id: Date.now(),
+                orderNumber: nextOrderNum,
+                // If it was from warehouse, we might want to store that link? For now, not strict.
+            };
+            setItems([...items, finalItem]);
+            logAction = selectedWarehouseItem ? "ombordan biriktirdi" : "qo'shdi";
         }
 
         // Add Log
@@ -142,6 +177,21 @@ const InventoryPage = () => {
 
         const updatedLogs = [newLog, ...storedLogs].slice(0, 50); // Keep last 50 logs
         localStorage.setItem("inventory_logs", JSON.stringify(updatedLogs));
+
+        // Reset
+        setSelectedWarehouseItem(null);
+    };
+
+    const openModal = (item = null) => {
+        setSelectedItem(item);
+        setSelectedWarehouseItem(null); // Clear warehouse selection if regular open
+        setIsModalOpen(true);
+    };
+
+    const handleSelectFromWarehouse = (wItem) => {
+        setSelectedWarehouseItem(wItem);
+        setIsWarehouseModalOpen(false);
+        setIsModalOpen(true); // Open the regular ItemModal, it will use selectedWarehouseItem as initialData
     };
 
     const openModal = (item = null) => {
@@ -185,13 +235,22 @@ const InventoryPage = () => {
                         {filters.status === 'repair' ? "Ta'mir talab jihozlar" : "Barcha jihozlar ro'yxati"}
                     </p>
                 </div>
-                <button
-                    onClick={() => openModal()}
-                    className="btn btn-primary shadow-lg shadow-indigo-200"
-                >
-                    <RiAddLine size={20} />
-                    Yangi qo'shish
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setIsWarehouseModalOpen(true)}
+                        className="btn bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
+                    >
+                        <RiStackLine size={20} className="mr-2" />
+                        Ombordan biriktirish
+                    </button>
+                    <button
+                        onClick={() => openModal()}
+                        className="btn btn-primary shadow-lg shadow-indigo-200"
+                    >
+                        <RiAddLine size={20} />
+                        Yangi qo'shish
+                    </button>
+                </div>
             </div>
 
             <div className="card border-0 shadow-lg shadow-gray-100/50">
@@ -346,10 +405,20 @@ const InventoryPage = () => {
                 <ItemModal
                     isOpen={isModalOpen}
                     item={selectedItem}
-                    onClose={() => setIsModalOpen(false)}
+                    initialData={selectedWarehouseItem}
+                    onClose={() => {
+                        setIsModalOpen(false);
+                        setSelectedWarehouseItem(null);
+                    }}
                     onSave={handleAddItem}
                 />
             )}
+
+            <WarehouseSelectionModal
+                isOpen={isWarehouseModalOpen}
+                onClose={() => setIsWarehouseModalOpen(false)}
+                onSelect={handleSelectFromWarehouse}
+            />
 
 
         </div>
