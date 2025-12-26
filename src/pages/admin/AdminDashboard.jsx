@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine } from "react-icons/ri";
+import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine, RiDeleteBinLine } from "react-icons/ri";
 import StatsCard from "../../components/admin/StatsCard";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -11,6 +11,7 @@ const AdminDashboard = () => {
     const [inventoryStats, setInventoryStats] = useState({
         totalItems: 0,
         repairItems: 0,
+        writtenOffItems: 0,
         totalValue: 0
     });
 
@@ -39,10 +40,14 @@ const AdminDashboard = () => {
 
             const totalItems = storedItems.length;
             const repairItems = storedItems.filter(item => item && item.status === 'repair').length;
+            const writtenOffItems = storedItems.filter(item => item && item.status === 'written-off').length;
 
             // Calculate total value
             const totalValue = storedItems.reduce((acc, item) => {
                 if (!item || !item.price) return acc;
+                // Exclude written-off items from total value calculation
+                if (item.status === 'written-off') return acc;
+
                 try {
                     const priceStr = String(item.price);
                     const cleanPrice = parseInt(priceStr.replace(/[^0-9]/g, ''));
@@ -55,6 +60,7 @@ const AdminDashboard = () => {
             setInventoryStats({
                 totalItems,
                 repairItems,
+                writtenOffItems,
                 totalValue
             });
 
@@ -132,6 +138,15 @@ const AdminDashboard = () => {
                     trendLabel="kamaydi"
                     color="orange"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
+                />
+                <StatsCard
+                    title="Spisat qilingan"
+                    value={inventoryStats.writtenOffItems}
+                    icon={<RiDeleteBinLine size={24} />}
+                    trend={inventoryStats.writtenOffItems > 0 ? "+1" : "0"}
+                    trendLabel="yangi"
+                    color="red"
+                    onClick={() => navigate("/admin/inventory", { state: { filter: "written-off" } })}
                 />
                 <StatsCard
                     title="Umumiy Qiymat"

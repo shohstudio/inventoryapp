@@ -164,6 +164,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item }) => {
                             >
                                 <option value="working">Ishchi</option>
                                 <option value="repair">Ta'mir talab</option>
+                                <option value="written-off">Spisat qilingan</option>
                                 <option value="broken">Buzilgan</option>
                             </select>
                         </div>

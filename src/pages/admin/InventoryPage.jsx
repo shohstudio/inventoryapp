@@ -25,38 +25,8 @@ const InventoryPage = () => {
         }
     }, [location.state]);
 
+
     const [showQRScanner, setShowQRScanner] = useState(false);
-
-    useEffect(() => {
-        // Users
-        const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
-        // No need to set user count here, just loading items
-
-        // The items state is already initialized from localStorage or mock data
-        // const storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
-        // If empty and not initialized, you might want to load mock data or keep empty
-        // For now trusting storedItems or empty array
-        // if (storedItems.length > 0) {
-        //    setItems(storedItems);
-        // }
-    }, []);
-
-    const handleScanSuccess = (decodedText) => {
-        // Search by ID, OrderNumber or Serial
-        const foundItem = items.find(item =>
-            String(item.id) === decodedText ||
-            item.orderNumber === decodedText ||
-            item.inn === decodedText ||
-            item.serial?.toLowerCase() === decodedText.toLowerCase()
-        );
-
-        if (foundItem) {
-            openModal(foundItem);
-        } else {
-            alert(`Jihoz topilmadi. QR Kod: ${decodedText}`);
-        }
-        setShowQRScanner(false);
-    };
 
     const [items, setItems] = useState(() => {
         const storedItems = localStorage.getItem("inventory_items");
@@ -111,13 +81,38 @@ const InventoryPage = () => {
                 price: "4 200 000",
                 images: [],
                 pdf: null
-            },
+            }
         ];
     });
+
+    // Handle Global QR Scan Navigation
+    useEffect(() => {
+        if (location.state?.scanCode) {
+            handleScanSuccess(location.state.scanCode);
+            // Clear state to prevent reopening on refresh
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state]);
 
     useEffect(() => {
         localStorage.setItem("inventory_items", JSON.stringify(items));
     }, [items]);
+
+    const handleScanSuccess = (decodedText) => {
+        // Search by ID, OrderNumber or Serial
+        const foundItem = items.find(item =>
+            String(item.id) === decodedText ||
+            item.orderNumber === decodedText ||
+            item.inn === decodedText ||
+            item.serial?.toLowerCase() === decodedText.toLowerCase()
+        );
+
+        if (foundItem) {
+            openModal(foundItem);
+        } else {
+            alert(`Jihoz topilmadi. QR Kod: ${decodedText}`);
+        }
+    };
 
     const { user } = useAuth();
 
@@ -213,13 +208,7 @@ const InventoryPage = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-                        <button
-                            onClick={() => setShowQRScanner(true)}
-                            className="btn bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 px-3"
-                            title="QR Kod orqali qidirish"
-                        >
-                            <RiQrCodeLine size={20} />
-                        </button>
+
                     </div>
 
                     <button
@@ -308,9 +297,13 @@ const InventoryPage = () => {
                                 <td className="py-4 px-4">
                                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-50 text-green-600' :
                                         item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
-                                            'bg-red-50 text-red-600'
+                                            item.status === 'written-off' ? 'bg-gray-100 text-gray-500 line-through' :
+                                                'bg-red-50 text-red-600'
                                         }`}>
-                                        {item.status === 'working' ? 'Ishchi' : item.status === 'repair' ? 'Ta\'mir talab' : 'Buzilgan'}
+                                        {item.status === 'working' ? 'Ishchi' :
+                                            item.status === 'repair' ? 'Ta\'mir talab' :
+                                                item.status === 'written-off' ? 'Spisat qilingan' :
+                                                    'Buzilgan'}
                                     </span>
                                 </td>
                                 <td className="py-4 px-4">
@@ -357,20 +350,7 @@ const InventoryPage = () => {
                 />
             )}
 
-            <QRScannerModal
-                isOpen={showQRScanner}
-                onClose={() => setShowQRScanner(false)}
-                onScanSuccess={handleScanSuccess}
-            />
 
-            {/* Mobile Floating QR Scan Button */}
-            <button
-                onClick={() => setShowQRScanner(true)}
-                className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-lg shadow-indigo-300 hover:bg-indigo-700 active:scale-95 transition-all md:hidden"
-                aria-label="Scan QR Code"
-            >
-                <RiQrCodeLine size={28} />
-            </button>
         </div>
     );
 
