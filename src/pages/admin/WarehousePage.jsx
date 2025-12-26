@@ -100,13 +100,15 @@ const WarehousePage = () => {
     const uniqueCategories = [...new Set(items.map(item => item.category))];
     const uniqueBuildings = [...new Set(items.map(item => item.building))];
 
+    console.log("WarehousePage Rendered"); // Verify render
+
     return (
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                         <RiArchiveLine className="text-orange-500" />
-                        Omborxona <span className="text-xs text-gray-400 font-normal">v1.2</span>
+                        Omborxona <span className="text-xs text-red-500 font-bold">v1.2 (DEBUG)</span>
                     </h1>
                     <p className="text-gray-500">
                         Zaxiradagi va hisobga olinmagan jihozlar
