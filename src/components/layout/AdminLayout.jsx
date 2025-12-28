@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import MobileBottomNav from "./MobileBottomNav"; // Import
 import QRScannerModal from "../admin/QRScannerModal";
 import { RiQrCodeLine } from "react-icons/ri";
 
@@ -17,7 +18,7 @@ const AdminLayout = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-20 md:pb-0">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-24 md:pb-0">
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
             <Header onMenuClick={() => setIsSidebarOpen(true)} />
 
@@ -41,14 +42,8 @@ const AdminLayout = () => {
                 onScanSuccess={handleScanSuccess}
             />
 
-            {/* Global Mobile Floating QR Scan Button */}
-            <button
-                onClick={() => setShowQRScanner(true)}
-                className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-lg shadow-indigo-300 hover:bg-indigo-700 active:scale-95 transition-all md:hidden"
-                aria-label="Scan QR Code"
-            >
-                <RiQrCodeLine size={28} />
-            </button>
+            {/* PWA Mobile Bottom Navigation */}
+            <MobileBottomNav onScanClick={() => setShowQRScanner(true)} />
         </div>
     );
 };
