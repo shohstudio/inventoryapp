@@ -309,14 +309,28 @@ const InventoryPage = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Joylashgan joyi</label>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('location')}</label>
                             <input
                                 type="text"
                                 className="input w-full"
-                                placeholder="Xona yoki bo'lim..."
+                                placeholder={t('location') + "..."}
                                 value={filters.location}
                                 onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
                             />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('status')}</label>
+                            <select
+                                className="input w-full"
+                                value={filters.status}
+                                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                            >
+                                <option value="all">{t('all')}</option>
+                                <option value="working">{t('status_working')}</option>
+                                <option value="repair">{t('status_repair')}</option>
+                                <option value="written-off">{t('status_written_off')}</option>
+                                <option value="broken">{t('status_broken')}</option>
+                            </select>
                         </div>
                     </div>
                 )}

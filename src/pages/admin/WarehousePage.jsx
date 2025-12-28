@@ -155,16 +155,30 @@ const WarehousePage = () => {
                 {showFilters && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Kategoriya</label>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('category')}</label>
                             <select
                                 className="input w-full"
                                 value={filters.category}
                                 onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
                             >
-                                <option value="">Barchasi</option>
+                                <option value="">{t('all')}</option>
                                 {uniqueCategories.map(cat => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('status')}</label>
+                            <select
+                                className="input w-full"
+                                value={filters.status}
+                                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                            >
+                                <option value="all">{t('all')}</option>
+                                <option value="working">{t('status_working')}</option>
+                                <option value="repair">{t('status_repair')}</option>
+                                <option value="written-off">{t('status_written_off')}</option>
+                                <option value="broken">{t('status_broken')}</option>
                             </select>
                         </div>
                     </div>
