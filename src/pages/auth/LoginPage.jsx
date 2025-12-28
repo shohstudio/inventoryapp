@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { RiLockPasswordLine, RiUserLine } from "react-icons/ri";
+import { RiLockPasswordLine, RiUserLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 
 const LoginPage = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
@@ -94,13 +95,20 @@ const LoginPage = () => {
                                     <RiLockPasswordLine size={22} />
                                 </span>
                                 <input
-                                    type="password"
-                                    className="w-full pl-12 pr-4 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-medium tracking-wide shadow-inner"
+                                    type={showPassword ? "text" : "password"}
+                                    className="w-full pl-12 pr-12 py-4 bg-slate-800/50 border border-slate-600 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all font-medium tracking-wide shadow-inner"
                                     placeholder="••••••••"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-cyan-400 transition-colors focus:outline-none"
+                                >
+                                    {showPassword ? <RiEyeOffLine size={22} /> : <RiEyeLine size={22} />}
+                                </button>
                             </div>
                         </div>
 
