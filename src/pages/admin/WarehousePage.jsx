@@ -172,73 +172,75 @@ const WarehousePage = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="border-b border-gray-100 text-gray-500 text-sm">
-                            <th className="py-4 px-4 font-medium">Tartib raqami</th>
-                            <th className="py-4 px-4 font-medium">Nomi / Model</th>
-                            <th className="py-4 px-4 font-medium">Kelgan Kuni</th>
-                            <th className="py-4 px-4 font-medium">Ishlab chiqarilgan</th>
-                            <th className="py-4 px-4 font-medium">Magazin (Yetkazib beruvchi)</th>
-                            <th className="py-4 px-4 font-medium">Kafolat</th>
-                            <th className="py-4 px-4 font-medium">Narxi</th>
-                            <th className="py-4 px-4 font-medium">Rasm</th>
-                            <th className="py-4 px-4 font-medium text-right">Amallar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredItems.map((item) => (
-                            <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
-                                <td className="py-4 px-4 text-gray-600 font-medium">#{item.orderNumber}</td>
-                                <td className="py-4 px-4">
-                                    <div className="font-medium text-gray-900">{item.name}</div>
-                                    <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
-                                </td>
-                                <td className="py-4 px-4 text-gray-600">{item.arrivalDate}</td>
-                                <td className="py-4 px-4 text-gray-600">{item.manufactureYear}</td>
-                                <td className="py-4 px-4 text-indigo-600 font-medium">{item.supplier}</td>
-                                <td className="py-4 px-4">
-                                    <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
-                                        {item.warranty}
-                                    </span>
-                                </td>
-                                <td className="py-4 px-4 text-gray-900 font-medium">{item.quantity || 1} ta</td>
-                                <td className="py-4 px-4 text-gray-900 font-bold">{item.price} so'm</td>
-                                <td className="py-4 px-4">
-                                    {item.images && item.images.length > 0 ? (
-                                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
-                                            <img
-                                                src={item.images[0]}
-                                                alt={item.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                                            <RiImage2Line size={20} />
-                                        </div>
-                                    )}
-                                </td>
-                                <td className="py-4 px-4 text-right">
-                                    <button
-                                        onClick={() => openModal(item)}
-                                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
-                                    >
-                                        <RiMore2Fill size={20} />
-                                    </button>
-                                </td>
+            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden mt-6">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-blue-600 text-white">
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Tartib raqami</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Nomi / Model</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Kelgan Kuni</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Ishlab chiqarilgan</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Magazin (Yetkazib beruvchi)</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Kafolat</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Narxi</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Rasm</th>
+                                <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">Amallar</th>
                             </tr>
-                        ))}
-                        {filteredItems.length === 0 && (
-                            <tr>
-                                <td colSpan="9" className="text-center py-8 text-gray-500">
-                                    Omborda jihozlar yo'q
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {filteredItems.map((item) => (
+                                <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
+                                    <td className="py-4 px-6 text-gray-600 font-medium">#{item.orderNumber}</td>
+                                    <td className="py-4 px-6">
+                                        <div className="font-medium text-gray-900">{item.name}</div>
+                                        <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
+                                    </td>
+                                    <td className="py-4 px-6 text-gray-600">{item.arrivalDate}</td>
+                                    <td className="py-4 px-6 text-gray-600">{item.manufactureYear}</td>
+                                    <td className="py-4 px-6 text-indigo-600 font-medium">{item.supplier}</td>
+                                    <td className="py-4 px-6">
+                                        <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
+                                            {item.warranty}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6 text-gray-900 font-medium">{item.quantity || 1} ta</td>
+                                    <td className="py-4 px-6 text-gray-900 font-bold">{item.price} so'm</td>
+                                    <td className="py-4 px-6">
+                                        {item.images && item.images.length > 0 ? (
+                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                <img
+                                                    src={item.images[0]}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <RiImage2Line size={20} />
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-6 text-right">
+                                        <button
+                                            onClick={() => openModal(item)}
+                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                        >
+                                            <RiMore2Fill size={20} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredItems.length === 0 && (
+                                <tr>
+                                    <td colSpan="9" className="text-center py-8 text-gray-500">
+                                        Omborda jihozlar yo'q
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             {/* Modals */}
             {isModalOpen && (

@@ -78,73 +78,75 @@ const UsersPage = () => {
                     />
                 </div>
 
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="border-b border-gray-100 text-gray-500 text-sm">
-                                <th className="py-4 px-4 font-medium">{t('name')}</th>
-                                <th className="py-4 px-4 font-medium">Bo'lim</th>
-                                <th className="py-4 px-4 font-medium">Role</th>
-                                <th className="py-4 px-4 font-medium">Holati</th>
-                                <th className="py-4 px-4 font-medium text-right">{t('actions')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {users.map((user) => (
-                                <tr key={user.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
-                                    <td className="py-4 px-4">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                                                {user.name.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div className="font-medium text-gray-900">{user.name}</div>
-                                                <div className="text-xs text-indigo-500 font-mono">@{user.username}</div>
-                                                <div className="text-xs text-gray-400">{user.email}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-4 text-gray-600">{user.department}</td>
-                                    <td className="py-4 px-4">
-                                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                                            {user.role === 'admin' ? (
-                                                <RiShieldKeyholeLine className="text-indigo-500" />
-                                            ) : user.role === 'accounter' ? (
-                                                <RiCalculatorLine className="text-blue-500" />
-                                            ) : (
-                                                <RiUserLine />
-                                            )}
-                                            <span className="capitalize">
-                                                {t(`role_${user.role}`)}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-4">
-                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${user.status === 'active' ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-500'
-                                            }`}>
-                                            {user.status === 'active' ? 'Faol' : 'Nofaol'}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-4 text-right flex justify-end gap-2">
-                                        <button
-                                            onClick={() => openModal(user)}
-                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
-                                            title="Tahrirlash"
-                                        >
-                                            <RiMore2Fill size={20} />
-                                        </button>
-                                        <button
-                                            onClick={() => handleDeleteUser(user.id)}
-                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
-                                            title="O'chirish"
-                                        >
-                                            <RiDeleteBinLine size={20} />
-                                        </button>
-                                    </td>
+                <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden mt-6">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-blue-600 text-white">
+                                    <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('name')}</th>
+                                    <th className="py-4 px-6 font-semibold text-sm">Bo'lim</th>
+                                    <th className="py-4 px-6 font-semibold text-sm">Role</th>
+                                    <th className="py-4 px-6 font-semibold text-sm">Holati</th>
+                                    <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {users.map((user) => (
+                                    <tr key={user.id} className="hover:bg-gray-50/80 transition-colors group">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                                                    {user.name.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-gray-900">{user.name}</div>
+                                                    <div className="text-xs text-indigo-500 font-mono">@{user.username}</div>
+                                                    <div className="text-xs text-gray-400">{user.email}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6 text-gray-600">{user.department}</td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                                                {user.role === 'admin' ? (
+                                                    <RiShieldKeyholeLine className="text-indigo-500" />
+                                                ) : user.role === 'accounter' ? (
+                                                    <RiCalculatorLine className="text-blue-500" />
+                                                ) : (
+                                                    <RiUserLine />
+                                                )}
+                                                <span className="capitalize">
+                                                    {t(`role_${user.role}`)}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                                                }`}>
+                                                {user.status === 'active' ? 'Faol' : 'Nofaol'}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-6 text-right flex justify-end gap-2">
+                                            <button
+                                                onClick={() => openModal(user)}
+                                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                                title="Tahrirlash"
+                                            >
+                                                <RiMore2Fill size={20} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteUser(user.id)}
+                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                                title="O'chirish"
+                                            >
+                                                <RiDeleteBinLine size={20} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 

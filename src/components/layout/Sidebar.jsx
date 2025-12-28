@@ -21,24 +21,24 @@ const Sidebar = ({ isOpen, onClose }) => {
 
     return (
         <div className={`
-            fixed top-0 left-0 h-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-r border-indigo-100/50 dark:border-slate-800 shadow-2xl z-40 transition-transform duration-300 ease-in-out
+            fixed top-0 left-0 h-full bg-[#1e1b4b] border-r border-indigo-900/50 shadow-2xl z-40 transition-transform duration-300 ease-in-out
             md:translate-x-0 w-64
             ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}>
-            <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">I</div>
-                    <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+            <div className="p-6 border-b border-indigo-900/50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">I</div>
+                    <span className="text-xl font-bold text-white tracking-tight">
                         Invertar
                     </span>
                 </div>
                 {/* Mobile Close Button */}
-                <button onClick={onClose} className="md:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <button onClick={onClose} className="md:hidden text-indigo-300 hover:text-white transition-colors">
                     <RiCloseLine size={24} />
                 </button>
             </div>
 
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto mt-2">
                 {links.map((link) => {
                     const isActive = pathname === link.path || (link.path !== "/admin" && pathname.startsWith(link.path));
                     return (
@@ -46,23 +46,25 @@ const Sidebar = ({ isOpen, onClose }) => {
                             key={link.path}
                             to={link.path}
                             className={clsx(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium",
+                                "flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 font-medium",
                                 isActive
-                                    ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shadow-sm"
-                                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-slate-800 dark:hover:text-gray-100"
+                                    ? "bg-white/10 text-white shadow-inner backdrop-blur-sm border border-white/5"
+                                    : "text-indigo-300/80 hover:bg-white/5 hover:text-white"
                             )}
                         >
-                            {link.icon}
+                            <span className={clsx("transition-transform duration-200", isActive ? "scale-110" : "")}>
+                                {link.icon}
+                            </span>
                             <span>{link.name}</span>
                         </Link>
                     );
                 })}
             </nav>
 
-            <div className="p-4 border-t border-gray-100 dark:border-slate-800">
+            <div className="p-4 border-t border-indigo-900/50">
                 <button
                     onClick={logout}
-                    className="flex items-center gap-3 w-full px-4 py-3 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 rounded-xl transition-colors font-medium"
+                    className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-xl transition-colors font-medium"
                 >
                     <RiLogoutBoxLine size={20} />
                     <span>Chiqish</span>

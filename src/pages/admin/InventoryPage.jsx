@@ -323,82 +323,84 @@ const InventoryPage = () => {
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="border-b border-gray-100 text-gray-500 text-sm">
-                            <th className="py-4 px-4 font-medium">{t('order_number')}</th>
-                            <th className="py-4 px-4 font-medium">{t('name')}</th>
-                            <th className="py-4 px-4 font-medium">{t('inn')}</th>
-                            <th className="py-4 px-4 font-medium">{t('purchase_year')}</th>
-                            <th className="py-4 px-4 font-medium">{t('current_value')}</th>
-                            <th className="py-4 px-4 font-medium">{t('building')}</th>
-                            <th className="py-4 px-4 font-medium">{t('status')}</th>
-                            <th className="py-4 px-4 font-medium">{t('image')}</th>
-                            <th className="py-4 px-4 font-medium text-right">{t('actions')}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredItems.map((item) => (
-                            <tr key={item.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors group">
-                                <td className="py-4 px-4 text-gray-600 font-medium">#{item.orderNumber}</td>
-                                <td className="py-4 px-4">
-                                    <div className="font-medium text-gray-900">{item.name}</div>
-                                    <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
-                                </td>
-                                <td className="py-4 px-4 text-gray-600 font-mono text-xs">{item.inn}</td>
-                                <td className="py-4 px-4 text-gray-600">{item.purchaseYear}</td>
-                                <td className="py-4 px-4 text-gray-900 font-medium">{item.price} so'm</td>
-                                <td className="py-4 px-4">
-                                    <div className="text-gray-900">{item.building}</div>
-                                    <div className="text-xs text-gray-400">{item.location}</div>
-                                </td>
-                                <td className="py-4 px-4">
-                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-50 text-green-600' :
-                                        item.status === 'repair' ? 'bg-orange-50 text-orange-600' :
-                                            item.status === 'written-off' ? 'bg-gray-100 text-gray-500 line-through' :
-                                                'bg-red-50 text-red-600'
-                                        }`}>
-                                        {item.status === 'working' ? 'Ishchi' :
-                                            item.status === 'repair' ? 'Ta\'mir talab' :
-                                                item.status === 'written-off' ? 'Ro\'yxatdan chiqarilgan' :
-                                                    'Buzilgan'}
-                                    </span>
-                                </td>
-                                <td className="py-4 px-4">
-                                    {item.images && item.images.length > 0 ? (
-                                        <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
-                                            <img
-                                                src={item.images[0]}
-                                                alt={item.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                                            <RiImage2Line size={20} />
-                                        </div>
-                                    )}
-                                </td>
-                                <td className="py-4 px-4 text-right">
-                                    <button
-                                        onClick={() => openModal(item)}
-                                        className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
-                                    >
-                                        <RiMore2Fill size={20} />
-                                    </button>
-                                </td>
+            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-blue-600 text-white">
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('order_number')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('name')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('inn')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('purchase_year')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('current_value')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('building')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('status')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('image')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
                             </tr>
-                        ))}
-                        {filteredItems.length === 0 && (
-                            <tr>
-                                <td colSpan="9" className="text-center py-8 text-gray-500">
-                                    Jihozlar topilmadi
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {filteredItems.map((item) => (
+                                <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
+                                    <td className="py-4 px-6 text-gray-800 font-medium">#{item.orderNumber}</td>
+                                    <td className="py-4 px-6">
+                                        <div className="font-medium text-gray-900">{item.name}</div>
+                                        <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
+                                    </td>
+                                    <td className="py-4 px-6 text-gray-600 font-mono text-xs">{item.inn}</td>
+                                    <td className="py-4 px-6 text-gray-600">{item.purchaseYear}</td>
+                                    <td className="py-4 px-6 text-gray-900 font-medium">{item.price} so'm</td>
+                                    <td className="py-4 px-6">
+                                        <div className="text-gray-900">{item.building}</div>
+                                        <div className="text-xs text-gray-400">{item.location}</div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.status === 'working' ? 'bg-green-100 text-green-700' :
+                                            item.status === 'repair' ? 'bg-orange-100 text-orange-700' :
+                                                item.status === 'written-off' ? 'bg-gray-100 text-gray-500 line-through' :
+                                                    'bg-red-100 text-red-700'
+                                            }`}>
+                                            {item.status === 'working' ? 'Ishchi' :
+                                                item.status === 'repair' ? 'Ta\'mir talab' :
+                                                    item.status === 'written-off' ? 'Ro\'yxatdan chiqarilgan' :
+                                                        'Buzilgan'}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        {item.images && item.images.length > 0 ? (
+                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                <img
+                                                    src={item.images[0]}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <RiImage2Line size={20} />
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="py-4 px-6 text-right">
+                                        <button
+                                            onClick={() => openModal(item)}
+                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                        >
+                                            <RiMore2Fill size={20} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {filteredItems.length === 0 && (
+                                <tr>
+                                    <td colSpan="9" className="text-center py-12 text-gray-500">
+                                        Jihozlar topilmadi
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
             {/* Modals */}
             {isModalOpen && (

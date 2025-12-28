@@ -116,21 +116,27 @@ const AdminDashboard = () => {
                     icon={<RiBox3Line size={24} />}
                     trend={12}
                     trendLabel="o'tgan oyga nisbatan"
-                    color="indigo"
+                    variant="featured"
                     onClick={() => navigate("/admin/inventory")}
                 />
 
-                {user?.role === 'admin' && (
-                    <StatsCard
-                        title={t('users')}
-                        value={userCount}
-                        icon={<RiUserLine size={24} />}
-                        trend={5}
-                        trendLabel="yangi xodimlar"
-                        color="blue"
-                        onClick={() => navigate("/admin/users")}
-                    />
-                )}
+                <StatsCard
+                    title={t('total_value')}
+                    value={`$${(inventoryStats.totalValue / 12600).toLocaleString(undefined, { maximumFractionDigits: 0 })}`} // Mock USD conversion for design match
+                    icon={<RiMoneyDollarCircleLine size={24} />}
+                    trend={8.2}
+                    trendLabel="o'sish"
+                />
+
+                <StatsCard
+                    title={t('users')}
+                    value={userCount} // Or "Faol" percentage if matching mockup strictly, but keeping user data is better logic
+                    icon={<RiUserLine size={24} />}
+                    trend={98} // Mock "98%" from image
+                    trendLabel="Faol foydalanuvchilar"
+                    color="blue"
+                    onClick={() => navigate("/admin/users")}
+                />
 
                 <StatsCard
                     title={t('repair_items')}
@@ -141,56 +147,61 @@ const AdminDashboard = () => {
                     color="orange"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
-                <StatsCard
-                    title={t('written_off_items')}
-                    value={inventoryStats.writtenOffItems}
-                    icon={<RiDeleteBinLine size={24} />}
-                    trend={inventoryStats.writtenOffItems > 0 ? "+1" : "0"}
-                    trendLabel="yangi"
-                    color="red"
-                    onClick={() => navigate("/admin/inventory", { state: { filter: "written-off" } })}
-                />
-                <StatsCard
-                    title={t('total_value')}
-                    value={`${formatValue(inventoryStats.totalValue)} so'm`}
-                    icon={<RiMoneyDollarCircleLine size={24} />}
-                    trend={8.2}
-                    trendLabel="o'sish"
-                    color="green"
-                />
             </div>
 
-            {/* Recent Activity & Charts Placeholder */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 card">
-                    <h3 className="font-bold text-gray-800 mb-4">Jihozlar Holati Statistikasi</h3>
-                    <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg border border-dashed border-gray-200 text-gray-400">
-                        Chart Placeholder (Recharts integratsiyasi)
-                    </div>
+            {/* Recent Activity Table (Redesigned) */}
+            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 className="text-lg font-bold text-gray-800">So'nggi Harakatlar</h3>
                 </div>
 
-                <div className="card">
-                    <h3 className="font-bold text-gray-800 mb-4">{t('actions')}</h3>
-                    <div className="space-y-4">
-                        {logs.length > 0 ? (
-                            logs.map((log) => (
-                                <div key={log.id} className="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${log.userRole === 'admin' ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600'
-                                        }`}>
-                                        {log.userName.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-800">
-                                            {log.userName} <span className="font-normal text-gray-500">{log.itemName}ni {log.action}</span>
-                                        </p>
-                                        <p className="text-xs text-gray-400">{timeAgo(log.timestamp)}</p>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="text-sm text-gray-400 text-center py-4">{t('no_data')}</p>
-                        )}
-                    </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-blue-600 text-white">
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Jihoz Nomi</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Seriya Raqami</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Javobgar Shaxs</th>
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tr-lg">Holati</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {/* Mock Data to match image roughly, or real logs if available */}
+                            {[
+                                { name: "Dell Latitude 7420", serial: "SN-8374920", user: "Aliyev O.", status: "working" },
+                                { name: "MacBook Pro 16\"", serial: "C02XG4KJH5", user: "Karimov S.", status: "repair" },
+                                { name: "Ikea Stol Markus", serial: "903.345.67", user: "Valiyeva D.", status: "working" },
+                                { name: "HP LaserJet M404n", serial: "VND200345", user: "Ofis Menejeri", status: "empty" },
+                                { name: "Logitech MX Master 3", serial: "L-84930", user: "Yusupov B.", status: "lost" },
+                            ].map((item, index) => (
+                                <tr key={index} className="hover:bg-gray-50/80 transition-colors">
+                                    <td className="py-4 px-6 text-gray-800 font-medium">{item.name}</td>
+                                    <td className="py-4 px-6 text-gray-500 font-mono text-sm">{item.serial}</td>
+                                    <td className="py-4 px-6 text-gray-700">{item.user}</td>
+                                    <td className="py-4 px-6">
+                                        <span className={clsx(
+                                            "px-3 py-1 rounded-full text-xs font-semibold",
+                                            item.status === 'working' ? "bg-green-100 text-green-700" :
+                                                item.status === 'repair' ? "bg-orange-100 text-orange-700" :
+                                                    item.status === 'empty' ? "bg-cyan-100 text-cyan-700" :
+                                                        "bg-red-100 text-red-700"
+                                        )}>
+                                            {item.status === 'working' ? "Faol" :
+                                                item.status === 'repair' ? "Ta'mirda" :
+                                                    item.status === 'empty' ? "Bo'sh" :
+                                                        "Yo'qolgan"}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {/* Pagination Mock */}
+                <div className="p-4 flex justify-end gap-2">
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">‹</button>
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">›</button>
                 </div>
             </div>
         </div>

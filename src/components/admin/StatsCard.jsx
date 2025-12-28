@@ -1,68 +1,62 @@
 import clsx from "clsx";
 
-const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", onClick }) => {
-    // Static color definitions for Tailwind JIT to detect
-    const colorVariants = {
-        indigo: {
-            iconBg: "bg-indigo-500 text-indigo-600 group-hover:bg-indigo-100",
-            blob: "bg-indigo-500",
-            text: "text-indigo-600"
-        },
-        blue: {
-            iconBg: "bg-blue-500 text-blue-600 group-hover:bg-blue-100",
-            blob: "bg-blue-500",
-            text: "text-blue-600"
-        },
-        orange: {
-            iconBg: "bg-orange-500 text-orange-600 group-hover:bg-orange-100",
-            blob: "bg-orange-500",
-            text: "text-orange-600"
-        },
-        green: {
-            iconBg: "bg-emerald-500 text-emerald-600 group-hover:bg-emerald-100",
-            blob: "bg-emerald-500",
-            text: "text-emerald-600"
-        }
-    };
-
-    const currentTheme = colorVariants[color] || colorVariants.indigo;
+const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", onClick, variant = "default" }) => {
+    const isFeatured = variant === "featured";
 
     return (
         <div
             onClick={onClick}
             className={clsx(
-                "card relative overflow-hidden group",
-                onClick && "cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                "relative overflow-hidden rounded-[20px] transition-all duration-300 group",
+                onClick && "cursor-pointer hover:-translate-y-1 active:scale-[0.98]",
+                isFeatured
+                    ? "bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 shadow-lg shadow-indigo-100/50"
+                    : "bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
             )}
         >
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-gray-500 text-sm font-medium mb-1">{title}</p>
-                    <h3 className="text-3xl font-bold text-gray-800">{value}</h3>
+            <div className="p-6 relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                    <p className={clsx(
+                        "text-sm font-semibold tracking-wide",
+                        isFeatured ? "text-indigo-600" : "text-gray-500"
+                    )}>{title}</p>
+                    {isFeatured && (
+                        <div className="p-2 bg-white rounded-lg shadow-sm text-indigo-600">
+                            {icon}
+                        </div>
+                    )}
                 </div>
-                <div className={clsx(
-                    "p-3 rounded-xl bg-opacity-10 transition-colors",
-                    currentTheme.iconBg
-                )}>
-                    {icon}
+
+                <div className="flex items-end gap-3 mb-2">
+                    <h3 className={clsx(
+                        "text-4xl font-extrabold tracking-tight",
+                        isFeatured ? "text-indigo-900" : "text-gray-800"
+                    )}>{value}</h3>
+                </div>
+
+                <div className="flex items-center text-sm font-medium">
+                    <span className={clsx(
+                        "flex items-center gap-1 px-2 py-0.5 rounded-md",
+                        trend > 0
+                            ? (isFeatured ? "bg-indigo-100 text-indigo-700" : "bg-green-50 text-green-600")
+                            : "bg-red-50 text-red-600"
+                    )}>
+                        {trend > 0 ? "+" : ""}{trend}%
+                    </span>
+                    <span className={clsx(
+                        "ml-2 text-xs",
+                        isFeatured ? "text-indigo-400" : "text-gray-400"
+                    )}>{trendLabel}</span>
                 </div>
             </div>
 
-            <div className="mt-4 flex items-center text-sm">
-                <span className={clsx(
-                    "font-medium flex items-center gap-1",
-                    trend > 0 ? "text-green-600" : "text-red-500"
-                )}>
-                    {trend > 0 ? "+" : ""}{trend}%
-                </span>
-                <span className="text-gray-400 ml-2">{trendLabel}</span>
-            </div>
-
-            {/* Decorative Background Blob */}
-            <div className={clsx(
-                "absolute -bottom-4 -right-4 w-24 h-24 rounded-full opacity-5 blur-2xl transition-all group-hover:opacity-10",
-                currentTheme.blob
-            )}></div>
+            {/* Decorative Elements for Featured Card */}
+            {isFeatured && (
+                <>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-400/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2"></div>
+                </>
+            )}
         </div>
     );
 };
