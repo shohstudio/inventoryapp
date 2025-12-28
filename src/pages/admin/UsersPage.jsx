@@ -14,6 +14,7 @@ const UsersPage = () => {
                 { id: 1, name: "Admin User", username: "admin", email: "admin@inv.uz", role: "admin", status: "active", department: "IT Department", password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918" },
                 { id: 2, name: "Ali Valiyev", username: "user", email: "ali@inv.uz", role: "employee", status: "active", department: "HR", password: "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb" },
                 { id: 3, name: "Vali Aliyev", username: "vali", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" },
+                { id: 4, name: "Jamshid Latipov", username: "ombor", email: "ombor@inv.uz", role: "warehouseman", status: "active", department: "Warehouse", password: "c06b3c8d08cf1fc55edac0e880108fbac645019fb7649c279cbc79c3f18c48a1" },
             ];
 
             // Cleanup Guli Karimova if she exists from previous sessions

@@ -78,7 +78,7 @@ export const translations = {
         category_stats: "Kategoriyalar statistikasi",
 
         // User Roles
-        role_admin: "Admin",
+        role_admin: "Administrator",
         role_employee: "Xodim",
         role_accounter: "Hisobchi",
         role_warehouseman: "Omborchi"
