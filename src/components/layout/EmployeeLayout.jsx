@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { RiHomeLine, RiFileListLine, RiAlertLine, RiLogoutBoxRLine, RiUserLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
+import Header from "./Header";
 import clsx from "clsx";
 
 const EmployeeLayout = () => {
@@ -15,7 +16,7 @@ const EmployeeLayout = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-20 md:pb-0">
             {/* Desktop Sidebar (Simplified) */}
             <div className="hidden md:flex flex-col w-64 fixed left-0 top-0 h-screen bg-[#1e1b4b] border-r border-indigo-900/50 shadow-2xl z-40 transition-transform duration-300 ease-in-out">
                 <div className="p-6 border-b border-indigo-900/50 flex items-center gap-3">
@@ -51,8 +52,11 @@ const EmployeeLayout = () => {
                 </div>
             </div>
 
+            {/* Header */}
+            <Header />
+
             {/* Main Content */}
-            <main className="md:ml-64 p-6">
+            <main className="md:ml-64 p-6 pt-24 transition-all duration-300">
                 <Outlet />
             </main>
 
