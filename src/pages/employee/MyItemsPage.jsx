@@ -59,7 +59,7 @@ const MyItemsPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {myItems.map((item) => (
-                    <div key={item.id} className="card group hover:border-indigo-200 transition-colors">
+                    <div key={item.id} className="bg-white rounded-[20px] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
                             <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                                 <RiComputerLine size={24} />
@@ -72,17 +72,22 @@ const MyItemsPage = () => {
                         </div>
 
                         <h3 className="font-bold text-lg text-gray-800 mb-1">{item.name}</h3>
-                        <p className="text-sm text-gray-500 mb-4">{item.category} • {item.serial}</p>
+                        <div className="flex items-center text-sm text-gray-500 mb-4 gap-2">
+                            <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">{item.category}</span>
+                            <span>•</span>
+                            <span className="font-mono text-xs text-gray-400">{item.serial}</span>
+                        </div>
 
                         {item.assignedPINFL && (
-                            <div className="mb-4 text-xs bg-gray-50 p-2 rounded text-gray-600 font-mono">
-                                PINFL: {item.assignedPINFL}
+                            <div className="mb-4 text-xs bg-gray-50 p-2 rounded-lg text-gray-600 font-mono border border-gray-100">
+                                <span className="text-gray-400 mr-2">PINFL:</span>
+                                {item.assignedPINFL}
                             </div>
                         )}
 
-                        <div className="pt-4 border-t border-gray-100 text-xs text-gray-400 flex justify-between items-center">
+                        <div className="pt-4 border-t border-gray-100 text-xs text-gray-400 flex justify-between items-center mt-auto">
                             <span>Biriktirilgan sana:</span>
-                            <span className="font-medium text-gray-600">{item.dateAssigned}</span>
+                            <span className="font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded">{item.dateAssigned}</span>
                         </div>
                     </div>
                 ))}

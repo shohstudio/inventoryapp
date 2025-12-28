@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { RiFileListLine, RiAlertLine, RiNotification3Line, RiCheckDoubleLine, RiTimeLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
+import StatsCard from "../../components/admin/StatsCard";
 
 const EmployeeDashboard = () => {
     const { user } = useAuth();
@@ -32,57 +33,82 @@ const EmployeeDashboard = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {stats.map((stat, index) => (
-                    <Link
-                        to={stat.link}
-                        key={index}
-                        className="card border-0 shadow-lg shadow-gray-100/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className={`p-4 rounded-2xl ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
-                                {stat.icon}
-                            </div>
-                            <div>
-                                <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
-                                <h3 className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</h3>
-                            </div>
-                        </div>
-                    </Link>
-                ))}
+                <StatsCard
+                    title="Mening jihozlarim"
+                    value="12"
+                    icon={<RiFileListLine size={24} />}
+                    variant="featured"
+                    onClick={() => { }} // Could be wrapped in Link or use navigate
+                    trend={12}
+                    trendLabel="ta"
+                />
+                <StatsCard
+                    title="Faol so'rovlar"
+                    value="1"
+                    icon={<RiAlertLine size={24} />}
+                    variant="featured"
+                    onClick={() => { }}
+                    trend={1}
+                    trendLabel="faol"
+                />
+                <StatsCard
+                    title="Xabarnomalar"
+                    value="3"
+                    icon={<RiNotification3Line size={24} />}
+                    variant="featured"
+                    onClick={() => { }}
+                    trend={3}
+                    trendLabel="yangilik"
+                />
             </div>
 
             {/* Recent Activity & Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {/* Recent Items List */}
-                <div className="lg:col-span-2 card border-0 shadow-lg shadow-gray-100/50">
-                    <div className="flex justify-between items-center mb-6">
+                {/* Recent Items List (Table Style) */}
+                <div className="lg:col-span-2 bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+                    <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                         <h2 className="text-lg font-bold text-gray-900">Oxirgi biriktirilgan jihozlar</h2>
                         <Link to="/employee/items" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
                             Barchasini ko'rish
                         </Link>
                     </div>
-                    <div className="space-y-4">
-                        {recentItems.map((item) => (
-                            <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-white hover:shadow-md transition-all border border-transparent hover:border-gray-100">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-gray-400 border border-gray-100">
-                                        <RiFileListLine size={20} />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-gray-800">{item.name}</h4>
-                                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                                            <RiTimeLine size={12} />
-                                            <span>{item.assignedDate}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
-                                    }`}>
-                                    {item.status === 'active' ? 'Faol' : 'Ta\'mirda'}
-                                </span>
-                            </div>
-                        ))}
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-blue-600 text-white">
+                                    <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Jihoz Nomi</th>
+                                    <th className="py-4 px-6 font-semibold text-sm">Sana</th>
+                                    <th className="py-4 px-6 font-semibold text-sm rounded-tr-lg">Holati</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {recentItems.map((item) => (
+                                    <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
+                                        <td className="py-4 px-6 font-medium text-gray-800">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-200">
+                                                    <RiFileListLine size={16} />
+                                                </div>
+                                                {item.name}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6 text-gray-600">
+                                            <div className="flex items-center gap-2 text-sm">
+                                                <RiTimeLine size={14} className="text-gray-400" />
+                                                {item.assignedDate}
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                                                }`}>
+                                                {item.status === 'active' ? 'Faol' : 'Ta\'mirda'}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
