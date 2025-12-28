@@ -1,7 +1,7 @@
 export const translations = {
     uz: {
         // Sidebar
-        dashboard: "Dashboard",
+        dashboard: "Asosiy oyna",
         inventory: "Invertar",
         warehouse: "Ombor",
         users: "Foydalanuvchilar",
@@ -85,7 +85,7 @@ export const translations = {
     },
     oz: {
         // Sidebar
-        dashboard: "Бошқарув панели",
+        dashboard: "Асосий ойна",
         inventory: "Инвентар",
         warehouse: "Омбор",
         users: "Фойдаланувчилар",

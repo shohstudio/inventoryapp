@@ -123,19 +123,20 @@ const AdminDashboard = () => {
 
                 <StatsCard
                     title={t('total_value')}
-                    value={`$${(inventoryStats.totalValue / 12600).toLocaleString(undefined, { maximumFractionDigits: 0 })}`} // Mock USD conversion for design match
+                    value={`${formatValue(inventoryStats.totalValue)} so'm`}
                     icon={<RiMoneyDollarCircleLine size={24} />}
                     trend={8.2}
                     trendLabel="o'sish"
+                    variant="featured"
                 />
 
                 <StatsCard
                     title={t('users')}
-                    value={userCount} // Or "Faol" percentage if matching mockup strictly, but keeping user data is better logic
+                    value={userCount}
                     icon={<RiUserLine size={24} />}
-                    trend={98} // Mock "98%" from image
+                    trend={98}
                     trendLabel="Faol foydalanuvchilar"
-                    color="blue"
+                    variant="featured"
                     onClick={() => navigate("/admin/users")}
                 />
 
@@ -145,7 +146,7 @@ const AdminDashboard = () => {
                     icon={<RiAlertLine size={24} />}
                     trend={-2}
                     trendLabel="kamaydi"
-                    color="orange"
+                    variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
             </div>
