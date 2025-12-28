@@ -110,7 +110,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <StatsCard
                     title={t('total_items')}
                     value={inventoryStats.totalItems}
@@ -128,6 +128,7 @@ const AdminDashboard = () => {
                     trend={8.2}
                     trendLabel="o'sish"
                     variant="featured"
+                    onClick={() => navigate("/admin/inventory")}
                 />
 
                 <StatsCard
@@ -148,6 +149,16 @@ const AdminDashboard = () => {
                     trendLabel="kamaydi"
                     variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
+                />
+
+                <StatsCard
+                    title={t('written_off_items')}
+                    value={inventoryStats.writtenOffItems}
+                    icon={<RiDeleteBinLine size={24} />}
+                    trend={0}
+                    trendLabel="o'zgarishsiz"
+                    variant="featured"
+                    onClick={() => navigate("/admin/inventory", { state: { filter: "written-off" } })}
                 />
             </div>
 
