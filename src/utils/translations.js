@@ -19,6 +19,7 @@ export const translations = {
         all: "Barchasi",
         loading: "Yuklanmoqda...",
         no_data: "Ma'lumot topilmadi",
+        export_excel: "Excelga yuklash",
 
         // Inventory Page
         inventory_title: "Invertar",
@@ -103,6 +104,7 @@ export const translations = {
         all: "Барчаси",
         loading: "Юкланмоқда...",
         no_data: "Маълумот топилмади",
+        export_excel: "Excelга юклаш",
 
         // Inventory Page
         inventory_title: "Инвентар",
@@ -187,6 +189,7 @@ export const translations = {
         all: "Все",
         loading: "Загрузка...",
         no_data: "Данные не найдены",
+        export_excel: "Скачать Excel",
 
         // Inventory Page
         inventory_title: "Инвентарь",

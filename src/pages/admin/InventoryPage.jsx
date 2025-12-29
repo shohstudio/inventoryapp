@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { useLanguage } from "../../context/LanguageContext";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine } from "react-icons/ri";
+import { read, utils, writeFile } from 'xlsx';
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionModal";
 import QRScannerModal from "../../components/admin/QRScannerModal";
@@ -196,6 +195,30 @@ const InventoryPage = () => {
         setIsModalOpen(true); // Open the regular ItemModal, it will use selectedWarehouseItem as initialData
     };
 
+    const handleExportExcel = () => {
+        const exportData = items.map(item => ({
+            [t('order_number')]: item.orderNumber,
+            [t('name')]: item.name,
+            [t('model')]: item.model,
+            [t('inn')]: item.inn,
+            [t('category')]: item.category,
+            [t('building')]: item.building,
+            [t('location')]: item.location,
+            [t('status')]: item.status === 'working' ? t('status_working') :
+                item.status === 'repair' ? t('status_repair') :
+                    item.status === 'written-off' ? t('status_written_off') :
+                        t('status_broken'),
+            [t('assigned_to')]: item.assignedTo,
+            [t('purchase_year')]: item.purchaseYear,
+            [t('price')]: item.price
+        }));
+
+        const ws = utils.json_to_sheet(exportData);
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, "Jihozlar");
+        writeFile(wb, "jihozlar_ruyxati.xlsx");
+    };
+
     // Correct `openModal` is already defined above at line 185.
     // Duplicate removed.
 
@@ -236,6 +259,13 @@ const InventoryPage = () => {
                     </p>
                 </div>
                 <div className="flex gap-2">
+                    <button
+                        onClick={handleExportExcel}
+                        className="btn bg-green-500 hover:bg-green-600 text-white shadow-sm border-0"
+                    >
+                        <RiFileExcel2Line size={20} className="mr-2" />
+                        {t('export_excel')}
+                    </button>
                     <button
                         onClick={() => setIsWarehouseModalOpen(true)}
                         className="btn bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
