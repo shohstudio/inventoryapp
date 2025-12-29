@@ -11,10 +11,10 @@ const UsersPage = () => {
         try {
             const storedUsers = localStorage.getItem("inventory_users_list");
             return storedUsers ? JSON.parse(storedUsers) : [
-                { id: 1, name: "Admin User", username: "admin", email: "admin@inv.uz", role: "admin", status: "active", department: "IT Department", password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918" },
-                { id: 2, name: "Ali Valiyev", username: "user", email: "ali@inv.uz", role: "employee", status: "active", department: "HR", password: "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb" },
-                { id: 3, name: "Vali Aliyev", username: "vali", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" },
-                { id: 4, name: "Jamshid Latipov", username: "ombor", email: "ombor@inv.uz", role: "warehouseman", status: "active", department: "Warehouse", password: "c06b3c8d08cf1fc55edac0e880108fbac645019fb7649c279cbc79c3f18c48a1" },
+                { id: 1, name: "Admin User", username: "admin", email: "admin@inv.uz", role: "admin", status: "active", department: "IT Department", pinfl: "00000000000000", password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918" },
+                { id: 2, name: "Ali Valiyev", username: "user", email: "ali@inv.uz", role: "employee", status: "active", department: "HR", pinfl: "32001951234567", password: "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb" },
+                { id: 3, name: "Vali Aliyev", username: "vali", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", pinfl: "12345678901234", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" },
+                { id: 4, name: "Jamshid Latipov", username: "ombor", email: "ombor@inv.uz", role: "warehouseman", status: "active", department: "Warehouse", pinfl: "98765432109876", password: "c06b3c8d08cf1fc55edac0e880108fbac645019fb7649c279cbc79c3f18c48a1" },
             ];
 
             // Cleanup Guli Karimova if she exists from previous sessions
@@ -90,6 +90,7 @@ const UsersPage = () => {
                             <thead>
                                 <tr className="bg-blue-600 text-white">
                                     <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('name')}</th>
+                                    <th className="py-4 px-6 font-semibold text-sm">PINFL</th>
                                     <th className="py-4 px-6 font-semibold text-sm">Bo'lim</th>
                                     <th className="py-4 px-6 font-semibold text-sm">Role</th>
                                     <th className="py-4 px-6 font-semibold text-sm">Holati</th>
@@ -111,6 +112,7 @@ const UsersPage = () => {
                                                 </div>
                                             </div>
                                         </td>
+                                        <td className="py-4 px-6 font-mono text-xs text-gray-500">{user.pinfl}</td>
                                         <td className="py-4 px-6 text-gray-600">{user.department}</td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-1.5 text-sm text-gray-600">
