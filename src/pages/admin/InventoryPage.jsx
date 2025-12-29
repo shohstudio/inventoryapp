@@ -41,7 +41,7 @@ const InventoryPage = () => {
                 model: "A2338",
                 serial: "FVFD1234",
                 inn: "123456789",
-                jshshir: "32001951234567",
+                assignedPINFL: "32001951234567",
                 orderNumber: "001",
                 category: "Laptop",
                 building: "Bosh Ofis",
@@ -59,7 +59,7 @@ const InventoryPage = () => {
                 model: "P2722H",
                 serial: "CN-0F123",
                 inn: "987654321",
-                jshshir: "32001951234567",
+                assignedPINFL: "32001951234567",
                 orderNumber: "002",
                 category: "Monitor",
                 building: "IT Bo'limi",
@@ -77,7 +77,7 @@ const InventoryPage = () => {
                 model: "M404dn",
                 serial: "PHB12345",
                 inn: "456123789",
-                jshshir: "",
+                assignedPINFL: "",
                 orderNumber: "003",
                 category: "Printer",
                 building: "Omborxona",
@@ -91,6 +91,19 @@ const InventoryPage = () => {
             }
         ];
     });
+
+    // Migration for JSHShIR -> assignedPINFL
+    useEffect(() => {
+        const needsMigration = items.some(item => item.jshshir && !item.assignedPINFL);
+        if (needsMigration) {
+            const migratedItems = items.map(item => ({
+                ...item,
+                assignedPINFL: item.assignedPINFL || item.jshshir, // Use existing new field or migrate old
+                jshshir: undefined // Remove old field
+            }));
+            setItems(migratedItems);
+        }
+    }, [items]);
 
     // Handle Global QR Scan Navigation
     useEffect(() => {
@@ -111,7 +124,7 @@ const InventoryPage = () => {
             String(item.id) === decodedText ||
             item.orderNumber === decodedText ||
             item.inn === decodedText ||
-            item.jshshir === decodedText ||
+            item.assignedPINFL === decodedText ||
             item.serial?.toLowerCase() === decodedText.toLowerCase()
         );
 
@@ -207,7 +220,7 @@ const InventoryPage = () => {
             [t('name')]: item.name,
             [t('model')]: item.model,
             [t('inn')]: item.inn,
-            ["JSHShIR"]: item.jshshir || "",
+            ["JSHShIR"]: item.assignedPINFL || "",
             [t('category')]: item.category,
             [t('building')]: item.building,
             [t('location')]: item.location,
@@ -239,7 +252,7 @@ const InventoryPage = () => {
                 item.model.toLowerCase().includes(query) ||
                 item.serial?.toLowerCase().includes(query) ||
                 item.inn?.includes(query) ||
-                item.jshshir?.includes(query) ||
+                item.assignedPINFL?.includes(query) ||
                 item.orderNumber.includes(query);
 
             if (!matchesSearch) return false;
