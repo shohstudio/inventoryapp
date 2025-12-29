@@ -9,6 +9,7 @@ export const translations = {
 
         // General
         search: "Qidirish...",
+        search_placeholder: "Qidirish (Nomi, Model, Seriya, INN, JSHShIR)...",
         filter: "Filter",
         add_new: "Yangi qo'shish",
         attach_warehouse: "Ombordan biriktirish",
@@ -94,6 +95,7 @@ export const translations = {
 
         // General
         search: "Қидириш...",
+        search_placeholder: "Қидириш (Номи, Модел, Серия, ИНН, ЖШШИР)...",
         filter: "Фильтр",
         add_new: "Янги қўшиш",
         attach_warehouse: "Омбордан бириктириш",
@@ -179,6 +181,7 @@ export const translations = {
 
         // General
         search: "Поиск...",
+        search_placeholder: "Поиск (Название, Модель, Серия, ИНН, ПИНФЛ)...",
         filter: "Фильтр",
         add_new: "Добавить",
         attach_warehouse: "Прикрепить со склада",

@@ -41,6 +41,7 @@ const InventoryPage = () => {
                 model: "A2338",
                 serial: "FVFD1234",
                 inn: "123456789",
+                jshshir: "32001951234567",
                 orderNumber: "001",
                 category: "Laptop",
                 building: "Bosh Ofis",
@@ -58,6 +59,7 @@ const InventoryPage = () => {
                 model: "P2722H",
                 serial: "CN-0F123",
                 inn: "987654321",
+                jshshir: "32001951234567",
                 orderNumber: "002",
                 category: "Monitor",
                 building: "IT Bo'limi",
@@ -75,6 +77,7 @@ const InventoryPage = () => {
                 model: "M404dn",
                 serial: "PHB12345",
                 inn: "456123789",
+                jshshir: "",
                 orderNumber: "003",
                 category: "Printer",
                 building: "Omborxona",
@@ -108,6 +111,7 @@ const InventoryPage = () => {
             String(item.id) === decodedText ||
             item.orderNumber === decodedText ||
             item.inn === decodedText ||
+            item.jshshir === decodedText ||
             item.serial?.toLowerCase() === decodedText.toLowerCase()
         );
 
@@ -203,6 +207,7 @@ const InventoryPage = () => {
             [t('name')]: item.name,
             [t('model')]: item.model,
             [t('inn')]: item.inn,
+            ["JSHShIR"]: item.jshshir || "",
             [t('category')]: item.category,
             [t('building')]: item.building,
             [t('location')]: item.location,
@@ -234,6 +239,7 @@ const InventoryPage = () => {
                 item.model.toLowerCase().includes(query) ||
                 item.serial?.toLowerCase().includes(query) ||
                 item.inn?.includes(query) ||
+                item.jshshir?.includes(query) ||
                 item.orderNumber.includes(query);
 
             if (!matchesSearch) return false;
@@ -295,7 +301,7 @@ const InventoryPage = () => {
                             <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Qidirish (Nomi, Model, Seriya, INN)..."
+                                placeholder={t('search_placeholder')}
                                 className="input pl-10 w-full"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
