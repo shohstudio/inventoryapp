@@ -261,13 +261,15 @@ const InventoryPage = () => {
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    <button
-                        onClick={handleExportExcel}
-                        className="btn bg-green-500 hover:bg-green-600 text-white shadow-sm border-0"
-                    >
-                        <RiFileExcel2Line size={20} className="mr-2" />
-                        {t('export_excel')}
-                    </button>
+                    {['admin', 'accounter', 'warehouseman'].includes(user?.role) && (
+                        <button
+                            onClick={handleExportExcel}
+                            className="btn bg-green-500 hover:bg-green-600 text-white shadow-sm border-0"
+                        >
+                            <RiFileExcel2Line size={20} className="mr-2" />
+                            {t('export_excel')}
+                        </button>
+                    )}
                     <button
                         onClick={() => setIsWarehouseModalOpen(true)}
                         className="btn bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
