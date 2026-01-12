@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { hashPassword } from "../utils/crypto";
+import api from "../api/axios";
 
 const AuthContext = createContext();
 
@@ -11,50 +12,33 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Simulating checking local storage for persisted session
-    const storedUser = localStorage.getItem("inventory_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedUser = localStorage.getItem("inventory_user");
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        if (parsed && parsed.id) {
+          setUser(parsed);
+        } else {
+          localStorage.removeItem("inventory_user"); // Corrupt data
+        }
+      }
+    } catch (e) {
+      localStorage.removeItem("inventory_user");
+      console.error("Auth init error:", e);
     }
     setLoading(false);
   }, []);
 
   const login = async (username, password) => {
-    const hashedPassword = await hashPassword(password);
-
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
-
-        // Find user
-        const foundUser = storedUsers.find(u => (u.username === username || u.email === username) && u.password === hashedPassword);
-
-        if (foundUser) {
-          if (foundUser.status === 'inactive') {
-            reject(new Error("Foydalanuvchi bloklangan"));
-            return;
-          }
-          const userData = { id: foundUser.id, name: foundUser.name, role: foundUser.role, email: foundUser.email };
-          setUser(userData);
-          localStorage.setItem("inventory_user", JSON.stringify(userData));
-          resolve(userData);
-        } else {
-          // Fallback for initial admin if list is empty or messed up
-          if (username === "admin" && hashedPassword === "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918") {
-            const adminData = { id: 1, name: "Admin User", username: "admin", role: "admin", email: "admin@inv.uz" };
-            setUser(adminData);
-            localStorage.setItem("inventory_user", JSON.stringify(adminData));
-            resolve(adminData);
-          } else if (username === "user" && hashedPassword === "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb") {
-            const userData = { id: 2, name: "Ali Valiyev", username: "user", role: "employee", email: "ali@inv.uz" };
-            setUser(userData);
-            localStorage.setItem("inventory_user", JSON.stringify(userData));
-            resolve(userData);
-          } else {
-            reject(new Error("Login yoki parol noto'g'ri"));
-          }
-        }
-      }, 500);
-    });
+    try {
+      const { data } = await api.post('/auth/login', { username, password });
+      setUser(data);
+      localStorage.setItem("inventory_user", JSON.stringify(data));
+      return data;
+    } catch (error) {
+      console.error("Login failed:", error);
+      throw new Error(error.response?.data?.message || "Login xatoligi");
+    }
   };
 
   const loginWithEImzo = async (signature, serial, pinfl) => {
@@ -100,6 +84,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    if (user) {
+      const logs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
+      logs.unshift({
+        id: Date.now(),
+        action: "Tizimdan chiqdi",
+        userName: user.name,
+        userRole: user.role,
+        timestamp: new Date().toISOString(),
+        itemId: null,
+        itemName: "Logout"
+      });
+      localStorage.setItem("inventory_logs", JSON.stringify(logs));
+    }
     setUser(null);
     localStorage.removeItem("inventory_user");
   };

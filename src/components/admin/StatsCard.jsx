@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", onClick, variant = "default" }) => {
+const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", onClick, variant = "default", footer }) => {
     const isFeatured = variant === "featured";
 
     return (
@@ -34,19 +34,31 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", on
                     )}>{value}</h3>
                 </div>
 
-                <div className="flex items-center text-sm font-medium">
-                    <span className={clsx(
-                        "flex items-center gap-1 px-2 py-0.5 rounded-md",
-                        trend > 0
-                            ? (isFeatured ? "bg-indigo-100 text-indigo-700" : "bg-green-50 text-green-600")
-                            : "bg-red-50 text-red-600"
-                    )}>
-                        {trend > 0 ? "+" : ""}{trend}%
-                    </span>
-                    <span className={clsx(
-                        "ml-2 text-xs",
-                        isFeatured ? "text-indigo-400" : "text-gray-400"
-                    )}>{trendLabel}</span>
+                {/* Footer Section: Custom Footer OR Trend */}
+                <div className="flex items-center text-sm font-medium h-6">
+                    {footer ? (
+                        <span className={clsx(
+                            "text-sm",
+                            isFeatured ? "text-indigo-500" : "text-gray-500"
+                        )}>{footer}</span>
+                    ) : (
+                        trend !== undefined && (
+                            <>
+                                <span className={clsx(
+                                    "flex items-center gap-1 px-2 py-0.5 rounded-md",
+                                    trend > 0
+                                        ? (isFeatured ? "bg-indigo-100 text-indigo-700" : "bg-green-50 text-green-600")
+                                        : "bg-red-50 text-red-600"
+                                )}>
+                                    {trend > 0 ? "+" : ""}{trend}%
+                                </span>
+                                <span className={clsx(
+                                    "ml-2 text-xs",
+                                    isFeatured ? "text-indigo-400" : "text-gray-400"
+                                )}>{trendLabel}</span>
+                            </>
+                        )
+                    )}
                 </div>
             </div>
 

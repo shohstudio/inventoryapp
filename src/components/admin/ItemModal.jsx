@@ -10,7 +10,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         orderNumber: "",
         category: "",
         building: "Bosh Ofis",
+        department: "",
         location: "",
+        quantity: 1, // NEW FIELD
+        purchaseDate: "",
+        price: "",
+        price: "", // NEW FIELD
         status: "working",
         assignedTo: "",
         assignedRole: "",
@@ -114,8 +119,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {/* Basic Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div className="md:col-span-6">
                             <label className="label">Nomi</label>
                             <input
                                 type="text"
@@ -127,7 +132,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 placeholder="MacBook Pro"
                             />
                         </div>
-                        <div>
+                        <div className="md:col-span-4">
                             <label className="label">Model</label>
                             <input
                                 type="text"
@@ -136,6 +141,18 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 value={formData.model}
                                 onChange={handleChange}
                                 placeholder="A2338"
+                            />
+                        </div>
+                        <div className="md:col-span-2">
+                            <label className="label">Soni</label>
+                            <input
+                                type="number"
+                                name="quantity"
+                                className="input"
+                                value={formData.quantity || 1}
+                                onChange={handleChange}
+                                min="1"
+                                placeholder="1"
                             />
                         </div>
                     </div>
@@ -153,16 +170,55 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 placeholder="FVFD1234"
                             />
                         </div>
-                        <div>
-                            <label className="label">INN Raqami</label>
-                            <input
-                                type="text"
-                                name="inn"
-                                className="input"
-                                value={formData.inn}
-                                onChange={handleChange}
-                                placeholder="123456789"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="label">INN Raqami</label>
+                                <input
+                                    type="text"
+                                    name="inn"
+                                    className="input"
+                                    value={formData.inn}
+                                    onChange={handleChange}
+                                    placeholder="123456"
+                                />
+                            </div>
+                            <div>
+                                <label className="label">Xarid Sanasi</label>
+                                <input
+                                    type="date"
+                                    name="purchaseDate"
+                                    className="input"
+                                    value={formData.purchaseDate || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <label className="label">Narxi</label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        name="price"
+                                        className="input pr-12"
+                                        value={formData.price || ""}
+                                        onChange={(e) => {
+                                            // Allow numbers, spaces, and ONE comma
+                                            let val = e.target.value.replace(/[^0-9\s,]/g, '');
+
+                                            // Ensure only one comma
+                                            const parts = val.split(',');
+                                            if (parts.length > 2) {
+                                                val = parts[0] + ',' + parts.slice(1).join('');
+                                            }
+
+                                            setFormData(prev => ({ ...prev, price: val }));
+                                        }}
+                                        placeholder="14 000 000,00"
+                                    />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">
+                                        so'm
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -205,6 +261,17 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 value={formData.building}
                                 onChange={handleChange}
                                 placeholder="Bosh Ofis"
+                            />
+                        </div>
+                        <div>
+                            <label className="label">Bo'lim</label>
+                            <input
+                                type="text"
+                                name="department"
+                                className="input"
+                                value={formData.department || ""}
+                                onChange={handleChange}
+                                placeholder="IT Bo'limi"
                             />
                         </div>
                         <div>

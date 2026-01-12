@@ -1,14 +1,77 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  username  String   @unique
+  email     String?  @unique
+  password  String
+  role      String   @default("employee") // admin, employee, warehouseman, accounter, guard
+  department String?
+  status    String   @default("active") // active, inactive
+  pinfl     String?  @unique // JSHSHIR (14 digits)
+
+  items     Item[]   @relation("AssignedItems")
+  logs      Log[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Item {
+  id           Int      @id @default(autoincrement())
+  name         String
+  model        String?
+  serialNumber String?  @unique
+  category     String?
+  subCategory  String?
+  
+  price        Decimal  @default(0)
+  quantity     Int      @default(1)
+  purchaseDate String?  // Storing as String to match "YYYY-MM-DD" easily, or could be DateTime
+  
+  status       String   @default("working") // working, repair, written-off, lost, empty
+  condition    String?  // new, old
+  
+  building     String?
+  location     String?
+  department   String?
+  
+  image        String?  // URL to image
+  
+  // Relations
+  assignedTo   User?    @relation("AssignedItems", fields: [assignedUserId], references: [id])
+  assignedUserId Int?
+  
+  assignedDate DateTime? // When it was assigned
+
+  logs         Log[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  action    String   // create, update, delete, assign, return, repair, write-off
+  details   String?  // JSON or text description
+  
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+  
+  item      Item?    @relation(fields: [itemId], references: [id])
+  itemId    Int?
+
+  createdAt DateTime @default(now())
 }

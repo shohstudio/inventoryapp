@@ -1,0 +1,18 @@
+const express = require('express');
+const router = express.Router();
+const { getItems, getItemById, createItem, updateItem, deleteItem, importItems } = require('../controllers/itemController');
+const { protect, admin } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
+
+router.post('/import', protect, admin, upload.single('file'), importItems);
+
+router.route('/')
+    .get(protect, getItems)
+    .post(protect, upload.single('image'), createItem);
+
+router.route('/:id')
+    .get(protect, getItemById)
+    .put(protect, upload.single('image'), updateItem)
+    .delete(protect, admin, deleteItem);
+
+module.exports = router;

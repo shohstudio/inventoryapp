@@ -1,23 +1,55 @@
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { RiFileListLine, RiAlertLine, RiNotification3Line, RiCheckDoubleLine, RiTimeLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import StatsCard from "../../components/admin/StatsCard";
+import { useState, useEffect } from "react"; // Added imports
 
 const EmployeeDashboard = () => {
     const { user } = useAuth();
+    const navigate = useNavigate(); // Hook for navigation
+    const [myItemsCount, setMyItemsCount] = useState(0); // State for real count
+    const [totalValue, setTotalValue] = useState(0); // State for total value
+    const [recentItems, setRecentItems] = useState([]);
 
-    // Mock Data
-    const stats = [
-        { title: "Mening jihozlarim", value: "12", icon: <RiFileListLine size={24} />, color: "bg-indigo-50 text-indigo-600", link: "/employee/items" },
-        { title: "Faol so'rovlar", value: "1", icon: <RiAlertLine size={24} />, color: "bg-orange-50 text-orange-600", link: "/employee/report" },
-        { title: "Xabarnomalar", value: "3", icon: <RiNotification3Line size={24} />, color: "bg-blue-50 text-blue-600", link: "#" },
-    ];
+    // Fetch Real Items
+    useEffect(() => {
+        if (user) {
+            const allItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
 
-    const recentItems = [
-        { id: 1, name: "MacBook Pro M1", assignedDate: "2023-10-15", status: "active" },
-        { id: 2, name: "Monitor Dell 27\"", assignedDate: "2023-11-01", status: "active" },
-        { id: 3, name: "Ofis stuli", assignedDate: "2023-09-20", status: "repair" },
-    ];
+            // Filter logic: Match by assignedTo (name) OR assignedPINFL
+            // Note: In real app, we should use User ID. Here we use Name/PINFL as per existing logic.
+            const myItems = allItems.filter(item =>
+                (item.assignedTo === user.name) ||
+                (user.pinfl && item.assignedPINFL === user.pinfl)
+            );
+
+            setMyItemsCount(myItems.length);
+
+            // Calculate Total Value
+            const total = myItems.reduce((sum, item) => {
+                let priceStr = (item.price || "0").toString().replace(/\s/g, '').replace(',', '.');
+                const price = parseFloat(priceStr) || 0;
+                const quantity = parseInt(item.quantity) || 1;
+                return sum + (price * quantity);
+            }, 0);
+            setTotalValue(total);
+
+            // Get recent 3 items for the table
+            // Assuming higher ID means newer, or we could sort by assignedDate if it existed.
+            // For now, reverse the array to show latest additions first.
+            setRecentItems(myItems.slice(-3).reverse().map(item => ({
+                id: item.id,
+                name: item.name,
+                assignedDate: item.purchaseDate || "Noma'lum", // Fallback to purchaseDate or placeholder
+                status: item.status === 'working' ? 'active' : 'repair'
+            })));
+        }
+    }, [user]);
+
+    // Format utility
+    const formatPrice = (price) => {
+        return price.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
 
     return (
         <div className="space-y-8 animate-in slide-in-from-bottom-4">
@@ -35,20 +67,20 @@ const EmployeeDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard
                     title="Mening jihozlarim"
-                    value="12"
+                    value={myItemsCount} // REAL VALUE
                     icon={<RiFileListLine size={24} />}
                     variant="featured"
-                    onClick={() => { }} // Could be wrapped in Link or use navigate
-                    trend={12}
-                    trendLabel="ta"
+                    onClick={() => navigate("/employee/items")} // ADDED NAVIGATION
+                    // Footer shows Total Value
+                    footer={<span className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-1 rounded">Jami: {formatPrice(totalValue)} so'm</span>}
                 />
                 <StatsCard
                     title="Faol so'rovlar"
-                    value="1"
+                    value="0" // Keep mock or implement real if needed
                     icon={<RiAlertLine size={24} />}
                     variant="featured"
-                    onClick={() => { }}
-                    trend={1}
+                    onClick={() => navigate("/employee/report")}
+                    trend={0}
                     trendLabel="faol"
                 />
                 <StatsCard
@@ -83,30 +115,38 @@ const EmployeeDashboard = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {recentItems.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
-                                        <td className="py-4 px-6 font-medium text-gray-800">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-200">
-                                                    <RiFileListLine size={16} />
+                                {recentItems.length > 0 ? (
+                                    recentItems.map((item) => (
+                                        <tr key={item.id} className="hover:bg-gray-50/80 transition-colors">
+                                            <td className="py-4 px-6 font-medium text-gray-800">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 border border-gray-200">
+                                                        <RiFileListLine size={16} />
+                                                    </div>
+                                                    {item.name}
                                                 </div>
-                                                {item.name}
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-6 text-gray-600">
-                                            <div className="flex items-center gap-2 text-sm">
-                                                <RiTimeLine size={14} className="text-gray-400" />
-                                                {item.assignedDate}
-                                            </div>
-                                        </td>
-                                        <td className="py-4 px-6">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
-                                                }`}>
-                                                {item.status === 'active' ? 'Faol' : 'Ta\'mirda'}
-                                            </span>
+                                            </td>
+                                            <td className="py-4 px-6 text-gray-600">
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <RiTimeLine size={14} className="text-gray-400" />
+                                                    {item.assignedDate}
+                                                </div>
+                                            </td>
+                                            <td className="py-4 px-6">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${item.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                                                    }`}>
+                                                    {item.status === 'active' ? 'Faol' : 'Ta\'mirda'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="3" className="py-6 text-center text-gray-500">
+                                            Sizga hali jihoz biriktirilmagan
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
                     </div>

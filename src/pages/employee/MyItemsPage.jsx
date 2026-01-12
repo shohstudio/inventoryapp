@@ -6,14 +6,17 @@ const MyItemsPage = () => {
     const { user } = useAuth();
     const [myItems, setMyItems] = useState([]);
 
+    const [requests, setRequests] = useState([]);
+
     useEffect(() => {
         if (!user) return;
 
         const storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
         const storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
+        const storedRequests = JSON.parse(localStorage.getItem("assignment_requests") || "[]");
 
+        // 1. Existing Items Logic
         // Filter items assigned to the current user (by Name or PINFL if available)
-        // We match by Name primarily as it is the legacy way ItemModal saves it
         const userItems = storedItems.filter(item => {
             // Check matches
             const nameMatch = item.assignedTo?.toLowerCase() === user.name?.toLowerCase();
@@ -39,9 +42,82 @@ const MyItemsPage = () => {
         });
 
         setMyItems(itemsWithLogs);
+
+        // 2. Pending Requests Logic
+        const myPendingRequests = storedRequests.filter(req =>
+            req.status === 'pending_employee' &&
+            (req.assignedToPinfl === user.pinfl || req.assignedToName?.toLowerCase() === user.name?.toLowerCase())
+        );
+        setRequests(myPendingRequests);
+
     }, [user]);
 
-    if (myItems.length === 0) {
+    const handleAccept = (request) => {
+        // 1. Move Item from Warehouse to Inventory
+        const warehouseItems = JSON.parse(localStorage.getItem("warehouse_items") || "[]");
+        const inventoryItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
+        const allRequests = JSON.parse(localStorage.getItem("assignment_requests") || "[]");
+
+        // Update Warehouse (decrement or remove)
+        const updatedWarehouseItems = warehouseItems.map(wItem => {
+            if (wItem.id === request.itemDetails.originalWarehouseId) {
+                // Decrement quantity
+                return { ...wItem, quantity: Math.max(0, parseInt(wItem.quantity) - 1) };
+            }
+            return wItem;
+        });
+        localStorage.setItem("warehouse_items", JSON.stringify(updatedWarehouseItems));
+
+        // Add to Inventory
+        const newItem = {
+            ...request.itemDetails,
+            id: Date.now(), // New ID for Inventory
+            assignedTo: user.name,
+            assignedPINFL: user.pinfl,
+            status: 'working'
+        };
+        localStorage.setItem("inventory_items", JSON.stringify([...inventoryItems, newItem]));
+
+        // Update Request Status
+        const updatedRequests = allRequests.map(r => {
+            if (r.id === request.id) {
+                return {
+                    ...r,
+                    status: 'completed',
+                    acceptedAt: new Date().toISOString()
+                };
+            }
+            return r;
+        });
+        localStorage.setItem("assignment_requests", JSON.stringify(updatedRequests));
+
+        // Add Logic Log
+        const logs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
+        logs.unshift({
+            id: Date.now(),
+            userName: user.name,
+            userRole: user.role,
+            action: "qabul qildi (imzoladi)",
+            itemName: newItem.name,
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem("inventory_logs", JSON.stringify(logs));
+
+        // Refresh State
+        setRequests(updatedRequests.filter(req =>
+            req.status === 'pending_employee' &&
+            (req.assignedToPinfl === user.pinfl || req.assignedToName?.toLowerCase() === user.name?.toLowerCase())
+        ));
+        // Force reload items (simple way: re-run effect or just append locally)
+        // For simplicity, let's just reload the page or better yet, depend on setMyItems updating next render? 
+        // We need to update myItems manually here or trigger re-fetch.
+        // Let's just manually append to myItems for instant feedback
+        setMyItems(prev => [...prev, { ...newItem, dateAssigned: new Date().toLocaleDateString('uz-UZ') }]);
+
+        alert("Jihoz muvaffaqiyatli qabul qilindi!");
+    };
+
+    if (myItems.length === 0 && requests.length === 0) {
         return (
             <div className="text-center py-20">
                 <div className="w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -56,6 +132,36 @@ const MyItemsPage = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Mening Jihozlarim</h1>
+
+            {requests.length > 0 && (
+                <div className="mb-8 animate-in slide-in-from-top duration-500">
+                    <h2 className="text-xl font-bold text-orange-600 mb-4 flex items-center gap-2">
+                        <RiAlertLine /> Tasdiqlash kutilmoqda
+                    </h2>
+                    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
+                        <div className="grid gap-4">
+                            {requests.map(req => (
+                                <div key={req.id} className="bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                                    <div>
+                                        <h3 className="font-bold text-gray-800">{req.itemDetails.name}</h3>
+                                        <p className="text-sm text-gray-500">Seriya: {req.itemDetails.serial || "Yo'q"}</p>
+                                        <div className="text-xs text-gray-400 mt-1">
+                                            Hisobchi tomonidan tasdiqlangan:
+                                            <span className="font-medium text-gray-600 ml-1">{new Date(req.accountantTimestamp).toLocaleString('uz-UZ')}</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleAccept(req)}
+                                        className="btn bg-orange-600 text-white hover:bg-orange-700 shadow-orange-200"
+                                    >
+                                        <RiCheckDoubleLine className="mr-2" /> Qabul qilish
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {myItems.map((item) => (

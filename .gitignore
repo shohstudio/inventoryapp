@@ -6,11 +6,29 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+debug_prisma.js
+diagnostic.js
+server/debug_env.js
+test_server.js
 
+# Dependency directories
 node_modules
+server/node_modules
+.pnp
+.pnp.js
+
+# Build outputs
 dist
 dist-ssr
+build
+out
+
+# Local development
 *.local
+.env
+.env.*
+!.env.example
+server/.env
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +40,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Database
+server/prisma/*.db
+server/prisma/*.db-journal
+
+# Uploads
+server/uploads/
+uploads/
+
+# Misc
+deploy.zip
+*.zip

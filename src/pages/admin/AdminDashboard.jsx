@@ -15,7 +15,8 @@ const AdminDashboard = () => {
         totalItems: 0,
         repairItems: 0,
         writtenOffItems: 0,
-        totalValue: 0
+        totalValue: 0,
+        recentItems: []
     });
 
     const [logs, setLogs] = useState([]);
@@ -52,9 +53,17 @@ const AdminDashboard = () => {
                 if (item.status === 'written-off') return acc;
 
                 try {
-                    const priceStr = String(item.price);
-                    const cleanPrice = parseInt(priceStr.replace(/[^0-9]/g, ''));
-                    return acc + (isNaN(cleanPrice) ? 0 : cleanPrice);
+                    // Normalize price string: remove spaces/non-numeric/non-separators first
+                    // Example: "14 000 000,00" -> "14000000,00"
+                    const priceStr = String(item.price).replace(/\s/g, '');
+
+                    // Replace comma with dot for parseFloat
+                    const normalizedPrice = priceStr.replace(',', '.');
+
+                    const cleanPrice = parseFloat(normalizedPrice);
+                    const quantity = parseInt(item.quantity) || 1;
+
+                    return acc + ((isNaN(cleanPrice) ? 0 : cleanPrice) * quantity);
                 } catch (e) {
                     return acc;
                 }
@@ -64,7 +73,8 @@ const AdminDashboard = () => {
                 totalItems,
                 repairItems,
                 writtenOffItems,
-                totalValue
+                totalValue,
+                recentItems: storedItems.slice(-5).reverse()
             });
 
             // Logs
@@ -179,34 +189,35 @@ const AdminDashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {/* Mock Data to match image roughly, or real logs if available */}
-                            {[
-                                { name: "Dell Latitude 7420", serial: "SN-8374920", user: "Aliyev O.", status: "working" },
-                                { name: "MacBook Pro 16\"", serial: "C02XG4KJH5", user: "Karimov S.", status: "repair" },
-                                { name: "Ikea Stol Markus", serial: "903.345.67", user: "Valiyeva D.", status: "working" },
-                                { name: "HP LaserJet M404n", serial: "VND200345", user: "Ofis Menejeri", status: "empty" },
-                                { name: "Logitech MX Master 3", serial: "L-84930", user: "Yusupov B.", status: "lost" },
-                            ].map((item, index) => (
-                                <tr key={index} className="hover:bg-gray-50/80 transition-colors">
-                                    <td className="py-4 px-6 text-gray-800 font-medium">{item.name}</td>
-                                    <td className="py-4 px-6 text-gray-500 font-mono text-sm">{item.serial}</td>
-                                    <td className="py-4 px-6 text-gray-700">{item.user}</td>
-                                    <td className="py-4 px-6">
-                                        <span className={clsx(
-                                            "px-3 py-1 rounded-full text-xs font-semibold",
-                                            item.status === 'working' ? "bg-green-100 text-green-700" :
-                                                item.status === 'repair' ? "bg-orange-100 text-orange-700" :
-                                                    item.status === 'empty' ? "bg-cyan-100 text-cyan-700" :
-                                                        "bg-red-100 text-red-700"
-                                        )}>
-                                            {item.status === 'working' ? "Faol" :
-                                                item.status === 'repair' ? "Ta'mirda" :
-                                                    item.status === 'empty' ? "Bo'sh" :
-                                                        "Yo'qolgan"}
-                                        </span>
+                            {inventoryStats.recentItems && inventoryStats.recentItems.length > 0 ? (
+                                inventoryStats.recentItems.map((item, index) => (
+                                    <tr key={item.id || index} className="hover:bg-gray-50/80 transition-colors">
+                                        <td className="py-4 px-6 text-gray-800 font-medium">{item.name}</td>
+                                        <td className="py-4 px-6 text-gray-500 font-mono text-sm">{item.model || "-"}</td>
+                                        <td className="py-4 px-6 text-gray-700">{item.assignedTo || "Omborda"}</td>
+                                        <td className="py-4 px-6">
+                                            <span className={clsx(
+                                                "px-3 py-1 rounded-full text-xs font-semibold",
+                                                item.status === 'working' ? "bg-green-100 text-green-700" :
+                                                    item.status === 'repair' ? "bg-orange-100 text-orange-700" :
+                                                        item.status === 'written-off' ? "bg-red-100 text-red-700" :
+                                                            "bg-cyan-100 text-cyan-700"
+                                            )}>
+                                                {item.status === 'working' ? "Faol" :
+                                                    item.status === 'repair' ? "Ta'mirda" :
+                                                        item.status === 'written-off' ? "Hisobdan chiqarilgan" :
+                                                            "Yangi"}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="py-6 text-center text-gray-500">
+                                        Hozircha ma'lumot yo'q
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

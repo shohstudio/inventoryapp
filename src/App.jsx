@@ -14,6 +14,9 @@ import EmployeeLayout from "./components/layout/EmployeeLayout";
 import MyItemsPage from "./pages/employee/MyItemsPage";
 import ReportIssuePage from "./pages/employee/ReportIssuePage";
 import ProfilePage from "./pages/common/ProfilePage";
+import RequestsPage from "./pages/admin/RequestsPage";
+import LogsPage from "./pages/admin/LogsPage";
+import GuardDashboard from "./pages/guard/GuardDashboard";
 
 import { LanguageProvider } from "./context/LanguageContext";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -37,6 +40,12 @@ function App() {
                     <UsersPage />
                   </ProtectedRoute>
                 } />
+                <Route path="requests" element={<RequestsPage />} />
+                <Route path="logs" element={
+                  <ProtectedRoute roles={["admin"]}>
+                    <LogsPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
 
@@ -53,6 +62,15 @@ function App() {
                 <Route path="report" element={<ReportIssuePage />} />
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
+
+              <Route
+                path="/guard/*"
+                element={
+                  <ProtectedRoute roles={["guard"]}>
+                    <GuardDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Default Redirect */}
               <Route path="/" element={<Navigate to="/login" replace />} />

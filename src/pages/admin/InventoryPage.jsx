@@ -7,6 +7,7 @@ import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionMo
 import QRScannerModal from "../../components/admin/QRScannerModal";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../api/axios"; // Import API
 
 const InventoryPage = () => {
     const location = useLocation();
@@ -32,100 +33,45 @@ const InventoryPage = () => {
 
     const [showQRScanner, setShowQRScanner] = useState(false);
 
-    const [items, setItems] = useState(() => {
-        const storedItems = localStorage.getItem("inventory_items");
-        return storedItems ? JSON.parse(storedItems) : [
-            {
-                id: 1,
-                name: "MacBook Pro M1",
-                model: "A2338",
-                serial: "FVFD1234",
-                inn: "123456789",
-                assignedPINFL: "32001951234567",
-                orderNumber: "001",
-                category: "Laptop",
-                building: "Bosh Ofis",
-                location: "2-qavat, 203-xona",
-                status: "working",
-                assignedTo: "Ali Valiyev",
-                purchaseYear: "2021",
-                price: "14 000 000",
-                images: [],
-                pdf: null
-            },
-            {
-                id: 2,
-                name: "Dell Monitor 27\"",
-                model: "P2722H",
-                serial: "CN-0F123",
-                inn: "987654321",
-                assignedPINFL: "32001951234567",
-                orderNumber: "002",
-                category: "Monitor",
-                building: "IT Bo'limi",
-                location: "1-qavat, Server xonasi",
-                status: "working",
-                assignedTo: "Ali Valiyev",
-                purchaseYear: "2022",
-                price: "3 500 000",
-                images: [],
-                pdf: "warranty_dell_p2722h.pdf"
-            },
-            {
-                id: 3,
-                name: "HP LaserJet Pro",
-                model: "M404dn",
-                serial: "PHB12345",
-                inn: "456123789",
-                assignedPINFL: "",
-                orderNumber: "003",
-                category: "Printer",
-                building: "Omborxona",
-                location: "Zaxira ombori",
-                status: "repair",
-                assignedTo: "Ofis",
-                purchaseYear: "2020",
-                price: "4 200 000",
-                images: [],
-                pdf: null
-            }
-        ];
-    });
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Migration for JSHShIR -> assignedPINFL
-    useEffect(() => {
-        const needsMigration = items.some(item => item.jshshir && !item.assignedPINFL);
-        if (needsMigration) {
-            const migratedItems = items.map(item => ({
-                ...item,
-                assignedPINFL: item.assignedPINFL || item.jshshir, // Use existing new field or migrate old
-                jshshir: undefined // Remove old field
-            }));
-            setItems(migratedItems);
+    const fetchItems = async () => {
+        setLoading(true);
+        try {
+            const { data } = await api.get('/items');
+            setItems(data);
+            setError(null);
+        } catch (err) {
+            console.error("Failed to fetch items", err);
+            setError("Ma'lumotlarni yuklashda xatolik yuz berdi");
+        } finally {
+            setLoading(false);
         }
-    }, [items]);
+    };
+
+    useEffect(() => {
+        fetchItems();
+    }, []);
 
     // Handle Global QR Scan Navigation
     useEffect(() => {
-        if (location.state?.scanCode) {
+        if (location.state?.scanCode && items.length > 0) {
             handleScanSuccess(location.state.scanCode);
             // Clear state to prevent reopening on refresh
             window.history.replaceState({}, document.title);
         }
-    }, [location.state]);
-
-    useEffect(() => {
-        localStorage.setItem("inventory_items", JSON.stringify(items));
-    }, [items]);
+    }, [location.state, items]);
 
     const handleScanSuccess = (decodedText) => {
         // Search by ID, OrderNumber or Serial
         const foundItem = items.find(item =>
             String(item.id) === decodedText ||
-            item.orderNumber === decodedText ||
+            String(item.orderNumber) === decodedText || // API might return number
             item.inn === decodedText ||
             item.assignedPINFL === decodedText ||
-            item.serial?.toLowerCase() === decodedText.toLowerCase()
+            item.serialNumber?.toLowerCase() === decodedText.toLowerCase() // Backend uses serialNumber
         );
 
         if (foundItem) {
@@ -140,66 +86,39 @@ const InventoryPage = () => {
     const [isWarehouseModalOpen, setIsWarehouseModalOpen] = useState(false);
     const [selectedWarehouseItem, setSelectedWarehouseItem] = useState(null);
 
-    const handleAddItem = (newItem) => {
-        const storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
-        const timestamp = new Date().toISOString();
-        let logAction = "";
+    const handleAddItem = async (newItemData) => {
+        // Prepare FormData for file upload
+        const formData = new FormData();
+        Object.keys(newItemData).forEach(key => {
+            if (key === 'imageFile' && newItemData[key]) {
+                formData.append('image', newItemData[key]);
+            } else if (key !== 'images' && key !== 'imageFile') { // processing logic
+                formData.append(key, newItemData[key]);
+            }
+        });
 
-        // NEW: Handle Warehouse Update if item came from warehouse
-        if (selectedWarehouseItem) {
-            const warehouseItems = JSON.parse(localStorage.getItem("warehouse_items") || "[]");
-            const updatedWarehouseItems = warehouseItems.map(wItem => {
-                if (wItem.id === selectedWarehouseItem.id) {
-                    return { ...wItem, quantity: Math.max(0, parseInt(wItem.quantity) - 1) };
-                }
-                return wItem;
-            });
-            localStorage.setItem("warehouse_items", JSON.stringify(updatedWarehouseItems));
+        // Special handling if image is NOT changed but existing? API handles that if we don't send 'image' field
 
-            // Add Log for Warehouse
-            const warehouseLogs = JSON.parse(localStorage.getItem("warehouse_logs") || "[]");
-            warehouseLogs.unshift({
-                id: Date.now() + 1, // Slight offset
-                userName: user?.name,
-                userRole: user?.role,
-                action: "inventarga o'tkazdi",
-                itemName: newItem.name,
-                timestamp: timestamp
-            });
-            localStorage.setItem("warehouse_logs", JSON.stringify(warehouseLogs.slice(0, 50)));
+        try {
+            if (selectedItem) {
+                // Update
+                await api.put(`/items/${selectedItem.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                alert("Jihoz yangilandi!");
+            } else {
+                // Create
+                await api.post('/items', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                alert("Jihoz qo'shildi!");
+            }
+            fetchItems(); // Refresh list
+            setSelectedWarehouseItem(null);
+        } catch (err) {
+            console.error("Save failed", err);
+            alert("Saqlashda xatolik: " + (err.response?.data?.message || err.message));
         }
-
-        if (selectedItem) {
-            setItems(items.map(i => i.id === selectedItem.id ? { ...newItem, id: selectedItem.id } : i));
-            logAction = "tahrirladi";
-        } else {
-            const nextOrderNum = (items.length + 1).toString().padStart(3, '0');
-            // Inherit price from warehouse item if available and not overridden
-            const finalItem = {
-                ...newItem,
-                id: Date.now(),
-                orderNumber: nextOrderNum,
-                // If it was from warehouse, we might want to store that link? For now, not strict.
-            };
-            setItems([...items, finalItem]);
-            logAction = selectedWarehouseItem ? "ombordan biriktirdi" : "qo'shdi";
-        }
-
-        // Add Log
-        const newLog = {
-            id: Date.now(),
-            userName: user?.name || "Noma'lum",
-            userRole: user?.role,
-            action: logAction,
-            itemName: newItem.name,
-            timestamp: timestamp
-        };
-
-        const updatedLogs = [newLog, ...storedLogs].slice(0, 50); // Keep last 50 logs
-        localStorage.setItem("inventory_logs", JSON.stringify(updatedLogs));
-
-        // Reset
-        setSelectedWarehouseItem(null);
     };
 
     const openModal = (item = null) => {
@@ -214,9 +133,32 @@ const InventoryPage = () => {
         setIsModalOpen(true); // Open the regular ItemModal, it will use selectedWarehouseItem as initialData
     };
 
+    const handleImportExcel = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            setLoading(true);
+            const { data } = await api.post('/items/import', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            alert(data.message);
+            fetchItems(); // Refresh
+        } catch (err) {
+            console.error("Import failed", err);
+            alert("Import xatoligi: " + (err.response?.data?.message || err.message));
+        } finally {
+            setLoading(false);
+            e.target.value = null; // Reset input
+        }
+    };
+
     const handleExportExcel = () => {
         const exportData = items.map(item => ({
-            [t('order_number')]: item.orderNumber,
+            [t('order_number')]: item.orderNumber || item.id,
             [t('name')]: item.name,
             [t('model')]: item.model,
             [t('inn')]: item.inn,
@@ -228,8 +170,8 @@ const InventoryPage = () => {
                 item.status === 'repair' ? t('status_repair') :
                     item.status === 'written-off' ? t('status_written_off') :
                         t('status_broken'),
-            [t('assigned_to')]: item.assignedTo,
-            [t('purchase_year')]: item.purchaseYear,
+            [t('assigned_to')]: item.assignedTo?.name || "", // Fix for object access if populated
+            [t('purchase_year')]: item.purchaseDate,
             [t('price')]: item.price
         }));
 
@@ -249,11 +191,11 @@ const InventoryPage = () => {
             const query = searchQuery.toLowerCase();
             const matchesSearch =
                 item.name.toLowerCase().includes(query) ||
-                item.model.toLowerCase().includes(query) ||
-                item.serial?.toLowerCase().includes(query) ||
+                item.model?.toLowerCase().includes(query) ||
+                item.serialNumber?.toLowerCase().includes(query) ||
                 item.inn?.includes(query) ||
                 item.assignedPINFL?.includes(query) ||
-                item.orderNumber.includes(query);
+                String(item.id).includes(query);
 
             if (!matchesSearch) return false;
         }
@@ -281,13 +223,25 @@ const InventoryPage = () => {
                 </div>
                 <div className="flex gap-2">
                     {['admin', 'accounter', 'warehouseman'].includes(user?.role) && (
-                        <button
-                            onClick={handleExportExcel}
-                            className="btn bg-green-500 hover:bg-green-600 text-white shadow-sm border-0"
-                        >
-                            <RiFileExcel2Line size={20} className="mr-2" />
-                            {t('export_excel')}
-                        </button>
+                        <>
+                            <label className="btn bg-blue-500 hover:bg-blue-600 text-white shadow-sm border-0 cursor-pointer">
+                                <RiFileExcel2Line size={20} className="mr-2" />
+                                Import (.xlsx)
+                                <input
+                                    type="file"
+                                    accept=".xlsx, .xls"
+                                    className="hidden"
+                                    onChange={handleImportExcel}
+                                />
+                            </label>
+                            <button
+                                onClick={handleExportExcel}
+                                className="btn bg-green-500 hover:bg-green-600 text-white shadow-sm border-0"
+                            >
+                                <RiFileExcel2Line size={20} className="mr-2" />
+                                {t('export_excel')}
+                            </button>
+                        </>
                     )}
                     <button
                         onClick={() => setIsWarehouseModalOpen(true)}
@@ -398,8 +352,8 @@ const InventoryPage = () => {
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('order_number')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('name')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('inn')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('purchase_year')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('current_value')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('purchase_date')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm whitespace-nowrap">{t('current_value')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('building')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('status')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('image')}</th>
@@ -415,8 +369,16 @@ const InventoryPage = () => {
                                         <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
                                     </td>
                                     <td className="py-4 px-6 text-gray-600 font-mono text-xs">{item.inn}</td>
-                                    <td className="py-4 px-6 text-gray-600">{item.purchaseYear}</td>
-                                    <td className="py-4 px-6 text-gray-900 font-medium">{item.price} so'm</td>
+                                    <td className="py-4 px-6 text-gray-600">{item.purchaseDate}</td>
+                                    <td className="py-4 px-6 text-gray-900 font-medium whitespace-nowrap">
+                                        {(() => {
+                                            const priceStr = (item.price || "0").toString().replace(/\s/g, '').replace(',', '.');
+                                            const price = parseFloat(priceStr) || 0;
+                                            const quantity = parseInt(item.quantity) || 1;
+                                            const total = price * quantity;
+                                            return total.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                                        })()} so'm
+                                    </td>
                                     <td className="py-4 px-6">
                                         <div className="text-gray-900">{item.building}</div>
                                         <div className="text-xs text-gray-400">{item.location}</div>
@@ -434,10 +396,12 @@ const InventoryPage = () => {
                                         </span>
                                     </td>
                                     <td className="py-4 px-6">
-                                        {item.images && item.images.length > 0 ? (
+                                        {item.image ? (
                                             <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
                                                 <img
-                                                    src={item.images[0]}
+                                                    src={item.image} // Backend returns full path including /uploads if configured or we need to prepend
+                                                    // Actually we served /uploads statically, so if DB has '/uploads/file.jpg', it's relative to domain root.
+                                                    // Let's assume DB stores relative path like '/uploads/...'
                                                     alt={item.name}
                                                     className="w-full h-full object-cover"
                                                 />

@@ -33,8 +33,9 @@ export const translations = {
         model: "Model",
         inn: "INN",
         purchase_year: "Sotib olingan yili",
+        purchase_date: "Xarid qilingan sana",
         price: "Narxi",
-        current_value: "Xozirgi qiymati",
+        current_value: "Narxi", // Changed from Xozirgi qiymati as per user request
         building: "Bino",
         location: "Joylashuv",
         status: "Holati",
@@ -119,8 +120,9 @@ export const translations = {
         model: "Модел",
         inn: "ИНН",
         purchase_year: "Сотиб олинган йили",
+        purchase_date: "Харид қилинган сана",
         price: "Нархи",
-        current_value: "Ҳозирги қиймати",
+        current_value: "Нархи", // Changed from Ҳозирги қиймати
         building: "Бино",
         location: "Жойлашув",
         status: "Ҳолати",
@@ -205,8 +207,9 @@ export const translations = {
         model: "Модель",
         inn: "ИНН",
         purchase_year: "Год покупки",
+        purchase_date: "Дата покупки",
         price: "Цена",
-        current_value: "Текущая стоимость",
+        current_value: "Цена", // Simplified from Текущая стоимость
         building: "Здание",
         location: "Расположение",
         status: "Статус",
