@@ -55,6 +55,7 @@ model Item {
 
   // If imported from Excel and user not found, store name here
   initialOwner String?
+  initialPinfl String?
   
   // Relations
   assignedTo   User?    @relation("AssignedItems", fields: [assignedUserId], references: [id])
