@@ -2,50 +2,63 @@ import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, RiDeleteBinLine, RiCalculatorLine } from "react-icons/ri";
 import UserModal from "../../components/admin/UserModal";
 import { useLanguage } from "../../context/LanguageContext";
+import api from "../../api/axios";
+import { toast } from "react-hot-toast";
 
 const UsersPage = () => {
     const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
-    const [users, setUsers] = useState(() => {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchUsers = async () => {
         try {
-            const storedUsers = localStorage.getItem("inventory_users_list");
-            return storedUsers ? JSON.parse(storedUsers) : [
-                { id: 1, name: "Admin User", username: "admin", email: "admin@inv.uz", role: "admin", status: "active", department: "IT Department", pinfl: "00000000000000", password: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918" },
-                { id: 2, name: "Ali Valiyev", username: "user", email: "ali@inv.uz", role: "employee", status: "active", department: "HR", pinfl: "32001951234567", password: "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb" },
-                { id: 3, name: "Vali Aliyev", username: "vali", email: "vali@example.com", role: "employee", status: "inactive", department: "Sales", pinfl: "12345678901234", password: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3" },
-                { id: 4, name: "Jamshid Latipov", username: "ombor", email: "ombor@inv.uz", role: "warehouseman", status: "active", department: "Warehouse", pinfl: "98765432109876", password: "c06b3c8d08cf1fc55edac0e880108fbac645019fb7649c279cbc79c3f18c48a1" },
-            ];
-
-            // Cleanup Guli Karimova if she exists from previous sessions
-            if (Array.isArray(parsed)) {
-                return parsed.filter(u => u.name !== "Guli Karimova" && u.username !== "guli");
-            }
-            return parsed;
+            const res = await api.get('/users');
+            setUsers(res.data);
         } catch (error) {
-            console.error("Failed to parse users from localStorage:", error);
-            return [
-                { id: 1, name: "Admin User", email: "admin", role: "admin", status: "active", department: "IT Department", password: "admin" },
-            ];
-        }
-    });
-
-    useEffect(() => {
-        localStorage.setItem("inventory_users_list", JSON.stringify(users));
-    }, [users]);
-
-    const handleSaveUser = (newUser) => {
-        // In a real app, you would handle password hashing here
-        if (selectedUser) {
-            setUsers(users.map(u => u.id === selectedUser.id ? { ...newUser, id: selectedUser.id } : u));
-        } else {
-            setUsers([...users, { ...newUser, id: Date.now() }]);
+            console.error("Error fetching users:", error);
+            toast.error("Foydalanuvchilarni yuklashda xatolik");
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleDeleteUser = (id) => {
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const handleSaveUser = async (userData) => {
+        try {
+            if (selectedUser) {
+                // Update existing
+                const res = await api.put(`/users/${selectedUser.id}`, userData);
+                setUsers(users.map(u => u.id === selectedUser.id ? res.data : u));
+                toast.success("Foydalanuvchi yangilandi");
+            } else {
+                // Create new
+                const res = await api.post('/users', userData);
+                setUsers([...users, res.data]);
+                toast.success("Yangi foydalanuvchi qo'shildi");
+            }
+        } catch (error) {
+            console.error("Save user error:", error);
+            // Handle specific backend error messages if available
+            const message = error.response?.data?.message || "Saqlashda xatolik yuz berdi";
+            toast.error(message);
+        }
+    };
+
+    const handleDeleteUser = async (id) => {
         if (window.confirm("Rostdan ham bu foydalanuvchini o'chirmoqchimisiz?")) {
-            setUsers(users.filter(u => u.id !== id));
+            try {
+                await api.delete(`/users/${id}`);
+                setUsers(users.filter(u => u.id !== id));
+                toast.success("Foydalanuvchi o'chirildi");
+            } catch (error) {
+                console.error("Delete user error:", error);
+                toast.error("O'chirishda xatolik");
+            }
         }
     };
 
@@ -53,6 +66,10 @@ const UsersPage = () => {
         setSelectedUser(user);
         setIsModalOpen(true);
     };
+
+    if (loading) {
+        return <div className="p-8 text-center text-gray-500">Yuklanmoqda...</div>;
+    }
 
     return (
         <div>
