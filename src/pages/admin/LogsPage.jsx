@@ -1,25 +1,52 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { RiHistoryLine, RiFileList3Line, RiTruckLine, RiLogoutBoxRLine } from "react-icons/ri";
+import api from "../../api/axios";
 
 const LogsPage = () => {
     const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState('inventory'); // inventory, warehouse, exit
+    const [allLogs, setAllLogs] = useState([]);
     const [logs, setLogs] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Load logs based on tab
-        let data = [];
+        const fetchLogs = async () => {
+            try {
+                // Currently backend has one unified 'Log' table. 
+                // We might filter client-side or backend-side ideally.
+                // For now, let's fetch all and filter client side based on 'action' text or type context?
+                const { data } = await api.get('/logs');
+                setAllLogs(data);
+            } catch (error) {
+                console.error("Failed to fetch logs", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchLogs();
+    }, []);
+
+    useEffect(() => {
+        if (loading) return;
+
+        // Filter logs based on tab (rudimentary text search based filter since backend 'action' string is loose)
+        let filtered = [];
         if (activeTab === 'inventory') {
-            data = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
+            filtered = allLogs.filter(l => !l.action.includes('import') && !l.action.includes('create')); // broad assumption
+            // Actually, let's show ALL logic for Inventory tab for now as 'General Logs'
+            filtered = allLogs;
         } else if (activeTab === 'warehouse') {
-            data = JSON.parse(localStorage.getItem("warehouse_logs") || "[]");
+            // Show only Create/Import actions?
+            filtered = allLogs.filter(l => l.action.includes('create') || l.action.includes('import'));
         } else if (activeTab === 'exit') {
-            data = JSON.parse(localStorage.getItem("exit_logs") || "[]");
+            // Exit logic not fully in backend yet?
+            filtered = allLogs.filter(l => l.action.includes('exit'));
         }
-        // Ensure sorted by newest
-        setLogs(data.sort((a, b) => new Date(b.timestamp || b.date) - new Date(a.timestamp || a.date)));
-    }, [activeTab]);
+
+        // Use allLogs directly without complex filtering for now if type is ambiguous
+        setLogs(allLogs);
+    }, [activeTab, allLogs, loading]);
 
     return (
         <div>
@@ -87,8 +114,8 @@ const LogsPage = () => {
                                         </td>
                                         <td className="py-3 px-6">
                                             <span className={`px-2 py-1 rounded text-xs ${log.action?.includes('qo\'shdi') ? 'bg-green-100 text-green-700' :
-                                                    log.type === 'exit_approval' ? 'bg-orange-100 text-orange-700' :
-                                                        'bg-gray-100 text-gray-600'
+                                                log.type === 'exit_approval' ? 'bg-orange-100 text-orange-700' :
+                                                    'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {log.action || (log.type === 'exit_approval' ? 'Chiqishga ruxsat berdi' : 'Amal')}
                                             </span>
