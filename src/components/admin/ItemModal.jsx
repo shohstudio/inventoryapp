@@ -15,7 +15,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         quantity: 1, // NEW FIELD
         purchaseDate: "",
         price: "",
-        price: "", // NEW FIELD
         status: "working",
         assignedTo: "",
         assignedRole: "",
