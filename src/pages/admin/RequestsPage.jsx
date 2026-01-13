@@ -20,7 +20,8 @@ const RequestsPage = () => {
             setRequests(data);
         } catch (error) {
             console.error("Failed to fetch requests", error);
-            toast.error("So'rovlarni yuklashda xatolik");
+            const msg = error.response?.data?.message || "So'rovlarni yuklashda xatolik";
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
