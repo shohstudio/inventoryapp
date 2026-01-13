@@ -19,7 +19,7 @@ echo "🛠 Backend sozlanmoqda..."
 cd server
 npm install
 npx prisma generate
-npx prisma migrate deploy
+npx prisma db push
 
 # 4. Restart PM2
 echo "🔄 Server qayta ishga tushirilmoqda..."
