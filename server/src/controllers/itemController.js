@@ -342,7 +342,7 @@ const importItems = async (req, res) => {
     }
 };
 
-};
+
 
 // @desc    Delete multiple items
 // @route   POST /api/items/delete-many
