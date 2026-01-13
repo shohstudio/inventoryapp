@@ -31,20 +31,45 @@ const RequestsPage = () => {
         fetchRequests();
     }, []);
 
-    const handleUpdateStatus = async (id, newStatus, signature = null) => {
-        if (!window.confirm("Tasdiqlaysizmi?")) return;
+    const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState("");
+    const [selectedRequestId, setSelectedRequestId] = useState(null);
+
+    const handleUpdateStatus = async (id, newStatus, signature = null, description = null) => {
+        if (newStatus === 'rejected' && !description) {
+            // Open modal for rejection reason
+            setSelectedRequestId(id);
+            setRejectionModalOpen(true);
+            return;
+        }
+
+        if (newStatus !== 'rejected' && !window.confirm("Tasdiqlaysizmi?")) return;
 
         setIsProcessing(true);
         try {
-            await api.put(`/requests/${id}`, { status: newStatus, signature });
+            await api.put(`/requests/${id}`, { status: newStatus, signature, description });
             toast.success("Muvaffaqiyatli bajarildi");
             fetchRequests();
+            if (rejectionModalOpen) {
+                setRejectionModalOpen(false);
+                setRejectionReason("");
+                setSelectedRequestId(null);
+            }
         } catch (error) {
             console.error("Update failed", error);
-            toast.error("Xatolik yuz berdi");
+            const msg = error.response?.data?.message || "Xatolik yuz berdi";
+            toast.error(msg);
         } finally {
             setIsProcessing(false);
         }
+    };
+
+    const submitRejection = () => {
+        if (!rejectionReason.trim()) {
+            toast.error("Rad etish sababini yozing");
+            return;
+        }
+        handleUpdateStatus(selectedRequestId, 'rejected', null, rejectionReason);
     };
 
     // Filter based on tab
