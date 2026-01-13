@@ -201,13 +201,37 @@ const importItems = async (req, res) => {
         const sheet = workbook.Sheets[sheetName];
         const data = xlsx.utils.sheet_to_json(sheet);
 
+        // 1. Gather all PINFLs from the file to fetch users efficiently
+        const pinflsFromFile = new Set();
+        data.forEach(row => {
+            // Helper to get value case-insensitively
+            const getVal = (keys) => {
+                for (let k of keys) {
+                    if (row[k] !== undefined) return row[k];
+                }
+                return null;
+            };
+            // Assume PINFL is in 'JSHSHIR' or 'PINFL' column
+            const pinfl = getVal(['JSHSHIR', 'PINFL', 'pinfl', 'jshshir']);
+            if (pinfl) pinflsFromFile.add(String(pinfl).replace(/\D/g, ''));
+        });
+
+        // 2. Fetch existing users with these PINFLs
+        const existingUsers = await prisma.user.findMany({
+            where: {
+                pinfl: { in: Array.from(pinflsFromFile) }
+            },
+            select: { id: true, pinfl: true, name: true }
+        });
+
+        const userMap = new Map(); // pinfl -> userObject
+        existingUsers.forEach(u => {
+            if (u.pinfl) userMap.set(u.pinfl, u);
+        });
+
         const itemsToCreate = [];
 
         for (const row of data) {
-            // Map columns. Assume Uzbek headers or fallback.
-            // Keys in 'row' depend on the Excel header row.
-
-            // Flexible matching helper
             const getVal = (keys) => {
                 for (let k of keys) {
                     if (row[k] !== undefined) return row[k];
@@ -216,7 +240,7 @@ const importItems = async (req, res) => {
             };
 
             const name = getVal(['Nomi', 'Name', 'Jihoz nomi', 'name']);
-            if (!name) continue; // Skip empty rows
+            if (!name) continue;
 
             const statusRaw = getVal(['Holati', 'Status', 'status']) || 'working';
             let status = 'working';
@@ -224,6 +248,24 @@ const importItems = async (req, res) => {
             if (s.includes('ta\'mir') || s.includes('repair')) status = 'repair';
             else if (s.includes('chiqarilgan') || s.includes('write')) status = 'written-off';
             else if (s.includes('buzilgan') || s.includes('broken')) status = 'broken';
+
+            // Get Owner Info
+            const pinflRaw = getVal(['JSHSHIR', 'PINFL', 'pinfl', 'jshshir']);
+            const pinfl = pinflRaw ? String(pinflRaw).replace(/\D/g, '') : null;
+            const ownerName = getVal(['Ega', 'Owner', 'F.I.SH', 'FIO', 'fullname']) || getVal(['Mas\'ul', 'Responsible']);
+
+            let assignedUserId = null;
+            let assignedDate = null;
+            let initialOwner = null;
+
+            if (pinfl && userMap.has(pinfl)) {
+                // User found! Assign item.
+                assignedUserId = userMap.get(pinfl).id;
+                assignedDate = new Date();
+            } else if (ownerName) {
+                // User NOT found, but we have a name. Store it.
+                initialOwner = String(ownerName);
+            }
 
             itemsToCreate.push({
                 name: String(name),
@@ -237,17 +279,15 @@ const importItems = async (req, res) => {
                 building: String(getVal(['Bino', 'Building', 'building']) || ''),
                 location: String(getVal(['Joylashuv', 'Location', 'location']) || 'Ombor'),
                 department: String(getVal(['Bo\'lim', 'Department', 'department']) || ''),
-                status: status
+                status: status,
+                assignedUserId, // New Logic
+                assignedDate,   // New Logic
+                initialOwner    // New Logic
             });
         }
 
         if (itemsToCreate.length > 0) {
-            // Use transaction or createMany with skipDuplicates (if supported) or loop
-            // Prisma createMany skipDuplicates is supported for SQLite in newer versions.
-
-            // However, to give feedback on exactly WHICH one failed is hard with createMany. 
-            // Let's try createMany first.
-            // 0. Deduplicate items within the file itself
+            // Deduplication logic (same as before)
             const uniqueFileItemsMap = new Map();
             const itemsWithoutSerial = [];
 
@@ -260,56 +300,40 @@ const importItems = async (req, res) => {
                     itemsWithoutSerial.push(item);
                 }
             }
-            // Combine unique serial items + all items without serial
-            const uniqueFileItems = [...Array.from(uniqueFileItemsMap.values()), ...itemsWithoutSerial];
 
-            // 1. Get all serial numbers from the unique file items
+            const uniqueFileItems = [...Array.from(uniqueFileItemsMap.values()), ...itemsWithoutSerial];
             const serials = uniqueFileItems.map(item => item.serialNumber).filter(s => s);
 
-            // 2. Find which ones already exist in DB
             const existingItems = await prisma.item.findMany({
-                where: {
-                    serialNumber: { in: serials }
-                },
+                where: { serialNumber: { in: serials } },
                 select: { serialNumber: true }
             });
 
             const existingSerials = new Set(existingItems.map(i => i.serialNumber));
-
-            // 3. Filter out duplicates (both internal and existing)
-            // Only filter if item has a serial number AND it exists in DB
             const newItems = uniqueFileItems.filter(item => !item.serialNumber || !existingSerials.has(item.serialNumber));
 
-            // 4. Insert only new items
             if (newItems.length > 0) {
                 await prisma.item.createMany({
                     data: newItems
                 });
 
-                // Log import
                 await prisma.log.create({
                     data: {
                         action: 'import',
-                        details: `Imported ${newItems.length} items from Excel (Skipped ${itemsToCreate.length - newItems.length} duplicates)`,
+                        details: `Imported ${newItems.length} items from Excel.`,
                         userId: req.user.id
                     }
                 });
             }
 
-            // Cleanup uploaded file
             fs.unlinkSync(req.file.path);
 
             return res.json({
                 message: `${newItems.length} ta yangi jihoz yuklandi! (${itemsToCreate.length - newItems.length} ta dublikat tashlab ketildi)`
             });
-            // End of new logic, ensuring we don't fall through to old response
-
-            /* Old response code below effectively unreachable or needs removal - handling via larger replacement would be cleaner but this tool call is minimized */
-
-
-
         }
     } catch (error) {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         console.error(error);
         res.status(500).json({ message: 'Import xatoligi: ' + error.message });
     }
