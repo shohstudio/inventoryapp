@@ -103,6 +103,15 @@ const createUser = async (req, res) => {
             }
         });
 
+        // Log creation
+        await prisma.log.create({
+            data: {
+                action: 'create_user',
+                details: `Foydalanuvchi yaratildi: ${name} (${username})`,
+                userId: req.user.id
+            }
+        });
+
         res.status(201).json(user);
     } catch (error) {
         res.status(400).json({ message: error.message });
