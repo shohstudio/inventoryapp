@@ -47,7 +47,7 @@ app.use('/api/auth', authLimiter);
 // Update CORS to be specific if needed in future, for now Allow All is strictly for dev convenience but insecure for prod. 
 // We will keep cors() standard for now but headers are secured.
 
-const path = require('path');
+
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const itemRoutes = require('./routes/itemRoutes');
