@@ -2,7 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+const fs = require('fs');
+const path = require('path');
+
 dotenv.config();
+
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir);
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
