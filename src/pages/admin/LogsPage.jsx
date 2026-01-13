@@ -104,24 +104,24 @@ const LogsPage = () => {
                                 logs.map((log, idx) => (
                                     <tr key={log.id || idx} className="hover:bg-gray-50/50 transition-colors">
                                         <td className="py-3 px-6 text-gray-500">
-                                            {new Date(log.timestamp || log.date).toLocaleString('uz-UZ')}
+                                            {new Date(log.createdAt).toLocaleString('uz-UZ')}
                                         </td>
                                         <td className="py-3 px-6 font-medium text-gray-800">
-                                            {log.userName || log.approvedBy || "Noma'lum"}
+                                            {log.user?.name || "Tizim"}
                                         </td>
                                         <td className="py-3 px-6 text-gray-500">
-                                            {log.userRole || (activeTab === 'exit' ? 'Accountant' : '-')}
+                                            {log.user?.role || "-"}
                                         </td>
                                         <td className="py-3 px-6">
-                                            <span className={`px-2 py-1 rounded text-xs ${log.action?.includes('qo\'shdi') ? 'bg-green-100 text-green-700' :
-                                                log.type === 'exit_approval' ? 'bg-orange-100 text-orange-700' :
+                                            <span className={`px-2 py-1 rounded text-xs ${log.action?.includes('create') ? 'bg-green-100 text-green-700' :
+                                                log.action?.includes('delete') ? 'bg-red-100 text-red-700' :
                                                     'bg-gray-100 text-gray-600'
                                                 }`}>
-                                                {log.action || (log.type === 'exit_approval' ? 'Chiqishga ruxsat berdi' : 'Amal')}
+                                                {log.action}
                                             </span>
                                         </td>
                                         <td className="py-3 px-6 text-gray-600 font-mono text-xs">
-                                            {log.itemName || "---"}
+                                            {log.item?.name || log.details || "---"}
                                         </td>
                                     </tr>
                                 ))
