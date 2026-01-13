@@ -136,6 +136,15 @@ const updateUser = async (req, res) => {
             data: dataToUpdate
         });
 
+        // Log update
+        await prisma.log.create({
+            data: {
+                action: 'update_user',
+                details: `Foydalanuvchi yangilandi: ${user.name} (${user.username})`,
+                userId: req.user.id
+            }
+        });
+
         res.json(user);
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -149,6 +158,15 @@ const deleteUser = async (req, res) => {
     try {
         await prisma.user.delete({
             where: { id: parseInt(req.params.id) }
+        });
+
+        // Log delete
+        await prisma.log.create({
+            data: {
+                action: 'delete_user',
+                details: `Foydalanuvchi o'chirildi ID: ${req.params.id}`,
+                userId: req.user.id
+            }
         });
         res.json({ message: 'User removed' });
     } catch (error) {
