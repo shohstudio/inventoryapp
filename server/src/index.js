@@ -52,8 +52,8 @@ app.use('/api/items', itemRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Serve Frontend (Vite build)
-// Expects 'dist' files to be in a 'public' folder in the server root
-app.use(express.static(path.join(__dirname, '../public')));
+// Expects 'dist' folder in the project root
+app.use(express.static(path.join(__dirname, '../../dist')));
 
 // API root message (optional, but good to keep)
 app.get('/api', (req, res) => {
@@ -62,7 +62,7 @@ app.get('/api', (req, res) => {
 
 // Handle SPA routing - return index.html for any unknown non-API route
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'index.html'));
+    res.sendFile(path.join(__dirname, '../../dist', 'index.html'));
 });
 
 // Global Error Handler

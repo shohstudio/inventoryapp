@@ -1,43 +1,33 @@
 #!/bin/bash
 
-# Stop execution on error
+# Stop on error
 set -e
 
-echo "🚀 Deployment started..."
+echo "🚀 Deployment boshlandi..."
 
 # 1. Pull latest changes
-echo "📥 Pulling latest changes from GitHub..."
+echo "📥 Git pull..."
 git pull origin main
 
-# 2. Install dependencies for frontend
-echo "📦 Installing frontend dependencies..."
+# 2. Install & Build Frontend
+echo "📦 Frontend o'rnatilmoqda va qurilmoqda..."
 npm install
-
-# 3. Build frontend
-echo "🏗️ Building frontend..."
 npm run build
 
-# 4. Install dependencies for backend
-echo "📦 Installing backend dependencies..."
+# 3. Setup Backend
+echo "🛠 Backend sozlanmoqda..."
 cd server
 npm install
-
-# 5. Generate Prisma Client
-echo "🔄 Generating Prisma Client..."
 npx prisma generate
+npx prisma migrate deploy
 
-# 6. Apply database changes (if any)
-# Note: For SQLite in production with simple setup, we might use db push or migrate deploy.
-# Using db push for now to be safe with rapid iteration, but migrate is better for prod.
-echo "🗄️ Syncing database schema..."
-npx prisma db push
+# 4. Restart PM2
+echo "🔄 Server qayta ishga tushirilmoqda..."
+# Check if PM2 process exists, restart if yes, start if no
+if pm2 list | grep -q "inventory-app"; then
+    pm2 restart inventory-app
+else
+    pm2 start src/index.js --name "inventory-app"
+fi
 
-cd ..
-
-# 7. Restart Backend (PM2)
-echo "🔄 Restarting application..."
-# Check if PM2 is running 'inventory-server' or similar. 
-# If you used a different name, update this part or just restart all.
-pm2 restart all || echo "⚠️ PM2 not found or no process to restart. If this is the first run, start manually."
-
-echo "✅ Deployment completed successfully!"
+echo "✅ Muvaffaqiyatli yakunlandi!"
