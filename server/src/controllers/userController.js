@@ -66,12 +66,25 @@ const createUser = async (req, res) => {
     console.log("CREATE USER REQUEST - Password received:", `'${password}'`);
 
     try {
-        const userExists = await prisma.user.findUnique({
-            where: { username }
+        // Check for existing user by username, email, OR pinfl
+        const existingUsers = await prisma.user.findMany({
+            where: {
+                OR: [
+                    { username: username },
+                    { email: email || undefined }, // undefined to skip if email is null 
+                    { pinfl: pinfl || undefined }
+                ]
+            }
         });
 
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
+        if (existingUsers.length > 0) {
+            const conflict = existingUsers[0];
+            let message = 'Foydalanuvchi allaqachon mavjud';
+            if (conflict.username === username) message = 'Bu foydalanuvchi nomi band (username)';
+            else if (conflict.email === email) message = 'Bu email allaqachon ro\'yxatdan o\'tgan';
+            else if (conflict.pinfl === pinfl) message = 'Bu PINFL raqami allaqachon mavjud';
+
+            return res.status(400).json({ message });
         }
 
         const salt = await bcrypt.genSalt(10);
