@@ -186,40 +186,40 @@ const RequestsPage = () => {
                     </table>
                 </div>
             </div>
-        </div>
-            
-            {/* Rejection Modal */ }
-    {
-        rejectionModalOpen && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
-                    <h3 className="text-xl font-bold text-gray-800 mb-4">Rad etish sababi</h3>
-                    <p className="text-sm text-gray-500 mb-2">Nega bu so'rovni rad etyapsiz? Izoh qoldirish majburiy.</p>
-                    <textarea
-                        className="textarea w-full h-32 mb-4"
-                        placeholder="Masalan: Jihoz menga tegishli emas..."
-                        value={rejectionReason}
-                        onChange={(e) => setRejectionReason(e.target.value)}
-                    />
-                    <div className="flex justify-end gap-3">
-                        <button
-                            onClick={() => setRejectionModalOpen(false)}
-                            className="btn btn-ghost text-gray-500"
-                        >
-                            Bekor qilish
-                        </button>
-                        <button
-                            onClick={submitRejection}
-                            className="btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200"
-                            disabled={!rejectionReason.trim() || isProcessing}
-                        >
-                            {isProcessing ? "..." : "Rad etish"}
-                        </button>
+
+
+            {/* Rejection Modal */}
+            {
+                rejectionModalOpen && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+                            <h3 className="text-xl font-bold text-gray-800 mb-4">Rad etish sababi</h3>
+                            <p className="text-sm text-gray-500 mb-2">Nega bu so'rovni rad etyapsiz? Izoh qoldirish majburiy.</p>
+                            <textarea
+                                className="textarea w-full h-32 mb-4"
+                                placeholder="Masalan: Jihoz menga tegishli emas..."
+                                value={rejectionReason}
+                                onChange={(e) => setRejectionReason(e.target.value)}
+                            />
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={() => setRejectionModalOpen(false)}
+                                    className="btn btn-ghost text-gray-500"
+                                >
+                                    Bekor qilish
+                                </button>
+                                <button
+                                    onClick={submitRejection}
+                                    className="btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200"
+                                    disabled={!rejectionReason.trim() || isProcessing}
+                                >
+                                    {isProcessing ? "..." : "Rad etish"}
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        )
-    }
+                )
+            }
         </div >
     );
 };
