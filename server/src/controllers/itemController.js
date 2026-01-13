@@ -257,14 +257,16 @@ const importItems = async (req, res) => {
             let assignedUserId = null;
             let assignedDate = null;
             let initialOwner = null;
+            let initialPinfl = null;
 
             if (pinfl && userMap.has(pinfl)) {
                 // User found! Assign item.
                 assignedUserId = userMap.get(pinfl).id;
                 assignedDate = new Date();
-            } else if (ownerName) {
-                // User NOT found, but we have a name. Store it.
-                initialOwner = String(ownerName);
+            } else {
+                // User NOT found
+                if (ownerName) initialOwner = String(ownerName);
+                if (pinfl) initialPinfl = String(pinfl);
             }
 
             itemsToCreate.push({
@@ -280,9 +282,10 @@ const importItems = async (req, res) => {
                 location: String(getVal(['Joylashuv', 'Location', 'location']) || 'Ombor'),
                 department: String(getVal(['Bo\'lim', 'Department', 'department']) || ''),
                 status: status,
-                assignedUserId, // New Logic
-                assignedDate,   // New Logic
-                initialOwner    // New Logic
+                assignedUserId,
+                assignedDate,
+                initialOwner,
+                initialPinfl
             });
         }
 
