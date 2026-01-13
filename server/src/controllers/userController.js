@@ -113,6 +113,34 @@ const createUser = async (req, res) => {
         });
 
         res.status(201).json(user);
+
+        // Retroactive Assignment Check
+        // If items were imported with this PINFL but no user existed then, we link them now via a Request.
+        if (pinfl) {
+            const pendingItems = await prisma.item.findMany({
+                where: {
+                    initialPinfl: pinfl,
+                    assignedUserId: null
+                }
+            });
+
+            if (pendingItems.length > 0) {
+                console.log(`Found ${pendingItems.length} items for new user ${name} (${pinfl}). Creating requests...`);
+
+                const requestsData = pendingItems.map(item => ({
+                    type: 'assignment',
+                    status: 'pending_employee', // Direct to employee for approval
+                    itemId: item.id,
+                    requesterId: req.user.id, // Admin who created the user is technically the requester
+                    targetUserId: user.id,
+                    description: "Avvalgi importdan qolgan biriktirilmagan jihoz (PINFL mosligi bo'yicha)"
+                }));
+
+                await prisma.request.createMany({
+                    data: requestsData
+                });
+            }
+        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
