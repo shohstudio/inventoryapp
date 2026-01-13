@@ -2,7 +2,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { RiFileListLine, RiAlertLine, RiNotification3Line, RiCheckDoubleLine, RiTimeLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import StatsCard from "../../components/admin/StatsCard";
-import { useState, useEffect } from "react"; // Added imports
+import { useState, useEffect } from "react";
+import api from "../../api/axios";
 
 const EmployeeDashboard = () => {
     const { user } = useAuth();
@@ -12,37 +13,42 @@ const EmployeeDashboard = () => {
     const [recentItems, setRecentItems] = useState([]);
 
     // Fetch Real Items
+    // Fetch Real Items
     useEffect(() => {
         if (user) {
-            const allItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
+            const fetchData = async () => {
+                try {
+                    const { data: allItems } = await api.get("/items");
 
-            // Filter logic: Match by assignedTo (name) OR assignedPINFL
-            // Note: In real app, we should use User ID. Here we use Name/PINFL as per existing logic.
-            const myItems = allItems.filter(item =>
-                (item.assignedTo === user.name) ||
-                (user.pinfl && item.assignedPINFL === user.pinfl)
-            );
+                    // Filter logic
+                    const myItems = allItems.filter(item =>
+                        (item.assignedUserId === user.id) ||
+                        (item.assignedTo?.name === user.name)
+                    );
 
-            setMyItemsCount(myItems.length);
+                    setMyItemsCount(myItems.length);
 
-            // Calculate Total Value
-            const total = myItems.reduce((sum, item) => {
-                let priceStr = (item.price || "0").toString().replace(/\s/g, '').replace(',', '.');
-                const price = parseFloat(priceStr) || 0;
-                const quantity = parseInt(item.quantity) || 1;
-                return sum + (price * quantity);
-            }, 0);
-            setTotalValue(total);
+                    // Calculate Total Value
+                    const total = myItems.reduce((sum, item) => {
+                        let price = parseFloat(item.price) || 0;
+                        const quantity = parseInt(item.quantity) || 1;
+                        return sum + (price * quantity);
+                    }, 0);
+                    setTotalValue(total);
 
-            // Get recent 3 items for the table
-            // Assuming higher ID means newer, or we could sort by assignedDate if it existed.
-            // For now, reverse the array to show latest additions first.
-            setRecentItems(myItems.slice(-3).reverse().map(item => ({
-                id: item.id,
-                name: item.name,
-                assignedDate: item.purchaseDate || "Noma'lum", // Fallback to purchaseDate or placeholder
-                status: item.status === 'working' ? 'active' : 'repair'
-            })));
+                    // Get recent 3 items
+                    setRecentItems(myItems.slice(-3).reverse().map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        assignedDate: item.assignedDate ? new Date(item.assignedDate).toLocaleDateString('uz-UZ') : "Noma'lum",
+                        status: item.status === 'working' ? 'active' : 'repair'
+                    })));
+
+                } catch (error) {
+                    console.error("Failed to fetch dashboard data", error);
+                }
+            };
+            fetchData();
         }
     }, [user]);
 

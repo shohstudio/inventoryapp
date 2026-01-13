@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiComputerLine, RiCheckDoubleLine, RiAlertLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
+import api from "../../api/axios";
 
 const MyItemsPage = () => {
     const { user } = useAuth();
@@ -11,45 +12,62 @@ const MyItemsPage = () => {
     useEffect(() => {
         if (!user) return;
 
-        const storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
-        const storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
-        const storedRequests = JSON.parse(localStorage.getItem("assignment_requests") || "[]");
+        const fetchData = async () => {
+            try {
+                const [itemsRes, logsRes] = await Promise.all([
+                    api.get("/items"),
+                    api.get("/logs")
+                ]);
 
-        // 1. Existing Items Logic
-        // Filter items assigned to the current user (by Name or PINFL if available)
-        const userItems = storedItems.filter(item => {
-            // Check matches
-            const nameMatch = item.assignedTo?.toLowerCase() === user.name?.toLowerCase();
-            const pinflMatch = user.pinfl && item.assignedPINFL === user.pinfl;
-            return nameMatch || pinflMatch;
-        });
+                const allItems = itemsRes.data;
+                const allLogs = logsRes.data;
 
-        const itemsWithLogs = userItems.map(item => {
-            // Find latest log for this item
-            const itemLogs = storedLogs.filter(log => log.itemName === item.name);
-            // Sort by latest
-            itemLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                // 1. Filter items assigned to the current user
+                // Backend stores assignedUserId.
+                // We also check legacy name/pinfl match just in case
+                const userItems = allItems.filter(item => {
+                    const idMatch = item.assignedUserId === user.id;
+                    // Fallback for older data or different assignment logic
+                    const nameMatch = item.assignedTo?.name === user.name; // assignedTo is relation object now
+                    const pinflMatch = user.pinfl && item.assignedTo?.pinfl === user.pinfl;
 
-            const latestLog = itemLogs.length > 0 ? itemLogs[0] : null;
-            const dateAssigned = latestLog
-                ? new Date(latestLog.timestamp).toLocaleDateString('uz-UZ')
-                : "Noma'lum"; // Fallback
+                    return idMatch || nameMatch || pinflMatch;
+                });
 
-            return {
-                ...item,
-                dateAssigned
-            };
-        });
+                const itemsWithLogs = userItems.map(item => {
+                    // Find latest log for this item (Assign action)
+                    // Logs from API have item object or itemId
+                    const itemLogs = allLogs.filter(log =>
+                        (log.item?.id === item.id) ||
+                        (log.itemName === item.name) // Fallback
+                    );
 
-        setMyItems(itemsWithLogs);
+                    // Sort by newest
+                    itemLogs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // 2. Pending Requests Logic
-        const myPendingRequests = storedRequests.filter(req =>
-            req.status === 'pending_employee' &&
-            (req.assignedToPinfl === user.pinfl || req.assignedToName?.toLowerCase() === user.name?.toLowerCase())
-        );
-        setRequests(myPendingRequests);
+                    const latestLog = itemLogs.length > 0 ? itemLogs[0] : null;
+                    const dateAssigned = latestLog
+                        ? new Date(latestLog.createdAt).toLocaleDateString('uz-UZ')
+                        : item.assignedDate ? new Date(item.assignedDate).toLocaleDateString('uz-UZ') : "Noma'lum";
 
+                    return {
+                        ...item,
+                        dateAssigned
+                    };
+                });
+
+                setMyItems(itemsWithLogs);
+
+                // 2. Pending Requests Logic - MOCK for now as API requests not fully implemented
+                // But we can clear it or leave empty
+                setRequests([]);
+
+            } catch (error) {
+                console.error("Failed to fetch employee items", error);
+            }
+        };
+
+        fetchData();
     }, [user]);
 
     const handleAccept = (request) => {
