@@ -156,4 +156,42 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser };
+// @desc    Check if use exists (for frontend validation)
+// @route   POST /api/users/check-availability
+// @access  Private/Admin
+const checkAvailability = async (req, res) => {
+    try {
+        const { username, email, pinfl, excludeId } = req.body;
+        const where = { OR: [] };
+
+        if (username) where.OR.push({ username });
+        if (email) where.OR.push({ email });
+        if (pinfl) where.OR.push({ pinfl });
+
+        if (where.OR.length === 0) return res.json({ available: true });
+
+        const exists = await prisma.user.findFirst({
+            where: {
+                AND: [
+                    { OR: where.OR },
+                    excludeId ? { NOT: { id: parseInt(excludeId) } } : {}
+                ]
+            }
+        });
+
+        if (exists) {
+            let message = 'Band';
+            if (exists.username === username) message = 'Login band';
+            if (exists.email === email) message = 'Email band';
+            if (exists.pinfl === pinfl) message = 'PINFL band';
+
+            return res.json({ available: false, message });
+        }
+
+        res.json({ available: true });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser, checkAvailability };
