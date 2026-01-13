@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import api from "../../api/axios";
 import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine, RiDeleteBinLine } from "react-icons/ri";
 import clsx from "clsx";
 import StatsCard from "../../components/admin/StatsCard";
@@ -11,84 +12,55 @@ const AdminDashboard = () => {
     const { user } = useAuth();
     const { t } = useLanguage();
     const [userCount, setUserCount] = useState(0);
-    const [inventoryStats, setInventoryStats] = useState({
-        totalItems: 0,
-        repairItems: 0,
-        writtenOffItems: 0,
-        totalValue: 0,
-        recentItems: []
-    });
-
-    const [logs, setLogs] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        try {
-            // Users
-            let storedUsers = [];
+        const fetchData = async () => {
             try {
-                storedUsers = JSON.parse(localStorage.getItem("inventory_users_list") || "[]");
-                if (!Array.isArray(storedUsers)) storedUsers = [];
-            } catch (e) {
-                console.error("Failed to parse users", e);
-            }
-            setUserCount(storedUsers.length);
+                const [usersRes, itemsRes] = await Promise.all([
+                    api.get("/users"),
+                    api.get("/items")
+                ]);
 
-            // Inventory
-            let storedItems = [];
-            try {
-                storedItems = JSON.parse(localStorage.getItem("inventory_items") || "[]");
-                if (!Array.isArray(storedItems)) storedItems = [];
-            } catch (e) {
-                console.error("Failed to parse items", e);
-            }
+                // Users
+                setUserCount(usersRes.data.length);
 
-            const totalItems = storedItems.length;
-            const repairItems = storedItems.filter(item => item && item.status === 'repair').length;
-            const writtenOffItems = storedItems.filter(item => item && item.status === 'written-off').length;
+                // Inventory
+                const items = itemsRes.data;
 
-            // Calculate total value
-            const totalValue = storedItems.reduce((acc, item) => {
-                if (!item || !item.price) return acc;
-                // Exclude written-off items from total value calculation
-                if (item.status === 'written-off') return acc;
+                const totalItems = items.length;
+                const repairItems = items.filter(item => item.status === 'repair').length;
+                const writtenOffItems = items.filter(item => item.status === 'written-off').length;
 
-                try {
-                    // Normalize price string: remove spaces/non-numeric/non-separators first
-                    // Example: "14 000 000,00" -> "14000000,00"
-                    const priceStr = String(item.price).replace(/\s/g, '');
+                // Calculate total value
+                const totalValue = items.reduce((acc, item) => {
+                    // Exclude written-off items
+                    if (item.status === 'written-off') return acc;
 
-                    // Replace comma with dot for parseFloat
-                    const normalizedPrice = priceStr.replace(',', '.');
-
-                    const cleanPrice = parseFloat(normalizedPrice);
+                    const price = parseFloat(item.price) || 0;
                     const quantity = parseInt(item.quantity) || 1;
+                    return acc + (price * quantity);
+                }, 0);
 
-                    return acc + ((isNaN(cleanPrice) ? 0 : cleanPrice) * quantity);
-                } catch (e) {
-                    return acc;
-                }
-            }, 0);
+                setInventoryStats({
+                    totalItems,
+                    repairItems,
+                    writtenOffItems,
+                    totalValue,
+                    recentItems: items.slice(0, 5) // Items are already ordered by desc in backend usually
+                });
 
-            setInventoryStats({
-                totalItems,
-                repairItems,
-                writtenOffItems,
-                totalValue,
-                recentItems: storedItems.slice(-5).reverse()
-            });
+                // TODO: Connect to /api/logs when available
+                setLogs([]);
 
-            // Logs
-            let storedLogs = [];
-            try {
-                storedLogs = JSON.parse(localStorage.getItem("inventory_logs") || "[]");
-                if (!Array.isArray(storedLogs)) storedLogs = [];
-            } catch (e) {
-                console.error("Failed to parse logs", e);
+            } catch (error) {
+                console.error("Dashboard failed to load", error);
+            } finally {
+                setLoading(false);
             }
-            setLogs(storedLogs.slice(0, 5));
-        } catch (error) {
-            console.error("Dashboard Error:", error);
-        }
+        };
+
+        fetchData();
     }, []);
 
     // Format utility for large numbers
