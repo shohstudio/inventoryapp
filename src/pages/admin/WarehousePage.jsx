@@ -16,7 +16,8 @@ const WarehousePage = () => {
         status: 'all',
         category: '',
         building: '',
-        location: ''
+        location: '',
+        isAssigned: 'all' // all, unassigned
     });
 
     const [items, setItems] = useState([]);
@@ -27,9 +28,8 @@ const WarehousePage = () => {
         try {
             const { data } = await api.get('/items');
             // Filter only unassigned items (those in warehouse)
-            // Or explicitly filter by location if preferred, but unassigned is safer for "Stock"
-            const warehouseItems = data.filter(item => !item.assignedUserId && !item.assignedTo);
-            setItems(warehouseItems);
+            // Fetch all items to allow flexible client-side filtering
+            setItems(data);
         } catch (error) {
             console.error("Failed to fetch warehouse items", error);
             toast.error("Ombor ma'lumotlarini yuklashda xatolik");
@@ -108,6 +108,13 @@ const WarehousePage = () => {
         if (filters.category && item.category !== filters.category) return false;
         if (filters.building && item.building !== filters.building) return false;
         if (filters.location && item.location && !item.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+
+        // Unassigned Filter logic
+        if (filters.isAssigned === 'unassigned') {
+            // Only show items that have NO assigned user 
+            if (item.assignedTo || item.assignedUserId) return false;
+        }
+
         return true;
     });
 
@@ -151,6 +158,21 @@ const WarehousePage = () => {
                             />
                         </div>
 
+                        {/* Status Tabs for Assigned/Unassigned */}
+                        <div className="flex bg-gray-100 p-1 rounded-lg">
+                            <button
+                                onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'all' }))}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'all' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Barchasi
+                            </button>
+                            <button
+                                onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'unassigned' }))}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'unassigned' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Birikmaganlar
+                            </button>
+                        </div>
                     </div>
 
                     <button
@@ -204,7 +226,7 @@ const WarehousePage = () => {
                             <tr className="bg-blue-600 text-white">
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">ID</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Nomi / Model</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Xarid Sanasi</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Mas'ul (Holat)</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Kafolat</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Narxi</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Rasm</th>
@@ -219,7 +241,19 @@ const WarehousePage = () => {
                                         <div className="font-medium text-gray-900">{item.name}</div>
                                         <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
                                     </td>
-                                    <td className="py-4 px-6 text-gray-600">{item.purchaseDate || '-'}</td>
+                                    <td className="py-4 px-6 text-gray-600">
+                                        {/* Display Assigned User or Initial Owner */}
+                                        {item.assignedTo ? (
+                                            <span className="text-blue-600 font-medium">{item.assignedTo.name}</span>
+                                        ) : item.initialOwner ? (
+                                            <div className="flex flex-col">
+                                                <span className="text-orange-500 text-sm font-medium">Biriktirilmagan</span>
+                                                <span className="text-xs text-gray-400">({item.initialOwner})</span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-400 italic">Omborda</span>
+                                        )}
+                                    </td>
                                     <td className="py-4 px-6">
                                         {/* Warranty not always in API? Using arrivalDate/ManufactureYear as proxy if needed, or check schema if warranty field exists. Schema didn't show warranty field, only purchaseDate. Let's assume frontend handled this loosely. */}
                                         <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
