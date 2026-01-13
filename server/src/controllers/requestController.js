@@ -51,23 +51,24 @@ const createRequest = async (req, res) => {
 // @access  Private
 const getRequests = async (req, res) => {
     try {
+        console.log("GET /api/requests called by user:", req.user?.id, req.user?.role);
+
         let where = {};
         const { status } = req.query;
 
         if (status) where.status = status;
 
         // Role based filtering
-        if (req.user.role === 'employee') {
+        if (req.user && req.user.role === 'employee') {
             // Employee sees requests where they are target or requester
             where.OR = [
                 { targetUserId: req.user.id },
                 { requesterId: req.user.id }
             ];
-        } else if (req.user.role === 'accounter') {
-            // Accounter sees pending assignment requests? Or all?
-            // Usually sees 'pending_accountant'
         }
-        // Admin/Warehouseman see all usually, or filtered by department
+
+        // Ensure Request table exists implicitly by catching error specifically? 
+        // No, just log error.
 
         const requests = await prisma.request.findMany({
             where,
@@ -81,7 +82,8 @@ const getRequests = async (req, res) => {
 
         res.json(requests);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("getRequests ERROR:", error);
+        res.status(500).json({ message: "Server xatoligi: " + error.message });
     }
 };
 
