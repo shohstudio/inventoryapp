@@ -43,8 +43,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
 
         let dataToSave = { ...formData };
         if (formData.password) {
-            const hashedPassword = await hashPassword(formData.password);
-            dataToSave.password = hashedPassword;
+            dataToSave.password = formData.password;
         } else {
             // Remove empty password field if editing and not changing password
             if (user) delete dataToSave.password;
