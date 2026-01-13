@@ -3,6 +3,8 @@ import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiAr
 import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
+import api from "../../api/axios";
+import { toast } from "react-hot-toast";
 
 const WarehousePage = () => {
     const { t } = useLanguage();
@@ -17,62 +19,72 @@ const WarehousePage = () => {
         location: ''
     });
 
-    const [items, setItems] = useState(() => {
-        const storedItems = localStorage.getItem("warehouse_items");
-        return storedItems ? JSON.parse(storedItems) : [];
-    });
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchItems = async () => {
+        setLoading(true);
+        try {
+            const { data } = await api.get('/items');
+            // Filter only unassigned items (those in warehouse)
+            // Or explicitly filter by location if preferred, but unassigned is safer for "Stock"
+            const warehouseItems = data.filter(item => !item.assignedUserId && !item.assignedTo);
+            setItems(warehouseItems);
+        } catch (error) {
+            console.error("Failed to fetch warehouse items", error);
+            toast.error("Ombor ma'lumotlarini yuklashda xatolik");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        localStorage.setItem("warehouse_items", JSON.stringify(items));
-    }, [items]);
+        fetchItems();
+    }, []);
 
     const { user } = useAuth();
 
-    const handleAddItem = (newItem) => {
+    const handleAddItem = async (itemData) => {
         try {
-            const storedLogs = JSON.parse(localStorage.getItem("warehouse_logs") || "[]");
-            const timestamp = new Date().toISOString();
-            let logAction = "";
+            const formData = new FormData();
+
+            // Convert simple object to FormData for file upload
+            Object.keys(itemData).forEach(key => {
+                if (key === 'imageFile' && itemData[key]) {
+                    formData.append('image', itemData[key]);
+                } else if (key !== 'images' && key !== 'imageFile') {
+                    // If ID is present (update), don't append it to body, it's in URL usually. 
+                    // But create needs fields.
+                    formData.append(key, itemData[key]);
+                }
+            });
+
+            // Ensure no user is assigned for warehouse items
+            formData.append('assignedUserId', '');
 
             if (selectedItem) {
-                setItems(items.map(i => i.id === selectedItem.id ? { ...newItem, id: selectedItem.id } : i));
-                logAction = "tahrirladi";
+                // Update
+                await api.put(`/items/${selectedItem.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                toast.success("Jihoz yangilandi");
             } else {
-                const nextOrderNum = (items.length + 1).toString().padStart(3, '0');
-                // Ensure newItem fields have defaults if missing
-                const itemToAdd = {
-                    ...newItem,
-                    status: 'working', // Default status for filtering compatibility
-                    id: Date.now(),
-                    orderNumber: nextOrderNum
-                };
-                setItems([...items, itemToAdd]);
-                logAction = "qo'shdi";
+                // Create
+                await api.post('/items', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                toast.success("Jihoz omborga qo'shildi");
             }
-
-            // Add Log
-            const newLog = {
-                id: Date.now(),
-                userName: user?.name || "Noma'lum",
-                userRole: user?.role,
-                action: logAction,
-                itemName: newItem.name,
-                timestamp: timestamp
-            };
-
-            const updatedLogs = [newLog, ...storedLogs].slice(0, 50);
-            localStorage.setItem("warehouse_logs", JSON.stringify(updatedLogs));
-            // Success feedback could be a toast, but for now we proceed silently or use a simple alert if requested
-            // alert("Muvaffaqiyatli saqlandi!"); 
+            fetchItems();
+            setIsModalOpen(false);
         } catch (error) {
-            console.error("Error adding item:", error);
-            alert("Xatolik yuz berdi: " + error.message);
+            console.error("Error saving item:", error);
+            const msg = error.response?.data?.message || error.message;
+            toast.error("Xatolik: " + msg);
         }
     };
 
     const openModal = (item = null) => {
-        // Debugging functionality
-        console.log("Opening modal", item);
         setSelectedItem(item);
         setIsModalOpen(true);
     };
@@ -84,10 +96,10 @@ const WarehousePage = () => {
             const query = searchQuery.toLowerCase();
             const matchesSearch =
                 item.name.toLowerCase().includes(query) ||
-                item.model.toLowerCase().includes(query) ||
-                item.serial?.toLowerCase().includes(query) ||
-                item.inn?.includes(query) ||
-                item.orderNumber.includes(query);
+                (item.model && item.model.toLowerCase().includes(query)) ||
+                (item.serialNumber && item.serialNumber.toLowerCase().includes(query)) || // Backend uses serialNumber
+                (item.inn && item.inn.includes(query)) ||
+                (item.orderNumber && String(item.orderNumber).includes(query));
 
             if (!matchesSearch) return false;
         }
@@ -95,14 +107,13 @@ const WarehousePage = () => {
         if (filters.status !== "all" && item.status !== filters.status) return false;
         if (filters.category && item.category !== filters.category) return false;
         if (filters.building && item.building !== filters.building) return false;
-        if (filters.location && !item.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
+        if (filters.location && item.location && !item.location.toLowerCase().includes(filters.location.toLowerCase())) return false;
         return true;
     });
 
-    const uniqueCategories = [...new Set(items.map(item => item.category))];
-    const uniqueBuildings = [...new Set(items.map(item => item.building))];
+    const uniqueCategories = [...new Set(items.map(item => item.category).filter(Boolean))];
 
-    console.log("WarehousePage Rendered"); // Verify render
+    if (loading) return <div className="p-8 text-center text-gray-500">Yuklanmoqda...</div>;
 
     return (
         <div>
@@ -110,7 +121,7 @@ const WarehousePage = () => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                         <RiArchiveLine className="text-orange-500" />
-                        {t('warehouse')} <span className="text-xs text-gray-400 font-normal">v1.3</span>
+                        {t('warehouse')}
                     </h1>
                     <p className="text-gray-500">
                         {t('inventory_subtitle')}
@@ -191,11 +202,9 @@ const WarehousePage = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-blue-600 text-white">
-                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Tartib raqami</th>
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">ID</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Nomi / Model</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Kelgan Kuni</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Ishlab chiqarilgan</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Magazin (Yetkazib beruvchi)</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Xarid Sanasi</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Kafolat</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Narxi</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Rasm</th>
@@ -205,26 +214,24 @@ const WarehousePage = () => {
                         <tbody className="divide-y divide-gray-100">
                             {filteredItems.map((item) => (
                                 <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
-                                    <td className="py-4 px-6 text-gray-600 font-medium">#{item.orderNumber}</td>
+                                    <td className="py-4 px-6 text-gray-600 font-medium">#{item.orderNumber || item.id}</td>
                                     <td className="py-4 px-6">
                                         <div className="font-medium text-gray-900">{item.name}</div>
                                         <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
                                     </td>
-                                    <td className="py-4 px-6 text-gray-600">{item.arrivalDate}</td>
-                                    <td className="py-4 px-6 text-gray-600">{item.manufactureYear}</td>
-                                    <td className="py-4 px-6 text-indigo-600 font-medium">{item.supplier}</td>
+                                    <td className="py-4 px-6 text-gray-600">{item.purchaseDate || '-'}</td>
                                     <td className="py-4 px-6">
+                                        {/* Warranty not always in API? Using arrivalDate/ManufactureYear as proxy if needed, or check schema if warranty field exists. Schema didn't show warranty field, only purchaseDate. Let's assume frontend handled this loosely. */}
                                         <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
-                                            {item.warranty}
+                                            {item.condition || 'Yangi'}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6 text-gray-900 font-medium">{item.quantity || 1} ta</td>
-                                    <td className="py-4 px-6 text-gray-900 font-bold">{item.price} so'm</td>
+                                    <td className="py-4 px-6 text-gray-900 font-bold">{parseFloat(item.price).toLocaleString()} so'm</td>
                                     <td className="py-4 px-6">
-                                        {item.images && item.images.length > 0 ? (
+                                        {item.image ? (
                                             <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
                                                 <img
-                                                    src={item.images[0]}
+                                                    src={item.image}
                                                     alt={item.name}
                                                     className="w-full h-full object-cover"
                                                 />
