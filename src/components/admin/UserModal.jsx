@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { RiCloseLine, RiSave3Line } from "react-icons/ri";
-
+import { RiCloseLine, RiSave3Line, RiErrorWarningLine } from "react-icons/ri";
+import api from "../../api/axios";
 
 const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const [formData, setFormData] = useState({
@@ -13,6 +13,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         pinfl: "",
         password: ""
     });
+    const [errors, setErrors] = useState({});
+    const [checking, setChecking] = useState({});
 
     useEffect(() => {
         if (user) {
@@ -20,7 +22,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         } else {
             setFormData({
                 name: "",
-                username: "", // New field
+                username: "",
                 email: "",
                 role: "employee",
                 department: "",
@@ -29,6 +31,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 password: ""
             });
         }
+        setErrors({});
     }, [user, isOpen]);
 
     if (!isOpen) return null;
@@ -36,16 +39,42 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        // Clear error when user starts typing again
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: null }));
+        }
+    };
+
+    const validateField = async (field, value) => {
+        if (!value) return;
+        // Skip check if value hasn't changed from original user (editing mode)
+        if (user && user[field] === value) return;
+
+        setChecking(prev => ({ ...prev, [field]: true }));
+        try {
+            const { data } = await api.post('/users/check-availability', {
+                [field]: value,
+                excludeId: user?.id
+            });
+
+            if (!data.available) {
+                setErrors(prev => ({ ...prev, [field]: data.message }));
+            }
+        } catch (error) {
+            console.error("Validation failed", error);
+        } finally {
+            setChecking(prev => ({ ...prev, [field]: false }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (Object.keys(errors).length > 0) return;
 
         let dataToSave = { ...formData };
         if (formData.password) {
             dataToSave.password = formData.password;
         } else {
-            // Remove empty password field if editing and not changing password
             if (user) delete dataToSave.password;
         }
 
@@ -81,15 +110,20 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
 
                     <div>
                         <label className="label">Login</label>
-                        <input
-                            type="text"
-                            name="username"
-                            className="input"
-                            required
-                            value={formData.username}
-                            onChange={handleChange}
-                            placeholder="vali123"
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                name="username"
+                                className={`input ${errors.username ? 'border-red-500 focus:ring-red-200' : ''}`}
+                                required
+                                value={formData.username}
+                                onChange={handleChange}
+                                onBlur={(e) => validateField('username', e.target.value)}
+                                placeholder="vali123"
+                            />
+                            {checking.username && <span className="absolute right-3 top-3 text-xs text-gray-400">Tekshirilmoqda...</span>}
+                        </div>
+                        {errors.username && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.username}</p>}
                     </div>
 
                     <div>
@@ -97,12 +131,14 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                         <input
                             type="email"
                             name="email"
-                            className="input"
+                            className={`input ${errors.email ? 'border-red-500 focus:ring-red-200' : ''}`}
                             required
                             value={formData.email}
                             onChange={handleChange}
+                            onBlur={(e) => validateField('email', e.target.value)}
                             placeholder="vali@example.com"
                         />
+                        {errors.email && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.email}</p>}
                     </div>
 
                     <div>
@@ -165,17 +201,20 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                         <input
                             type="text"
                             name="pinfl"
-                            className="input"
+                            className={`input ${errors.pinfl ? 'border-red-500 focus:ring-red-200' : ''}`}
                             value={formData.pinfl}
                             onChange={(e) => {
                                 const val = e.target.value.replace(/\D/g, '').slice(0, 14);
                                 setFormData(prev => ({ ...prev, pinfl: val }));
+                                if (errors.pinfl) setErrors(prev => ({ ...prev, pinfl: null }));
                             }}
+                            onBlur={(e) => validateField('pinfl', e.target.value)}
                             placeholder="14 xonali raqam"
                             minLength={14}
                             maxLength={14}
                             required
                         />
+                        {errors.pinfl && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.pinfl}</p>}
                     </div>
 
                     <div className="pt-4 flex justify-end gap-3">
@@ -188,7 +227,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                         </button>
                         <button
                             type="submit"
-                            className="btn btn-primary shadow-lg shadow-indigo-200"
+                            className="btn btn-primary shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={Object.values(errors).some(e => e) || Object.values(checking).some(c => c)}
                         >
                             <RiSave3Line size={18} />
                             Saqlash
