@@ -17,7 +17,7 @@ const WarehousePage = () => {
         category: '',
         building: '',
         location: '',
-        isAssigned: 'all' // all, unassigned
+        isAssigned: 'unassigned' // default: unassigned (only stock)
     });
 
     const [items, setItems] = useState([]);
