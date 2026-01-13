@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine, RiDeleteBinLine } from "react-icons/ri";
 import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -19,6 +19,10 @@ const WarehousePage = () => {
         location: '',
         isAssigned: 'unassigned' // default: unassigned (only stock)
     });
+
+    // Bulk Delete State
+    const [selectedItems, setSelectedItems] = useState(new Set());
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -89,6 +93,43 @@ const WarehousePage = () => {
         setIsModalOpen(true);
     };
 
+    // Bulk Delete Logic
+    const toggleSelectAll = () => {
+        if (selectedItems.size === filteredItems.length) {
+            setSelectedItems(new Set());
+        } else {
+            const allIds = new Set(filteredItems.map(i => i.id));
+            setSelectedItems(allIds);
+        }
+    };
+
+    const toggleSelectItem = (id) => {
+        const newSet = new Set(selectedItems);
+        if (newSet.has(id)) {
+            newSet.delete(id);
+        } else {
+            newSet.add(id);
+        }
+        setSelectedItems(newSet);
+    };
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(`Tanlangan ${selectedItems.size} ta jihozni o'chirib yuborishni tasdiqlaysizmi?`)) return;
+
+        setIsDeleting(true);
+        try {
+            await api.post('/items/delete-many', { ids: Array.from(selectedItems) });
+            toast.success("Jihozlar muvaffaqiyatli o'chirildi");
+            setSelectedItems(new Set());
+            fetchItems();
+        } catch (error) {
+            console.error(error);
+            toast.error("O'chirishda xatolik yuz berdi");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     // Filter logic
     const filteredItems = items.filter(item => {
         // Search Filter
@@ -134,13 +175,25 @@ const WarehousePage = () => {
                         {t('inventory_subtitle')}
                     </p>
                 </div>
-                <button
-                    onClick={() => openModal()}
-                    className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
-                >
-                    <RiAddLine size={20} />
-                    {t('warehouse_add')}
-                </button>
+                <div className="flex gap-2">
+                    {selectedItems.size > 0 && (
+                        <button
+                            onClick={handleBulkDelete}
+                            className="btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200 border-red-600 animate-in fade-in zoom-in"
+                            disabled={isDeleting}
+                        >
+                            <RiDeleteBinLine size={20} />
+                            Tanlanganlarni o'chirish ({selectedItems.size})
+                        </button>
+                    )}
+                    <button
+                        onClick={() => openModal()}
+                        className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
+                    >
+                        <RiAddLine size={20} />
+                        {t('warehouse_add')}
+                    </button>
+                </div>
             </div>
 
             <div className="card border-0 shadow-lg shadow-gray-100/50">
@@ -224,7 +277,15 @@ const WarehousePage = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-blue-600 text-white">
-                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">ID</th>
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg w-12">
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox checkbox-sm border-white checked:bg-white checked:text-blue-600"
+                                        checked={filteredItems.length > 0 && selectedItems.size === filteredItems.length}
+                                        onChange={toggleSelectAll}
+                                    />
+                                </th>
+                                <th className="py-4 px-6 font-semibold text-sm">ID</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Nomi / Model</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Mas'ul (Holat)</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Kafolat</th>
@@ -235,7 +296,15 @@ const WarehousePage = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredItems.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
+                                <tr key={item.id} className={`hover:bg-gray-50/80 transition-colors group ${selectedItems.has(item.id) ? 'bg-orange-50' : ''}`}>
+                                    <td className="py-4 px-6">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox checkbox-sm border-gray-300 checked:bg-orange-500 checked:border-orange-500"
+                                            checked={selectedItems.has(item.id)}
+                                            onChange={() => toggleSelectItem(item.id)}
+                                        />
+                                    </td>
                                     <td className="py-4 px-6 text-gray-600 font-medium">#{item.orderNumber || item.id}</td>
                                     <td className="py-4 px-6">
                                         <div className="font-medium text-gray-900">{item.name}</div>
@@ -288,7 +357,7 @@ const WarehousePage = () => {
                             ))}
                             {filteredItems.length === 0 && (
                                 <tr>
-                                    <td colSpan="9" className="text-center py-8 text-gray-500">
+                                    <td colSpan="10" className="text-center py-8 text-gray-500">
                                         Omborda jihozlar yo'q
                                     </td>
                                 </tr>
