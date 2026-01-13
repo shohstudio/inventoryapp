@@ -219,7 +219,6 @@ const RequestsPage = () => {
             </div>
         )
     }
-        </div >
     );
 };
 
