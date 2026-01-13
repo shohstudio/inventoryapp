@@ -63,6 +63,7 @@ const getUserById = async (req, res) => {
 // @access  Private/Admin
 const createUser = async (req, res) => {
     const { name, username, email, password, role, department, status, pinfl } = req.body;
+    console.log("CREATE USER REQUEST - Password received:", `'${password}'`);
 
     try {
         const userExists = await prisma.user.findUnique({

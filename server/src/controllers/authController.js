@@ -16,7 +16,7 @@ const login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        console.log('Login attempt:', username, password);
+        console.log("LOGIN REQUEST - Username:", `'${username}'`, "Password:", `'${password}'`);
         const user = await prisma.user.findUnique({
             where: { username },
         });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line } from "react-icons/ri";
-import { hashPassword } from "../../utils/crypto";
+
 
 const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const [formData, setFormData] = useState({
