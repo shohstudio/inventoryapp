@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 
 // Pages
@@ -27,6 +28,7 @@ function App() {
       <AuthProvider>
         <LanguageProvider>
           <ThemeProvider>
+            <Toaster position="top-right" />
             <Routes>
               <Route path="/login" element={<LoginPage />} />
 
