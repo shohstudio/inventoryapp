@@ -13,6 +13,14 @@ const AdminDashboard = () => {
     const { t } = useLanguage();
     const [userCount, setUserCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [inventoryStats, setInventoryStats] = useState({
+        totalItems: 0,
+        repairItems: 0,
+        writtenOffItems: 0,
+        totalValue: 0,
+        recentItems: []
+    });
+    const [logs, setLogs] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
