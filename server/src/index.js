@@ -43,12 +43,14 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const logRoutes = require('./routes/logRoutes');
+const requestRoutes = require('./routes/requestRoutes');
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/logs', logRoutes);
+app.use('/api/requests', requestRoutes);
 
 // Make uploads folder static
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
