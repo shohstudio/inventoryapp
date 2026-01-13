@@ -12,6 +12,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "type": "commonjs",
   "devDependencies": {
     "nodemon": "^3.1.11",
