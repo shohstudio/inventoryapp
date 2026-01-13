@@ -342,4 +342,48 @@ const importItems = async (req, res) => {
     }
 };
 
-module.exports = { getItems, getItemById, createItem, updateItem, deleteItem, importItems };
+};
+
+// @desc    Delete multiple items
+// @route   POST /api/items/delete-many
+// @access  Private/Admin
+const deleteManyItems = async (req, res) => {
+    try {
+        const { ids } = req.body; // Array of item IDs to delete
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: "O'chirish uchun jihozlar tanlanmagan" });
+        }
+
+        // Optional: Check if any items are assigned before deleting?
+        // For now, let's allow deleting unassigned items primarily.
+        // Or we can just try to delete and Prisma will throw if there are strict foreign key constraints (like active Requests).
+        // Let's safe delete: only delete if NOT assigned? Or just let admin force delete.
+        // Admin power: Force delete.
+
+        // However, if we delete an item that has a 'request', cascade might fail or be set.
+        // Let's assume on-delete cascade or simple delete is fine.
+
+        const deleted = await prisma.item.deleteMany({
+            where: {
+                id: { in: ids }
+            }
+        });
+
+        // Log
+        await prisma.log.create({
+            data: {
+                action: 'bulk_delete',
+                details: `${deleted.count} ta jihoz o'chirildi (Ommaviy)`,
+                userId: req.user.id
+            }
+        });
+
+        res.json({ message: `${deleted.count} ta jihoz o'chirildi` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "O'chirishda xatolik: " + error.message });
+    }
+};
+
+module.exports = { getItems, getItemById, createItem, updateItem, deleteItem, importItems, deleteManyItems };
