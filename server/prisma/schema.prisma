@@ -19,6 +19,7 @@ model User {
   password  String
   role      String   @default("employee") // admin, employee, warehouseman, accounter, guard
   department String?
+  position  String?  // Lavozimi (e.g. Director, Accountant)
   status    String   @default("active") // active, inactive
   pinfl     String?  @unique // JSHSHIR (14 digits)
 

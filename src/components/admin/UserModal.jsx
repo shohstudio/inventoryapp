@@ -9,6 +9,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         email: "",
         role: "employee",
         department: "",
+        position: "",
         status: "active",
         pinfl: "",
         password: ""
@@ -26,6 +27,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 email: "",
                 role: "employee",
                 department: "",
+                position: "",
                 status: "active",
                 pinfl: "",
                 password: ""
@@ -43,6 +45,28 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
         }
+    };
+
+    const validate = () => {
+        const newErrors = {};
+
+        if (!formData.name.trim()) newErrors.name = "F.I.SH kiritish majburiy";
+        if (!formData.username.trim()) newErrors.username = "Login kiritish majburiy";
+        if (!formData.email.trim()) newErrors.email = "Email kiritish majburiy";
+        // Password required only for new users
+        if (!user && !formData.password.trim()) newErrors.password = "Parol kiritish majburiy";
+
+        if (!formData.department.trim()) newErrors.department = "Bo'lim kiritish majburiy";
+        if (!formData.position?.trim()) newErrors.position = "Lavozim kiritish majburiy";
+        if (!formData.pinfl.trim()) newErrors.pinfl = "PINFL kiritish majburiy";
+
+        // Also check if any async validations failed (kept in current errors state)
+        if (errors.username && errors.username !== "Login kiritish majburiy") newErrors.username = errors.username;
+        if (errors.email && errors.email !== "Email kiritish majburiy") newErrors.email = errors.email;
+        if (errors.pinfl && errors.pinfl !== "PINFL kiritish majburiy") newErrors.pinfl = errors.pinfl;
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const validateField = async (field, value) => {
@@ -70,17 +94,14 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Block if there are actual errors
-        const hasErrors = Object.values(errors).some(e => e);
-        if (hasErrors) {
-            alert("Iltimos, xatoliklarni to'g'rilang");
+        // 1. Run local validation
+        if (!validate()) {
             return;
         }
 
-        // Block if still checking (network slow)
+        // 2. Block if still checking async
         const isChecking = Object.values(checking).some(c => c);
         if (isChecking) {
-            // Optional: wait or warn
             return;
         }
 
@@ -109,26 +130,25 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="label">F.I.SH</label>
+                        <label className="label">F.I.SH <span className="text-red-500">*</span></label>
                         <input
                             type="text"
                             name="name"
-                            className="input"
-                            required
+                            className={`input ${errors.name ? 'border-red-500 focus:ring-red-200' : ''}`}
                             value={formData.name}
                             onChange={handleChange}
                             placeholder="Vali Aliyev"
                         />
+                        {errors.name && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.name}</p>}
                     </div>
 
                     <div>
-                        <label className="label">Login</label>
+                        <label className="label">Login <span className="text-red-500">*</span></label>
                         <div className="relative">
                             <input
                                 type="text"
                                 name="username"
                                 className={`input ${errors.username ? 'border-red-500 focus:ring-red-200' : ''}`}
-                                required
                                 value={formData.username}
                                 onChange={handleChange}
                                 onBlur={(e) => validateField('username', e.target.value)}
@@ -140,12 +160,11 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                     </div>
 
                     <div>
-                        <label className="label">Email</label>
+                        <label className="label">Email <span className="text-red-500">*</span></label>
                         <input
                             type="email"
                             name="email"
                             className={`input ${errors.email ? 'border-red-500 focus:ring-red-200' : ''}`}
-                            required
                             value={formData.email}
                             onChange={handleChange}
                             onBlur={(e) => validateField('email', e.target.value)}
@@ -155,29 +174,44 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                     </div>
 
                     <div>
-                        <label className="label">Parol {user && <span className="text-xs text-gray-400 font-normal">(o'zgartirish uchun kiriting)</span>}</label>
+                        <label className="label">Parol {user ? <span className="text-xs text-gray-400 font-normal">(o'zgartirish uchun kiriting)</span> : <span className="text-red-500">*</span>}</label>
                         <input
                             type="password"
                             name="password"
-                            className="input"
+                            className={`input ${errors.password ? 'border-red-500 focus:ring-red-200' : ''}`}
                             value={formData.password}
                             onChange={handleChange}
                             placeholder={user ? "O'zgartilmasin" : "Yangi parol"}
                             minLength={user ? 0 : 6}
-                            required={!user}
                         />
+                        {errors.password && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.password}</p>}
                     </div>
 
-                    <div>
-                        <label className="label">Bo'lim</label>
-                        <input
-                            type="text"
-                            name="department"
-                            className="input"
-                            value={formData.department}
-                            onChange={handleChange}
-                            placeholder="IT Department"
-                        />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="label">Bo'lim <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="department"
+                                className={`input ${errors.department ? 'border-red-500 focus:ring-red-200' : ''}`}
+                                value={formData.department}
+                                onChange={handleChange}
+                                placeholder="IT Department"
+                            />
+                            {errors.department && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.department}</p>}
+                        </div>
+                        <div>
+                            <label className="label">Lavozimi <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="position"
+                                className={`input ${errors.position ? 'border-red-500 focus:ring-red-200' : ''}`}
+                                value={formData.position || ""}
+                                onChange={handleChange}
+                                placeholder="Dasturchi"
+                            />
+                            {errors.position && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.position}</p>}
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -210,7 +244,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                     </div>
 
                     <div>
-                        <label className="label">JSHSHIR (PINFL)</label>
+                        <label className="label">JSHSHIR (PINFL) <span className="text-red-500">*</span></label>
                         <input
                             type="text"
                             name="pinfl"
@@ -225,7 +259,6 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                             placeholder="14 xonali raqam"
                             minLength={14}
                             maxLength={14}
-                            required
                         />
                         {errors.pinfl && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.pinfl}</p>}
                     </div>
@@ -241,7 +274,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                         <button
                             type="submit"
                             className="btn btn-primary shadow-lg shadow-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={Object.values(errors).some(e => e)} // Only disable on known errors, not while checking
+                            // Disabled only if checking async availability
+                            disabled={Object.values(checking).some(c => c)}
                         >
                             {Object.values(checking).some(c => c) ? (
                                 <span className="flex items-center gap-2">

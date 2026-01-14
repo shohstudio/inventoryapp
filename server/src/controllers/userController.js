@@ -14,6 +14,7 @@ const getUsers = async (req, res) => {
                 email: true,
                 role: true,
                 department: true,
+                position: true,
                 status: true,
                 pinfl: true,
                 createdAt: true,
@@ -42,6 +43,7 @@ const getUserById = async (req, res) => {
                 email: true,
                 role: true,
                 department: true,
+                position: true,
                 status: true,
                 pinfl: true,
                 items: true
@@ -62,7 +64,7 @@ const getUserById = async (req, res) => {
 // @route   POST /api/users
 // @access  Private/Admin
 const createUser = async (req, res) => {
-    const { name, username, email, password, role, department, status, pinfl } = req.body;
+    const { name, username, email, password, role, department, position, status, pinfl } = req.body;
     console.log("CREATE USER REQUEST - Password received:", `'${password}'`);
 
     try {
@@ -98,6 +100,7 @@ const createUser = async (req, res) => {
                 password: hashedPassword,
                 role,
                 department,
+                position,
                 status,
                 pinfl
             }
@@ -150,7 +153,7 @@ const createUser = async (req, res) => {
 // @route   PUT /api/users/:id
 // @access  Private/Admin
 const updateUser = async (req, res) => {
-    const { name, username, email, password, role, department, status, pinfl } = req.body;
+    const { name, username, email, password, role, department, position, status, pinfl } = req.body;
 
     try {
         const dataToUpdate = {
@@ -159,6 +162,7 @@ const updateUser = async (req, res) => {
             email,
             role,
             department,
+            position,
             status,
             pinfl
         };
