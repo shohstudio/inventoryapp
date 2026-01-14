@@ -23,7 +23,10 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         pdf: null
     });
 
+    const [errors, setErrors] = useState({});
+
     useEffect(() => {
+        setErrors({}); // Reset errors on open
         if (item) {
             setFormData({
                 ...item,
@@ -73,9 +76,28 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
 
     if (!isOpen) return null;
 
+    const validate = () => {
+        const newErrors = {};
+        if (!formData.name.trim()) newErrors.name = "Shu joyni to'ldirish majburiy";
+        if (!formData.model.trim()) newErrors.model = "Shu joyni to'ldirish majburiy";
+        if (!formData.serial.trim()) newErrors.serial = "Shu joyni to'ldirish majburiy";
+        if (!formData.category.trim()) newErrors.category = "Shu joyni to'ldirish majburiy";
+        if (!formData.building.trim()) newErrors.building = "Shu joyni to'ldirish majburiy";
+        if (!formData.location.trim()) newErrors.location = "Shu joyni to'ldirish majburiy";
+        if (!formData.price) newErrors.price = "Shu joyni to'ldirish majburiy";
+        if (!formData.quantity) newErrors.quantity = "Shu joyni to'ldirish majburiy";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+        // Clear error when user types
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: "" }));
+        }
     };
 
     const handleImageChange = (e) => {
@@ -100,6 +122,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!validate()) return;
         onSave(formData);
         onClose();
     };
@@ -120,54 +143,56 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     {/* Basic Info */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                         <div className="md:col-span-6">
-                            <label className="label">Nomi</label>
+                            <label className="label">Nomi <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="name"
-                                className="input"
-                                required
+                                className={`input ${errors.name ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="MacBook Pro"
                             />
+                            {errors.name && <span className="text-red-500 text-xs mt-1 block">{errors.name}</span>}
                         </div>
                         <div className="md:col-span-4">
-                            <label className="label">Model</label>
+                            <label className="label">Model <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="model"
-                                className="input"
+                                className={`input ${errors.model ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.model}
                                 onChange={handleChange}
                                 placeholder="A2338"
                             />
+                            {errors.model && <span className="text-red-500 text-xs mt-1 block">{errors.model}</span>}
                         </div>
                         <div className="md:col-span-2">
-                            <label className="label">Soni</label>
+                            <label className="label">Soni <span className="text-red-500">*</span></label>
                             <input
                                 type="number"
                                 name="quantity"
-                                className="input"
+                                className={`input ${errors.quantity ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.quantity || 1}
                                 onChange={handleChange}
                                 min="1"
                                 placeholder="1"
                             />
+                            {errors.quantity && <span className="text-red-500 text-xs mt-1 block">{errors.quantity}</span>}
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Seriya raqami</label>
+                            <label className="label">Seriya raqami <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="serial"
-                                className="input"
-                                required
+                                className={`input ${errors.serial ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.serial}
                                 onChange={handleChange}
                                 placeholder="FVFD1234"
                             />
+                            {errors.serial && <span className="text-red-500 text-xs mt-1 block">{errors.serial}</span>}
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
@@ -192,12 +217,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 />
                             </div>
                             <div className="col-span-2">
-                                <label className="label">Narxi</label>
+                                <label className="label">Narxi <span className="text-red-500">*</span></label>
                                 <div className="relative">
                                     <input
                                         type="text"
                                         name="price"
-                                        className="input pr-12"
+                                        className={`input pr-12 ${errors.price ? 'border-red-500 ring-red-500' : ''}`}
                                         value={formData.price || ""}
                                         onChange={(e) => {
                                             // Allow numbers, spaces, and ONE comma
@@ -210,6 +235,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                             }
 
                                             setFormData(prev => ({ ...prev, price: val }));
+                                            // Clear error manually for this custom handler
+                                            if (errors.price) setErrors(prev => ({ ...prev, price: "" }));
                                         }}
                                         placeholder="14 000 000,00"
                                     />
@@ -217,6 +244,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                         so'm
                                     </span>
                                 </div>
+                                {errors.price && <span className="text-red-500 text-xs mt-1 block">{errors.price}</span>}
                             </div>
                         </div>
                     </div>
@@ -224,15 +252,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     {/* Location & Category */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Kategoriya</label>
+                            <label className="label">Kategoriya <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="category"
-                                className="input"
+                                className={`input ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.category}
                                 onChange={handleChange}
                                 placeholder="Laptop, Mebel, Printer..."
                             />
+                            {errors.category && <span className="text-red-500 text-xs mt-1 block">{errors.category}</span>}
                         </div>
                         <div>
                             <label className="label">Holati</label>
@@ -252,15 +281,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Bino (Ofis)</label>
+                            <label className="label">Bino (Ofis) <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="building"
-                                className="input"
+                                className={`input ${errors.building ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.building}
                                 onChange={handleChange}
                                 placeholder="Bosh Ofis"
                             />
+                            {errors.building && <span className="text-red-500 text-xs mt-1 block">{errors.building}</span>}
                         </div>
                         <div>
                             <label className="label">Bo'lim</label>
@@ -274,15 +304,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                             />
                         </div>
                         <div>
-                            <label className="label">Aniq Joylashuvi (Xona)</label>
+                            <label className="label">Aniq Joylashuvi (Xona) <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="location"
-                                className="input"
+                                className={`input ${errors.location ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.location}
                                 onChange={handleChange}
                                 placeholder="2-qavat, 203-xona"
                             />
+                            {errors.location && <span className="text-red-500 text-xs mt-1 block">{errors.location}</span>}
                         </div>
                     </div>
 
