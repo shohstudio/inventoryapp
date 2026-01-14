@@ -13,6 +13,7 @@ import WarehousePage from "./pages/admin/WarehousePage";
 import UsersPage from "./pages/admin/UsersPage";
 import EmployeeLayout from "./components/layout/EmployeeLayout";
 import MyItemsPage from "./pages/employee/MyItemsPage";
+import EmployeeRequestsPage from "./pages/employee/EmployeeRequestsPage";
 import ReportIssuePage from "./pages/employee/ReportIssuePage";
 import ProfilePage from "./pages/common/ProfilePage";
 import RequestsPage from "./pages/admin/RequestsPage";
@@ -61,6 +62,7 @@ function App() {
               >
                 <Route index element={<EmployeeDashboard />} />
                 <Route path="items" element={<MyItemsPage />} />
+                <Route path="requests" element={<EmployeeRequestsPage />} />
                 <Route path="report" element={<ReportIssuePage />} />
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
