@@ -13,13 +13,22 @@ const EmployeeRequestsPage = () => {
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            // Employee sees requests where they are target or requester (backend logic)
-            // Ideally backend filters already.
-            const { data } = await api.get('/requests?status=pending_employee');
-            // We can ask for all and filter client side or trust backend default filter for employee
-            // To be safe and show only actionable items:
-            const pendingActions = data.filter(r => r.status === 'pending_employee' && r.targetUserId === user.id);
-            setRequests(pendingActions);
+            // Fetch ALL requests for this employee (handled by backend role check)
+            const { data } = await api.get('/requests');
+
+            // Filter to show relevant assignment requests
+            // We want to see:
+            // 1. pending_employee (Action required)
+            // 2. pending_accountant (Waiting for approval)
+            // 3. rejected (For history/info - optional, maybe just active flows?)
+            // Let's show active flows: pending_accountant AND pending_employee
+
+            const activeRequests = data.filter(r =>
+                (r.status === 'pending_employee' || r.status === 'pending_accountant') &&
+                r.targetUserId === user.id
+            );
+
+            setRequests(activeRequests);
         } catch (error) {
             console.error("Failed to fetch requests", error);
             const msg = error.response?.data?.message || "So'rovlarni yuklashda xatolik";
@@ -97,7 +106,7 @@ const EmployeeRequestsPage = () => {
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Sana</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Jihoz</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Kimdan</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Izoh</th>
+                                <th className="py-4 px-6 font-semibold text-sm">Holat</th>
                                 <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">Amallar</th>
                             </tr>
                         </thead>
@@ -125,26 +134,41 @@ const EmployeeRequestsPage = () => {
                                             {req.requester?.name || "Admin"}
                                             <div className="text-xs text-gray-400">({req.requester?.role})</div>
                                         </td>
-                                        <td className="py-4 px-6 text-gray-600 text-sm italic">
-                                            "{req.description || "Izoh yo'q"}"
+                                        <td className="py-4 px-6 text-sm">
+                                            {req.status === 'pending_accountant' ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                                    <RiTimeLine className="mr-1" /> Hisobchi tasdiqlashi kutilmoqda
+                                                </span>
+                                            ) : req.status === 'pending_employee' ? (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                    <RiCheckDoubleLine className="mr-1" /> Qabul qilishingiz kutilmoqda
+                                                </span>
+                                            ) : (
+                                                <span className="text-gray-500">{req.status}</span>
+                                            )}
+                                            {req.description && <div className="text-xs text-gray-400 mt-1 italic">"{req.description}"</div>}
                                         </td>
                                         <td className="py-4 px-6 text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <button
-                                                    onClick={() => handleAction(req.id, 'rejected')}
-                                                    className="btn btn-sm bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
-                                                    disabled={isProcessing}
-                                                >
-                                                    <RiCloseCircleLine /> Rad etish
-                                                </button>
-                                                <button
-                                                    onClick={() => handleAction(req.id, 'completed')}
-                                                    className="btn btn-sm bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200"
-                                                    disabled={isProcessing}
-                                                >
-                                                    <RiCheckDoubleLine /> Qabul qilish
-                                                </button>
-                                            </div>
+                                            {req.status === 'pending_employee' ? (
+                                                <div className="flex justify-end gap-2">
+                                                    <button
+                                                        onClick={() => handleAction(req.id, 'rejected')}
+                                                        className="btn btn-sm bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                                                        disabled={isProcessing}
+                                                    >
+                                                        <RiCloseCircleLine /> Rad etish
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction(req.id, 'completed')}
+                                                        className="btn btn-sm bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200"
+                                                        disabled={isProcessing}
+                                                    >
+                                                        <RiCheckDoubleLine /> Qabul qilish
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-gray-400 italic">Amal talab etilmaydi</span>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

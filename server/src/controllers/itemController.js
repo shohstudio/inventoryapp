@@ -53,30 +53,45 @@ const createItem = async (req, res) => {
         const {
             name, model, serialNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
-            building, location, department, assignedUserId
+            building, location, department, assignedUserId,
+            assignedPINFL, assignedTo, assignedRole // Extract new fields
         } = req.body;
 
         const image = req.file ? `/uploads/${req.file.filename}` : null;
 
+        // Check if User exists by PINFL or assignedUserId
+        let targetUser = null;
+        if (assignedUserId) {
+            targetUser = await prisma.user.findUnique({ where: { id: parseInt(assignedUserId) } });
+        } else if (assignedPINFL) {
+            targetUser = await prisma.user.findFirst({ where: { pinfl: assignedPINFL } });
+        }
+
+        const itemData = {
+            name,
+            model,
+            serialNumber,
+            category,
+            subCategory,
+            price: price ? parseFloat(price) : 0,
+            quantity: quantity ? parseInt(quantity) : 1,
+            purchaseDate,
+            status,
+            condition,
+            building,
+            location,
+            department,
+            image,
+            // Do NOT assign directly yet
+            assignedUserId: null,
+            assignedDate: null,
+            // Save initial info if user not found (for future linking)
+            initialPinfl: !targetUser && assignedPINFL ? assignedPINFL : null,
+            initialOwner: !targetUser && assignedTo ? assignedTo : null
+        };
+
         const item = await prisma.item.create({
-            data: {
-                name,
-                model,
-                serialNumber,
-                category,
-                subCategory,
-                price: price ? parseFloat(price) : 0,
-                quantity: quantity ? parseInt(quantity) : 1,
-                purchaseDate,
-                status,
-                condition,
-                building,
-                location,
-                department,
-                assignedUserId: assignedUserId ? parseInt(assignedUserId) : null,
-                assignedDate: assignedUserId ? new Date() : null,
-                image
-            }
+            data: itemData
         });
 
         // Log creation
@@ -88,6 +103,21 @@ const createItem = async (req, res) => {
                 itemId: item.id
             }
         });
+
+        // If Target User found, CREATE REQUEST
+        if (targetUser) {
+            await prisma.request.create({
+                data: {
+                    type: 'assignment',
+                    status: 'pending_accountant', // Admin created -> Needs Accountant Approval
+                    itemId: item.id,
+                    requesterId: req.user.id,
+                    targetUserId: targetUser.id,
+                    description: `Yangi jihoz yaratildi va biriktirildi. (PINFL: ${targetUser.pinfl})`
+                }
+            });
+            // We can return a specific message saying request created
+        }
 
         res.status(201).json(item);
     } catch (error) {
