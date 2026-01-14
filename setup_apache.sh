@@ -38,7 +38,10 @@ sudo tee /etc/apache2/sites-available/inventory-app.conf > /dev/null <<EOF
 <VirtualHost *:80>
     ServerAdmin webmaster@localhost
     ServerName _
-    # ServerName example.com  # Agar domen bo'lsa, shunisi ishlatiladi
+    DocumentRoot /var/www/html
+
+    # Allow Certbot authentication (Do not proxy .well-known)
+    ProxyPass /.well-known !
 
     # Proxy Settings
     ProxyPreserveHost On
