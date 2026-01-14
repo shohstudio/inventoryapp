@@ -33,6 +33,13 @@ sudo a2enmod headers
 # 5. Configure Apache VirtualHost
 echo "⚙️ VirtualHost sozlanmoqda..."
 
+# Ensure webroot exists
+if [ ! -d "/var/www/html" ]; then
+    sudo mkdir -p /var/www/html
+    sudo chown -R www-data:www-data /var/www/html
+    sudo chmod -R 755 /var/www/html
+fi
+
 # Create config file
 sudo tee /etc/apache2/sites-available/inventory-app.conf > /dev/null <<EOF
 <VirtualHost *:80>
@@ -40,13 +47,21 @@ sudo tee /etc/apache2/sites-available/inventory-app.conf > /dev/null <<EOF
     ServerName _
     DocumentRoot /var/www/html
 
-    # Allow Certbot authentication (Do not proxy .well-known)
-    ProxyPass /.well-known !
+    # GLOBAL: Explicitly handle Let's Encrypt / Certbot challenges
+    Alias /.well-known/acme-challenge/ /var/www/html/.well-known/acme-challenge/
+    <Directory "/var/www/html/.well-known/acme-challenge/">
+        Options None
+        AllowOverride None
+        Require all granted
+    </Directory>
 
     # Proxy Settings
     ProxyPreserveHost On
     ProxyRequests Off
     
+    # Exclude .well-known from proxy (backup safety)
+    ProxyPass /.well-known !
+
     # Proxy to Node.js app running on port 5000
     ProxyPass / http://localhost:5000/
     ProxyPassReverse / http://localhost:5000/
@@ -61,6 +76,8 @@ sudo tee /etc/apache2/sites-available/inventory-app.conf > /dev/null <<EOF
     RewriteCond %{HTTP:Upgrade} =websocket             [NC]
     RewriteRule /(.*)           ws://localhost:5000/\$1 [P,L]
 
+    # Note: RewriteRule fallback isn't strictly needed given ProxyPass / above, 
+    # but if used, ensure it excludes .well-known too.
     RewriteCond %{REQUEST_URI}  !^/.well-known
     RewriteCond %{HTTP:Upgrade} !=websocket            [NC]
     RewriteRule /(.*)           http://localhost:5000/\$1 [P,L]
