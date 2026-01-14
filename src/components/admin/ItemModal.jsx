@@ -87,6 +87,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (!formData.price) newErrors.price = "Shu joyni to'ldirish majburiy";
         if (!formData.quantity) newErrors.quantity = "Shu joyni to'ldirish majburiy";
 
+        // New Mandatory Fields
+        if (!formData.inn.trim()) newErrors.inn = "Shu joyni to'ldirish majburiy";
+        if (!formData.purchaseDate) newErrors.purchaseDate = "Shu joyni to'ldirish majburiy";
+        if (!formData.department.trim()) newErrors.department = "Shu joyni to'ldirish majburiy";
+
+        // Assigned Person Mandatory
+        if (!formData.assignedTo.trim()) newErrors.assignedTo = "Shu joyni to'ldirish majburiy";
+        if (!formData.assignedRole.trim()) newErrors.assignedRole = "Shu joyni to'ldirish majburiy";
+        if (!formData.assignedPINFL.trim()) newErrors.assignedPINFL = "Shu joyni to'ldirish majburiy";
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -196,25 +206,27 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="label">INN Raqami</label>
+                                <label className="label">INN Raqami <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="inn"
-                                    className="input"
+                                    className={`input ${errors.inn ? 'border-red-500 ring-red-500' : ''}`}
                                     value={formData.inn}
                                     onChange={handleChange}
                                     placeholder="123456"
                                 />
+                                {errors.inn && <span className="text-red-500 text-xs mt-1 block">{errors.inn}</span>}
                             </div>
                             <div>
-                                <label className="label">Xarid Sanasi</label>
+                                <label className="label">Xarid Sanasi <span className="text-red-500">*</span></label>
                                 <input
                                     type="date"
                                     name="purchaseDate"
-                                    className="input"
+                                    className={`input ${errors.purchaseDate ? 'border-red-500 ring-red-500' : ''}`}
                                     value={formData.purchaseDate || ""}
                                     onChange={handleChange}
                                 />
+                                {errors.purchaseDate && <span className="text-red-500 text-xs mt-1 block">{errors.purchaseDate}</span>}
                             </div>
                             <div className="col-span-2">
                                 <label className="label">Narxi <span className="text-red-500">*</span></label>
@@ -293,15 +305,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                             {errors.building && <span className="text-red-500 text-xs mt-1 block">{errors.building}</span>}
                         </div>
                         <div>
-                            <label className="label">Bo'lim</label>
+                            <label className="label">Bo'lim <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="department"
-                                className="input"
+                                className={`input ${errors.department ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.department || ""}
                                 onChange={handleChange}
                                 placeholder="IT Bo'limi"
                             />
+                            {errors.department && <span className="text-red-500 text-xs mt-1 block">{errors.department}</span>}
                         </div>
                         <div>
                             <label className="label">Aniq Joylashuvi (Xona) <span className="text-red-500">*</span></label>
@@ -323,42 +336,47 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className="label">F.I.SH</label>
+                                <label className="label">F.I.SH <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="assignedTo"
-                                    className="input bg-white"
+                                    className={`input bg-white ${errors.assignedTo ? 'border-red-500 ring-red-500' : ''}`}
                                     value={formData.assignedTo}
                                     onChange={handleChange}
                                     placeholder="Ali Valiyev"
                                 />
+                                {errors.assignedTo && <span className="text-red-500 text-xs mt-1 block">{errors.assignedTo}</span>}
                             </div>
                             <div>
-                                <label className="label">Lavozimi</label>
+                                <label className="label">Lavozimi <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="assignedRole"
-                                    className="input bg-white"
+                                    className={`input bg-white ${errors.assignedRole ? 'border-red-500 ring-red-500' : ''}`}
                                     value={formData.assignedRole}
                                     onChange={handleChange}
                                     placeholder="Hisobchi"
                                 />
+                                {errors.assignedRole && <span className="text-red-500 text-xs mt-1 block">{errors.assignedRole}</span>}
                             </div>
                             <div>
-                                <label className="label">JSHSHIR (PINFL)</label>
+                                <label className="label">JSHSHIR (PINFL) <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="assignedPINFL"
-                                    className="input bg-white"
+                                    className={`input bg-white ${errors.assignedPINFL ? 'border-red-500 ring-red-500' : ''}`}
                                     value={formData.assignedPINFL}
                                     onChange={(e) => {
                                         const val = e.target.value.replace(/\D/g, '').slice(0, 14);
                                         setFormData(prev => ({ ...prev, assignedPINFL: val }));
+                                        // Clear error manually for custom handler
+                                        if (errors.assignedPINFL) setErrors(prev => ({ ...prev, assignedPINFL: "" }));
                                     }}
                                     placeholder="14 xonali raqam"
                                     minLength={14}
                                     maxLength={14}
                                 />
+                                {errors.assignedPINFL && <span className="text-red-500 text-xs mt-1 block">{errors.assignedPINFL}</span>}
                             </div>
                         </div>
                     </div>

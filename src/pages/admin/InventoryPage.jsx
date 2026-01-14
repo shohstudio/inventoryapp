@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { read, utils, writeFile } from 'xlsx';
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line, RiDeleteBinLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionModal";
 import QRScannerModal from "../../components/admin/QRScannerModal";
@@ -36,6 +36,7 @@ const InventoryPage = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]); // Track selected items for bulk delete
 
     const fetchItems = async () => {
         setLoading(true);
@@ -43,6 +44,7 @@ const InventoryPage = () => {
             const { data } = await api.get('/items');
             setItems(data);
             setError(null);
+            setSelectedIds([]); // Clear selection on refresh
         } catch (err) {
             console.error("Failed to fetch items", err);
             setError("Ma'lumotlarni yuklashda xatolik yuz berdi");
@@ -181,9 +183,6 @@ const InventoryPage = () => {
         writeFile(wb, "jihozlar_ruyxati.xlsx");
     };
 
-    // Correct `openModal` is already defined above at line 185.
-    // Duplicate removed.
-
     // Filter logic
     const filteredItems = items.filter(item => {
         // Search Filter
@@ -210,6 +209,41 @@ const InventoryPage = () => {
     const uniqueCategories = [...new Set(items.map(item => item.category))];
     const uniqueBuildings = [...new Set(items.map(item => item.building))];
 
+    // Bulk Delete Logic
+    const toggleSelectAll = (e) => {
+        if (e.target.checked) {
+            // Select all currently filtered items
+            const allIds = filteredItems.map(i => i.id);
+            setSelectedIds(allIds);
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const toggleSelectItem = (id) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+
+        if (!window.confirm(`${selectedIds.length} ta jihozni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi!`)) {
+            return;
+        }
+
+        try {
+            await api.post('/items/delete-many', { ids: selectedIds });
+            alert(`${selectedIds.length} ta jihoz o'chirildi.`);
+            fetchItems(); // Refresh
+        } catch (err) {
+            console.error("Bulk delete failed", err);
+            alert("O'chirishda xatolik: " + (err.response?.data?.message || err.message));
+        }
+    };
+
+
     return (
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -224,6 +258,16 @@ const InventoryPage = () => {
                 <div className="flex gap-2">
                     {['admin', 'accounter', 'warehouseman'].includes(user?.role) && (
                         <>
+                            {selectedIds.length > 0 && (
+                                <button
+                                    onClick={handleBulkDelete}
+                                    className="btn bg-red-500 hover:bg-red-600 text-white shadow-sm border-0 animate-in fade-in"
+                                >
+                                    <RiDeleteBinLine size={20} className="mr-2" />
+                                    Tanlanganlarni o'chirish ({selectedIds.length})
+                                </button>
+                            )}
+
                             <label className="btn bg-blue-500 hover:bg-blue-600 text-white shadow-sm border-0 cursor-pointer">
                                 <RiFileExcel2Line size={20} className="mr-2" />
                                 Import (.xlsx)
@@ -349,6 +393,15 @@ const InventoryPage = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-blue-600 text-white">
+                                <th className="py-4 px-6 w-12 text-center">
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox checkbox-sm border-white"
+                                        checked={filteredItems.length > 0 && selectedIds.length === filteredItems.length}
+                                        onChange={toggleSelectAll}
+                                        disabled={filteredItems.length === 0}
+                                    />
+                                </th>
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('order_number')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('name')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('inn')}</th>
@@ -362,7 +415,15 @@ const InventoryPage = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredItems.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
+                                <tr key={item.id} className={`hover:bg-gray-50/80 transition-colors group ${selectedIds.includes(item.id) ? "bg-blue-50/50" : ""}`}>
+                                    <td className="py-4 px-6 text-center">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox checkbox-sm"
+                                            checked={selectedIds.includes(item.id)}
+                                            onChange={() => toggleSelectItem(item.id)}
+                                        />
+                                    </td>
                                     <td className="py-4 px-6 text-gray-800 font-medium">#{item.orderNumber}</td>
                                     <td className="py-4 px-6">
                                         <div className="font-medium text-gray-900">{item.name}</div>
@@ -424,7 +485,7 @@ const InventoryPage = () => {
                             ))}
                             {filteredItems.length === 0 && (
                                 <tr>
-                                    <td colSpan="9" className="text-center py-12 text-gray-500">
+                                    <td colSpan="10" className="text-center py-12 text-gray-500">
                                         Jihozlar topilmadi
                                     </td>
                                 </tr>
