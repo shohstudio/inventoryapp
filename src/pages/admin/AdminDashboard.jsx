@@ -174,7 +174,7 @@ const AdminDashboard = () => {
                                     <tr key={item.id || index} className="hover:bg-gray-50/80 transition-colors">
                                         <td className="py-4 px-6 text-gray-800 font-medium">{item.name}</td>
                                         <td className="py-4 px-6 text-gray-500 font-mono text-sm">{item.model || "-"}</td>
-                                        <td className="py-4 px-6 text-gray-700">{item.assignedTo || "Omborda"}</td>
+                                        <td className="py-4 px-6 text-gray-700">{item.assignedTo?.name || "Omborda"}</td>
                                         <td className="py-4 px-6">
                                             <span className={clsx(
                                                 "px-3 py-1 rounded-full text-xs font-semibold",

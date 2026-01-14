@@ -58,7 +58,7 @@ const GuardDashboard = () => {
         if (item) {
             setFoundItem(item);
             // Auto fill responsible if assigned
-            if (item.assignedTo) setResponsiblePerson(item.assignedTo);
+            if (item.assignedTo) setResponsiblePerson(item.assignedTo.name || item.assignedTo);
         } else {
             alert("Jihoz topilmadi. Kod: " + code);
             setFoundItem(null);
