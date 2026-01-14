@@ -5,7 +5,15 @@ const prisma = require('../utils/prisma');
 // @access  Private
 const getItems = async (req, res) => {
     try {
+        const { assignedUserId } = req.query;
+        let where = {};
+
+        if (assignedUserId) {
+            where.assignedUserId = parseInt(assignedUserId);
+        }
+
         const items = await prisma.item.findMany({
+            where,
             include: {
                 assignedTo: {
                     select: { name: true, pinfl: true }

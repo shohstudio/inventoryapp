@@ -5,9 +5,13 @@ const prisma = require('../utils/prisma');
 // @access  Private/Admin
 const getLogs = async (req, res) => {
     try {
-        const { startDate, endDate } = req.query;
+        const { startDate, endDate, userId, itemId } = req.query;
 
         let where = {};
+
+        if (userId) where.userId = parseInt(userId);
+        if (itemId) where.itemId = parseInt(itemId);
+
         if (startDate || endDate) {
             where.createdAt = {};
             if (startDate) {
