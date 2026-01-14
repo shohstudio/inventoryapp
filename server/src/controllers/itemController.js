@@ -9,6 +9,16 @@ const getItems = async (req, res) => {
             include: {
                 assignedTo: {
                     select: { name: true, pinfl: true }
+                },
+                requests: {
+                    where: {
+                        status: { in: ['pending_accountant', 'pending_employee'] }
+                    },
+                    select: {
+                        id: true,
+                        status: true,
+                        targetUser: { select: { name: true } }
+                    }
                 }
             },
             orderBy: {

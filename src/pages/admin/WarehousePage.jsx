@@ -152,8 +152,15 @@ const WarehousePage = () => {
 
         // Unassigned Filter logic
         if (filters.isAssigned === 'unassigned') {
-            // Only show items that have NO assigned user 
-            if (item.assignedTo || item.assignedUserId) return false;
+            // Only show items that have NO assigned user AND NO active requests
+            const hasActiveRequest = item.requests && item.requests.length > 0;
+            if (item.assignedTo || item.assignedUserId || hasActiveRequest) return false;
+        }
+
+        // Pending Filter Logic
+        if (filters.isAssigned === 'pending') {
+            const hasActiveRequest = item.requests && item.requests.length > 0;
+            if (!hasActiveRequest) return false; // Must have active request
         }
 
         return true;
@@ -224,6 +231,12 @@ const WarehousePage = () => {
                                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'unassigned' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
                                 Birikmaganlar
+                            </button>
+                            <button
+                                onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'pending' }))}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'pending' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Kutilayotganlar
                             </button>
                         </div>
                     </div>
@@ -314,6 +327,12 @@ const WarehousePage = () => {
                                         {/* Display Assigned User or Initial Owner */}
                                         {item.assignedTo ? (
                                             <span className="text-blue-600 font-medium">{item.assignedTo.name}</span>
+                                        ) : (item.requests && item.requests.length > 0) ? (
+                                            <div className="flex flex-col">
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                    Jaroyonda: {item.requests[0].targetUser?.name}
+                                                </span>
+                                            </div>
                                         ) : item.initialOwner ? (
                                             <div className="flex flex-col">
                                                 <span className="text-orange-500 text-sm font-medium">Biriktirilmagan</span>
