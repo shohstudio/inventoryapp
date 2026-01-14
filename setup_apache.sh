@@ -57,9 +57,12 @@ sudo tee /etc/apache2/sites-available/inventory-app.conf > /dev/null <<EOF
 
     # Upgrade headers for WebSocket (if needed, e.g. for Vite HMR or Socket.io)
     RewriteEngine On
-    RewriteCond %{HTTP:Upgrade} =websocket [NC]
+    RewriteCond %{REQUEST_URI}  ^/socket.io            [NC]
+    RewriteCond %{HTTP:Upgrade} =websocket             [NC]
     RewriteRule /(.*)           ws://localhost:5000/\$1 [P,L]
-    RewriteCond %{HTTP:Upgrade} !=websocket [NC]
+
+    RewriteCond %{REQUEST_URI}  !^/.well-known
+    RewriteCond %{HTTP:Upgrade} !=websocket            [NC]
     RewriteRule /(.*)           http://localhost:5000/\$1 [P,L]
 </VirtualHost>
 EOF
