@@ -43,13 +43,13 @@ sudo systemctl reload apache2
 
 echo "✅ ServerName o'zgartirildi."
 
-# 4. Run Certbot
-echo "🔐 SSL sertifikat olinmoqda (Certbot)..."
+# 4. Run Certbot (Webroot mode for reliability)
+echo "🔐 SSL sertifikat olinmoqda (Certbot - Webroot usuli)..."
 echo "⚠️  ESLATMA: Domen A Recordi server IP siga ulangan bo'lishi SHART!"
 
-# Run certbot in non-interactive mode if possible, but usually interactive is safer for first run to agree TOS
-# Let's run interactive but with Apache plugin specified
-sudo certbot --apache -d "$DOMAIN_NAME"
+# Use webroot authentication (places file in /var/www/html/.well-known/acme-challenge)
+# but use apache plugin for installation (updating config to HTTPS)
+sudo certbot --authenticator webroot --installer apache -w /var/www/html -d "$DOMAIN_NAME"
 
 echo "🎉 SSL o'rnatish yakunlandi!"
 echo "➡️  https://$DOMAIN_NAME manzilini tekshirib ko'ring."
