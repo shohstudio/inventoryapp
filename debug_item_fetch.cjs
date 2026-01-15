@@ -34,6 +34,14 @@ async function debugBackend() {
 
         if (items.length === 0) return;
 
+        const testItem = itemsRes.data.find(i => i.name === 'Test1' || i.serialNumber === 'FVFD1234');
+        if (testItem) {
+            console.log("FOUND TEST ITEM:", JSON.stringify(testItem, null, 2));
+        } else {
+            console.log("Test item not found. dumping first 3 items:");
+            console.log(JSON.stringify(itemsRes.data.slice(0, 3), null, 2));
+        }
+
         // Check for specific fields
         const itemWithUser = items.find(i => i.assignedTo);
         const itemWithoutUser = items.find(i => !i.assignedTo && (i.initialOwner || i.initialRole));

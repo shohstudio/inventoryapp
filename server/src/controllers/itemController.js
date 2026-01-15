@@ -182,10 +182,12 @@ const updateItem = async (req, res) => {
                 // User found -> Reassign
                 dataToUpdate.assignedUserId = targetUser.id;
                 dataToUpdate.assignedDate = new Date();
-                dataToUpdate.initialPinfl = null; // Clear initial if linked
+                // Clear initial fields if assigned to real user
+                dataToUpdate.initialPinfl = null;
                 dataToUpdate.initialOwner = null;
+                dataToUpdate.initialRole = null;
             } else {
-                // User NOT found -> Unassign from current user (if any) and store PINFL
+                // User NOT found -> Unassign from current user (if any) and store PINFL/Role/Name
                 dataToUpdate.assignedUserId = null;
                 dataToUpdate.assignedDate = null;
                 dataToUpdate.initialPinfl = assignedPINFL;
@@ -201,6 +203,11 @@ const updateItem = async (req, res) => {
                 dataToUpdate.assignedUserId = parseInt(assignedUserId);
                 dataToUpdate.assignedDate = new Date();
             }
+        } else {
+            // No assignment logic triggered (no PINFL, no ID change)
+            // But if Name/Role provided, update initial fields (handling manual edit of unassigned item)
+            if (assignedTo) dataToUpdate.initialOwner = assignedTo;
+            if (assignedRole) dataToUpdate.initialRole = assignedRole;
         }
 
         const item = await prisma.item.update({
