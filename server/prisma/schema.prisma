@@ -28,6 +28,8 @@ model User {
   
   sentRequests     Request[] @relation("Requester")
   receivedRequests Request[] @relation("TargetUser")
+  
+  registeredItems  ExternalItem[] // Items registered by guard
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
