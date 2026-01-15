@@ -8,17 +8,27 @@ import api from "../../api/axios";
 const EmployeeDashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate(); // Hook for navigation
-    const [myItemsCount, setMyItemsCount] = useState(0); // State for real count
-    const [totalValue, setTotalValue] = useState(0); // State for total value
-    const [recentItems, setRecentItems] = useState([]);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [pendingCount, setPendingCount] = useState(0);
 
-    // Fetch Real Items
-    // Fetch Real Items
+    // Fetch Real Items & Pending Requests
     useEffect(() => {
         if (user) {
             const fetchData = async () => {
                 try {
-                    const { data: allItems } = await api.get("/items");
+                    const [itemsRes, requestsRes] = await Promise.all([
+                        api.get("/items"),
+                        api.get("/requests?status=pending_employee")
+                    ]);
+
+                    // Check for pending requests
+                    const pendingRequests = requestsRes.data;
+                    if (pendingRequests.length > 0) {
+                        setPendingCount(pendingRequests.length);
+                        setShowConfirmModal(true);
+                    }
+
+                    const allItems = itemsRes.data;
 
                     // Filter logic
                     const myItems = allItems.filter(item =>
@@ -182,6 +192,41 @@ const EmployeeDashboard = () => {
                 </div>
 
             </div>
+            {/* Notification Modal for Employee */}
+            {showConfirmModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-in fade-in zoom-in duration-300 border border-blue-100">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-6 shadow-inner ring-8 ring-blue-50">
+                                <RiCheckDoubleLine size={40} />
+                            </div>
+
+                            <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                                Tasdiqlash Kerak!
+                            </h2>
+
+                            <p className="text-lg text-gray-500 mb-8 max-w-xs">
+                                Sizning nomingizga <span className="font-bold text-blue-600">{pendingCount} ta</span> yangi jihoz biriktirilmoqda. Iltimos, qabul qilib oling.
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-4 w-full">
+                                <button
+                                    onClick={() => setShowConfirmModal(false)}
+                                    className="py-3 px-6 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold transition-colors"
+                                >
+                                    Keyinroq
+                                </button>
+                                <button
+                                    onClick={() => navigate('/employee/requests')}
+                                    className="py-3 px-6 rounded-xl bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 font-semibold transition-transform active:scale-95"
+                                >
+                                    Ko'rish
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
