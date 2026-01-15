@@ -69,7 +69,7 @@ const getItemById = async (req, res) => {
 const createItem = async (req, res) => {
     try {
         const {
-            name, model, serialNumber, category, subCategory,
+            name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId,
             assignedPINFL, assignedTo, assignedRole // Extract new fields
@@ -89,6 +89,8 @@ const createItem = async (req, res) => {
             name,
             model,
             serialNumber,
+            inn,
+            orderNumber,
             category,
             subCategory,
             price: price ? parseFloat(price) : 0,
@@ -153,13 +155,13 @@ const createItem = async (req, res) => {
 const updateItem = async (req, res) => {
     try {
         const {
-            name, model, serialNumber, category, subCategory,
+            name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId
         } = req.body;
 
         const dataToUpdate = {
-            name, model, serialNumber, category, subCategory,
+            name, model, serialNumber, inn, orderNumber, category, subCategory,
             price: price ? parseFloat(price) : undefined,
             quantity: quantity ? parseInt(quantity) : undefined,
             purchaseDate, status, condition,
@@ -321,6 +323,8 @@ const importItems = async (req, res) => {
                 name: String(name),
                 model: String(getVal(['Model', 'model']) || ''),
                 serialNumber: getVal(['Seriya', 'Serial', 'Seriya raqami', 'serial', 'serialNumber']) ? String(getVal(['Seriya', 'Serial', 'Seriya raqami', 'serial', 'serialNumber'])) : null,
+                inn: getVal(['INN', 'Inn', 'inn']) ? String(getVal(['INN', 'Inn', 'inn'])) : null,
+                orderNumber: getVal(['OrderNumber', 'orderNumber', 'Invertar raqami', 'Invertar']) ? String(getVal(['OrderNumber', 'orderNumber', 'Invertar raqami', 'Invertar'])) : null,
                 category: String(getVal(['Kategoriya', 'Category', 'category']) || 'Boshqa'),
                 subCategory: String(getVal(['Subkategoriya', 'SubCategory']) || ''),
                 price: parseFloat(String(getVal(['Narx', 'Price', 'Narxi', 'price']) || '0').replace(/[^0-9.]/g, '')),

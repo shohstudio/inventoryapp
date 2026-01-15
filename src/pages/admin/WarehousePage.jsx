@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine, RiDeleteBinLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine, RiDeleteBinLine, RiQrCodeLine } from "react-icons/ri";
 import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
+import QRGeneratorModal from "../../components/admin/QRGeneratorModal";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import api from "../../api/axios";
@@ -9,6 +10,9 @@ import { toast } from "react-hot-toast";
 const WarehousePage = () => {
     const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    // QR State
+    const [isQRGenOpen, setIsQRGenOpen] = useState(false);
+    const [qrItem, setQrItem] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [showFilters, setShowFilters] = useState(false);
@@ -91,6 +95,11 @@ const WarehousePage = () => {
     const openModal = (item = null) => {
         setSelectedItem(item);
         setIsModalOpen(true);
+    };
+
+    const openQRModal = (item) => {
+        setQrItem(item);
+        setIsQRGenOpen(true);
     };
 
     // Bulk Delete Logic
@@ -350,19 +359,28 @@ const WarehousePage = () => {
                                     </td>
                                     <td className="py-4 px-6 text-gray-900 font-bold">{parseFloat(item.price).toLocaleString()} so'm</td>
                                     <td className="py-4 px-6">
-                                        {item.image ? (
-                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
-                                                <img
-                                                    src={item.image}
-                                                    alt={item.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                                                <RiImage2Line size={20} />
-                                            </div>
-                                        )}
+                                        <div className="flex items-center gap-3">
+                                            {item.image ? (
+                                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                                    <RiImage2Line size={20} />
+                                                </div>
+                                            )}
+                                            <button
+                                                onClick={() => openQRModal(item)}
+                                                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                                                title="QR Kodni ko'rish"
+                                            >
+                                                <RiQrCodeLine size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                     <td className="py-4 px-6 text-right">
                                         <button
@@ -394,6 +412,12 @@ const WarehousePage = () => {
                     onSave={handleAddItem}
                 />
             )}
+
+            <QRGeneratorModal
+                isOpen={isQRGenOpen}
+                onClose={() => setIsQRGenOpen(false)}
+                item={qrItem}
+            />
         </div>
     );
 };

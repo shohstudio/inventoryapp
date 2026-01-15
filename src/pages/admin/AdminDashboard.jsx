@@ -95,8 +95,8 @@ const AdminDashboard = () => {
     return (
         <div>
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-gray-800">{t('dashboard')}</h1>
-                <p className="text-gray-500">Bugungi statistika va muhim o'zgarishlar</p>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('dashboard')}</h1>
+                <p className="text-gray-500 dark:text-gray-400">Bugungi statistika va muhim o'zgarishlar</p>
             </div>
 
             {/* Stats Grid */}
@@ -153,9 +153,9 @@ const AdminDashboard = () => {
             </div>
 
             {/* Recent Activity Table (Redesigned) */}
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-gray-800">So'nggi Harakatlar</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white">So'nggi Harakatlar</h3>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -171,10 +171,10 @@ const AdminDashboard = () => {
                         <tbody className="divide-y divide-gray-100">
                             {inventoryStats.recentItems && inventoryStats.recentItems.length > 0 ? (
                                 inventoryStats.recentItems.map((item, index) => (
-                                    <tr key={item.id || index} className="hover:bg-gray-50/80 transition-colors">
-                                        <td className="py-4 px-6 text-gray-800 font-medium">{item.name}</td>
-                                        <td className="py-4 px-6 text-gray-500 font-mono text-sm">{item.model || "-"}</td>
-                                        <td className="py-4 px-6 text-gray-700">{item.assignedTo?.name || "Omborda"}</td>
+                                    <tr key={item.id || index} className="hover:bg-gray-50/80 dark:hover:bg-slate-700/50 transition-colors">
+                                        <td className="py-4 px-6 text-gray-800 dark:text-gray-200 font-medium">{item.name}</td>
+                                        <td className="py-4 px-6 text-gray-500 dark:text-gray-400 font-mono text-sm">{item.model || "-"}</td>
+                                        <td className="py-4 px-6 text-gray-700 dark:text-gray-300">{item.assignedTo?.name || "Omborda"}</td>
                                         <td className="py-4 px-6">
                                             <span className={clsx(
                                                 "px-3 py-1 rounded-full text-xs font-semibold",

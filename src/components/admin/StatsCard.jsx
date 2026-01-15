@@ -10,15 +10,15 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", on
                 "relative overflow-hidden rounded-[20px] transition-all duration-300 group",
                 onClick && "cursor-pointer hover:-translate-y-1 active:scale-[0.98]",
                 isFeatured
-                    ? "bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 shadow-lg shadow-indigo-100/50"
-                    : "bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]"
+                    ? "bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 border border-indigo-100 dark:border-slate-700 shadow-lg shadow-indigo-100/50 dark:shadow-none"
+                    : "bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] dark:shadow-none"
             )}
         >
             <div className="p-6 relative z-10">
                 <div className="flex justify-between items-start mb-4">
                     <p className={clsx(
                         "text-sm font-semibold tracking-wide",
-                        isFeatured ? "text-indigo-600" : "text-gray-500"
+                        isFeatured ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400"
                     )}>{title}</p>
                     {isFeatured && (
                         <div className="p-2 bg-white rounded-lg shadow-sm text-indigo-600">
@@ -30,7 +30,7 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", on
                 <div className="flex items-end gap-3 mb-2">
                     <h3 className={clsx(
                         "text-4xl font-extrabold tracking-tight",
-                        isFeatured ? "text-indigo-900" : "text-gray-800"
+                        isFeatured ? "text-indigo-900 dark:text-white" : "text-gray-800 dark:text-white"
                     )}>{value}</h3>
                 </div>
 

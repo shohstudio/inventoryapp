@@ -38,6 +38,8 @@ model Item {
   name         String
   model        String?
   serialNumber String?  @unique
+  inn          String?  // Inventory Number / INN
+  orderNumber  String?  // Custom Inventory Number
   category     String?
   subCategory  String?
   

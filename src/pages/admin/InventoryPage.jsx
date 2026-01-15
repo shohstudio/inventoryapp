@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { read, utils, writeFile } from 'xlsx';
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line, RiDeleteBinLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line, RiDeleteBinLine, RiQrCodeLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionModal";
 import QRScannerModal from "../../components/admin/QRScannerModal";
+import QRGeneratorModal from "../../components/admin/QRGeneratorModal";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios"; // Import API
@@ -88,6 +89,15 @@ const InventoryPage = () => {
 
     const [isWarehouseModalOpen, setIsWarehouseModalOpen] = useState(false);
     const [selectedWarehouseItem, setSelectedWarehouseItem] = useState(null);
+
+    // QR Generator State
+    const [isQRGenOpen, setIsQRGenOpen] = useState(false);
+    const [qrItem, setQrItem] = useState(null);
+
+    const openQRModal = (item) => {
+        setQrItem(item);
+        setIsQRGenOpen(true);
+    };
 
     const handleAddItem = async (newItemData) => {
         // Prepare FormData for file upload
@@ -458,23 +468,33 @@ const InventoryPage = () => {
                                         </span>
                                     </td>
                                     <td className="py-4 px-6">
-                                        {item.image ? (
-                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
-                                                <img
-                                                    src={item.image} // Backend returns full path including /uploads if configured or we need to prepend
-                                                    // Actually we served /uploads statically, so if DB has '/uploads/file.jpg', it's relative to domain root.
-                                                    // Let's assume DB stores relative path like '/uploads/...'
-                                                    alt={item.name}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                                                <RiImage2Line size={20} />
-                                            </div>
-                                        )}
+                                        <div className="flex items-center gap-3">
+                                            {item.image ? (
+                                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                                    <RiImage2Line size={20} />
+                                                </div>
+                                            )}
+
+                                            {/* QR Button next to image */}
+                                            <button
+                                                onClick={() => openQRModal(item)}
+                                                className="w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 flex items-center justify-center text-blue-600 transition-colors border border-blue-200"
+                                                title="QR Kodni ko'rish"
+                                            >
+                                                <RiQrCodeLine size={18} />
+                                            </button>
+                                        </div>
                                     </td>
                                     <td className="py-4 px-6 text-right">
+
                                         <button
                                             onClick={() => openModal(item)}
                                             className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
@@ -513,6 +533,12 @@ const InventoryPage = () => {
                 isOpen={isWarehouseModalOpen}
                 onClose={() => setIsWarehouseModalOpen(false)}
                 onSelect={handleSelectFromWarehouse}
+            />
+
+            <QRGeneratorModal
+                isOpen={isQRGenOpen}
+                onClose={() => setIsQRGenOpen(false)}
+                item={qrItem}
             />
 
 
