@@ -170,7 +170,7 @@ const RequestsPage = () => {
                                                         Rad etish
                                                     </button>
                                                     <button
-                                                        onClick={() => handleUpdateStatus(req.id, 'pending_employee', 'mock_signature_XYZ')}
+                                                        onClick={() => handleUpdateStatus(req.id, req.type === 'exit' ? 'approved' : 'pending_employee', 'mock_signature_XYZ')}
                                                         className="btn btn-sm bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200"
                                                         disabled={isProcessing}
                                                     >
