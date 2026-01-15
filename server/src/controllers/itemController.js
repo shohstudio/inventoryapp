@@ -247,8 +247,15 @@ const updateItem = async (req, res) => {
 // @access  Private/Admin
 const deleteItem = async (req, res) => {
     try {
+        const itemId = parseInt(req.params.id);
+
+        // Delete associated requests first (manual cascade to be safe)
+        await prisma.request.deleteMany({
+            where: { itemId: itemId }
+        });
+
         await prisma.item.delete({
-            where: { id: parseInt(req.params.id) }
+            where: { id: itemId }
         });
 
         // Log delete
