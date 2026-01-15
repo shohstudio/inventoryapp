@@ -24,6 +24,7 @@ const AdminDashboard = () => {
 
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [pendingCount, setPendingCount] = useState(0);
+    const [pendingTab, setPendingTab] = useState('assignment'); // Default
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,6 +41,10 @@ const AdminDashboard = () => {
                         const count = requests.length;
                         if (count > 0) {
                             setPendingCount(count);
+                            // Determine which tab has pending requests (prioritize exit if mixed or mostly exit?)
+                            // If any is exit, go to exit. Else assignment.
+                            const hasExit = requests.some(r => r.type === 'exit');
+                            setPendingTab(hasExit ? 'exit' : 'assignment');
                             setShowPendingModal(true);
                         }
                     } catch (err) {
@@ -250,7 +255,7 @@ const AdminDashboard = () => {
                                     Keyinroq
                                 </button>
                                 <button
-                                    onClick={() => navigate('/admin/requests')}
+                                    onClick={() => navigate('/admin/requests', { state: { activeTab: pendingTab } })}
                                     className="py-3 px-6 rounded-xl bg-orange-600 text-white hover:bg-orange-700 shadow-lg shadow-orange-200 font-semibold transition-transform active:scale-95"
                                 >
                                     Ko'rish
