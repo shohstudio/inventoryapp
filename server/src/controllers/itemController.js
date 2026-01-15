@@ -207,9 +207,9 @@ const updateItem = async (req, res) => {
             }
         } else {
             // No assignment logic triggered (no PINFL, no ID change)
-            // But if Name/Role provided, update initial fields (handling manual edit of unassigned item)
-            if (assignedTo) dataToUpdate.initialOwner = assignedTo;
-            if (assignedRole) dataToUpdate.initialRole = assignedRole;
+            // Check for undefined to allow clearing values if sent as empty string (though validation requires them, this is safer)
+            if (assignedTo !== undefined) dataToUpdate.initialOwner = assignedTo;
+            if (assignedRole !== undefined) dataToUpdate.initialRole = assignedRole;
         }
 
         const item = await prisma.item.update({
