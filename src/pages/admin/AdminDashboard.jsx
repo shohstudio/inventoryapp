@@ -22,6 +22,9 @@ const AdminDashboard = () => {
     });
     const [logs, setLogs] = useState([]);
 
+    const [showPendingModal, setShowPendingModal] = useState(false);
+    const [pendingCount, setPendingCount] = useState(0);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -29,6 +32,20 @@ const AdminDashboard = () => {
                     api.get("/users"),
                     api.get("/items")
                 ]);
+
+                // Check for pending requests if user is accounter or admin
+                if (['accounter', 'admin'].includes(user?.role)) {
+                    try {
+                        const { data: requests } = await api.get('/requests?status=pending_accountant');
+                        const count = requests.length;
+                        if (count > 0) {
+                            setPendingCount(count);
+                            setShowPendingModal(true);
+                        }
+                    } catch (err) {
+                        console.error("Failed to fetch pending requests", err);
+                    }
+                }
 
                 // Users
                 setUserCount(usersRes.data.length);
@@ -69,7 +86,7 @@ const AdminDashboard = () => {
         };
 
         fetchData();
-    }, []);
+    }, [user?.role]); // Re-run if user role changes (login)
 
     // Format utility for large numbers
     const formatValue = (num) => {
@@ -208,6 +225,41 @@ const AdminDashboard = () => {
                     <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">›</button>
                 </div>
             </div>
+            {/* Notification Modal for Accountant */}
+            {showPendingModal && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-in fade-in zoom-in duration-300 border border-indigo-100 dark:border-slate-700">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-6 shadow-inner ring-8 ring-orange-50">
+                                <RiAlertLine size={40} />
+                            </div>
+
+                            <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+                                Diqqat! Yangi So'rovlar
+                            </h2>
+
+                            <p className="text-lg text-gray-500 dark:text-gray-300 mb-8 max-w-xs">
+                                Sizda <span className="font-bold text-orange-600">{pendingCount} ta</span> tasdiqlanmagan chiqqish so'rovi bor.
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-4 w-full">
+                                <button
+                                    onClick={() => setShowPendingModal(false)}
+                                    className="py-3 px-6 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+                                >
+                                    Keyinroq
+                                </button>
+                                <button
+                                    onClick={() => navigate('/admin/requests')}
+                                    className="py-3 px-6 rounded-xl bg-orange-600 text-white hover:bg-orange-700 shadow-lg shadow-orange-200 font-semibold transition-transform active:scale-95"
+                                >
+                                    Ko'rish
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
