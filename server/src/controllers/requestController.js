@@ -73,7 +73,13 @@ const getRequests = async (req, res) => {
         const requests = await prisma.request.findMany({
             where,
             include: {
-                item: true,
+                item: {
+                    include: {
+                        assignedTo: {
+                            select: { name: true }
+                        }
+                    }
+                },
                 requester: { select: { name: true, role: true } },
                 targetUser: { select: { name: true, pinfl: true } }
             },

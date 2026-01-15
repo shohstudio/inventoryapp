@@ -150,10 +150,30 @@ const RequestsPage = () => {
                                             <div className="font-medium text-gray-900">{req.item?.name}</div>
                                             <div className="text-xs text-gray-400 font-mono">{req.item?.serialNumber}</div>
                                         </td>
-                                        <td className="py-4 px-6 text-gray-700 text-sm">{req.requester?.name}</td>
+                                        <td className="py-4 px-6 text-gray-700 text-sm">
+                                            {req.type === 'exit' ? (
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-gray-900">{req.item?.assignedTo?.name || "Noma'lum"}</span>
+                                                    <span className="text-xs text-gray-400">Egasi</span>
+                                                </div>
+                                            ) : (
+                                                req.requester?.name
+                                            )}
+                                        </td>
                                         <td className="py-4 px-6">
-                                            <div className="font-medium text-gray-900">{req.targetUser?.name || "Bino"}</div>
-                                            {req.targetUser?.pinfl && <div className="text-xs text-gray-500 font-mono">PINFL: {req.targetUser.pinfl}</div>}
+                                            {req.type === 'exit' ? (
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-gray-900">
+                                                        {req.description?.match(/Olib chiquvchi: ([^.]+)/)?.[1] || "Aniqlanmadi"}
+                                                    </span>
+                                                    <span className="text-xs text-orange-500">Olib ketmoqda</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="font-medium text-gray-900">{req.targetUser?.name || "Bino"}</div>
+                                                    {req.targetUser?.pinfl && <div className="text-xs text-gray-500 font-mono">PINFL: {req.targetUser.pinfl}</div>}
+                                                </>
+                                            )}
                                         </td>
                                         <td className="py-4 px-6">
                                             {getStatusBadge(req.status)}
