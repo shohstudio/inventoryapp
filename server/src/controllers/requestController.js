@@ -13,9 +13,9 @@ const createRequest = async (req, res) => {
         }
 
         // Determine initial status based on type
-        let status = 'pending_accountant';
-        if (type === 'exit') {
-            status = 'pending_guard'; // Or approval flow
+        let status = req.body.status || 'pending_accountant';
+        if (type === 'exit' && !req.body.status) {
+            status = 'pending_accountant';
         }
 
         const request = await prisma.request.create({
