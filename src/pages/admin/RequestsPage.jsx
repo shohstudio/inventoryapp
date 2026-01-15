@@ -191,7 +191,7 @@ const RequestsPage = () => {
             {/* Rejection Modal */}
             {
                 rejectionModalOpen && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
                         <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
                             <h3 className="text-xl font-bold text-gray-800 mb-4">Rad etish sababi</h3>
                             <p className="text-sm text-gray-500 mb-2">Nega bu so'rovni rad etyapsiz? Izoh qoldirish majburiy.</p>
@@ -203,14 +203,16 @@ const RequestsPage = () => {
                             />
                             <div className="flex justify-end gap-3">
                                 <button
+                                    type="button"
                                     onClick={() => setRejectionModalOpen(false)}
-                                    className="btn btn-ghost text-gray-500"
+                                    className="btn btn-ghost text-gray-500 cursor-pointer"
                                 >
                                     Bekor qilish
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={submitRejection}
-                                    className="btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200"
+                                    className={`btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200 cursor-pointer ${(!rejectionReason.trim() || isProcessing) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={!rejectionReason.trim() || isProcessing}
                                 >
                                     {isProcessing ? "..." : "Rad etish"}
