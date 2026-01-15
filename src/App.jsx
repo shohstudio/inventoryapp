@@ -71,10 +71,13 @@ function App() {
                 path="/guard/*"
                 element={
                   <ProtectedRoute roles={["guard"]}>
-                    <GuardDashboard />
+                    <AdminLayout />
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route index element={<GuardDashboard />} />
+                <Route path="profile" element={<ProfilePage />} />
+              </Route>
 
               {/* Default Redirect */}
               <Route path="/" element={<Navigate to="/login" replace />} />

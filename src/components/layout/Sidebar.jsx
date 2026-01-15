@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine, RiArchiveLine, RiFileList3Line, RiHistoryLine } from "react-icons/ri";
+import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine, RiArchiveLine, RiFileList3Line, RiHistoryLine, RiShieldCheckLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import clsx from "clsx";
@@ -17,8 +17,8 @@ const Sidebar = ({ isOpen, onClose }) => {
         ...(user?.role === 'admin' ? [{ name: t('users'), path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
         ...(['admin', 'accounter', 'warehouseman'].includes(user?.role) ? [{ name: "So'rovlar", path: "/admin/requests", icon: <RiFileList3Line size={20} /> }] : []),
         ...(user?.role === 'admin' ? [{ name: "Loglar (Tarix)", path: "/admin/logs", icon: <RiHistoryLine size={20} /> }] : []),
-        { name: t('profile'), path: "/admin/profile", icon: <RiUserSettingsLine size={20} /> },
-        // ...(user?.role === 'admin' ? [{ name: "Sozlamalar", path: "/admin/settings", icon: <RiSettings4Line size={20} /> }] : []),
+        ...(user?.role === 'guard' ? [{ name: "Qoravul Paneli", path: "/guard", icon: <RiShieldCheckLine size={20} /> }] : []),
+        { name: t('profile'), path: user?.role === 'employee' ? "/employee/profile" : (user?.role === 'guard' ? "/guard/profile" : "/admin/profile"), icon: <RiUserSettingsLine size={20} /> },
     ];
 
     return (
