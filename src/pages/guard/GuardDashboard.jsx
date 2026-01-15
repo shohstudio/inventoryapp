@@ -187,11 +187,11 @@ const GuardDashboard = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {exitRequests.filter(r => r.status !== 'rejected').length === 0 ? (
+                                {exitRequests.length === 0 ? (
                                     <tr><td colSpan="5" className="p-6 text-center text-gray-400">So'rovlar yo'q</td></tr>
                                 ) : (
-                                    exitRequests.filter(r => r.status !== 'rejected').map(req => (
-                                        <tr key={req.id} className="hover:bg-gray-50">
+                                    exitRequests.map(req => (
+                                        <tr key={req.id} className={`hover:bg-gray-50 border-l-4 ${req.status === 'rejected' ? 'border-red-500 bg-red-50/50' : 'border-transparent'}`}>
                                             <td className="p-4 text-sm text-gray-600">{new Date(req.createdAt).toLocaleString('uz-UZ')}</td>
                                             <td className="p-4 font-medium text-gray-800">{req.requester?.name || '---'}</td>
                                             <td className="p-4 text-gray-600">{req.item?.name || '---'} <span className="text-xs text-gray-400">({req.item?.serialNumber || 'SN yo\'q'})</span></td>
@@ -199,6 +199,12 @@ const GuardDashboard = () => {
                                                 {req.status === 'pending_accountant' && <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs border border-orange-200">Hisobchi kutilmoqda</span>}
                                                 {req.status === 'approved' && <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs border border-green-200">Ruxsat Berilgan</span>}
                                                 {req.status === 'completed' && <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs border border-gray-200">Chiqib ketgan</span>}
+                                                {req.status === 'rejected' && (
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs border border-red-200 w-fit">Rad Etildi</span>
+                                                        <span className="text-xs text-red-600 italic">"{req.description}"</span>
+                                                    </div>
+                                                )}
                                             </td>
                                             <td className="p-4">
                                                 {req.status === 'approved' && (
@@ -210,6 +216,7 @@ const GuardDashboard = () => {
                                                     </button>
                                                 )}
                                                 {req.status === 'completed' && <span className="text-gray-400 text-sm"><RiCheckLine className="inline" /> Bajarildi</span>}
+                                                {req.status === 'rejected' && <span className="text-red-400 text-sm">Rad etilgan</span>}
                                             </td>
                                         </tr>
                                     ))

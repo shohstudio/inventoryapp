@@ -99,7 +99,7 @@ const getRequests = async (req, res) => {
 const updateRequestStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, signature } = req.body;
+        const { status, signature, description } = req.body;
 
         const request = await prisma.request.findUnique({ where: { id: parseInt(id) } });
 
@@ -112,7 +112,8 @@ const updateRequestStatus = async (req, res) => {
             where: { id: parseInt(id) },
             data: {
                 status,
-                ...(signature && { accountantSignature: signature })
+                ...(signature && { accountantSignature: signature }),
+                ...(description && { description: description }) // Allow updating description (e.g. rejection reason)
             }
         });
 
