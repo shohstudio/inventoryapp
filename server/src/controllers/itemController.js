@@ -161,8 +161,6 @@ const updateItem = async (req, res) => {
             building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo
         } = req.body;
 
-        console.log(`[Item Update ${req.params.id}] Body:`, JSON.stringify(req.body, null, 2));
-
         const dataToUpdate = {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price: price ? parseFloat(price) : undefined,
