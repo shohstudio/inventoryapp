@@ -5,5 +5,6 @@ const { login, registerSetup } = require('../controllers/authController');
 router.post('/login', login);
 // This route is temporary for creating initial admin/users
 router.post('/register-setup', registerSetup);
+router.post('/eimzo', require('../controllers/authController').eimzoLogin);
 
 module.exports = router;

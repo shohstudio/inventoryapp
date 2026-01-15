@@ -91,4 +91,75 @@ const registerSetup = async (req, res) => {
     }
 };
 
-module.exports = { login, registerSetup };
+// Verify PKCS#7 Signature (Placeholder)
+// In a real production environment, this should call an external service or use a library
+// like 'node-forge' (complex) or an official E-IMZO server module.
+const verifyPkcs7 = async (signature) => {
+    // TODO: Implement actual verification using:
+    // 1. External API (e.g., https://sign.soliq.uz/api/verify)
+    // 2. Or local library
+
+    // For now, we trust the signature is present and not empty.
+    // SECURITY WARNING: This allows anyone to login if they know the PINFL without a valid signature.
+    // MUST BE REPLACED FOR PRODUCTION.
+    if (!signature) return false;
+    return true;
+};
+
+// @desc    Login with E-IMZO (Soliq)
+// @route   POST /api/auth/eimzo
+// @access  Public
+const eimzoLogin = async (req, res) => {
+    const { signature, pinfl } = req.body;
+
+    try {
+        // 1. Verify Signature
+        const isValid = await verifyPkcs7(signature);
+        if (!isValid) {
+            return res.status(401).json({ message: "Imzo haqiqiy emas (Signature Invalid)" });
+        }
+
+        // 2. Find User by PINFL
+        let user = await prisma.user.findFirst({
+            where: { pinfl }
+        });
+
+        // 3. If user doesn't exist, Create or Reject?
+        // Logic: specific to business. Here we might auto-create LIMITED access users or reject.
+        // Let's CREATE a temporary employee if not found, or reject if we want strict access.
+        // For ASTI project, usually we want to allow employees to enter.
+
+        if (!user) {
+            // Option A: Reject
+            // return res.status(404).json({ message: "Foydalanuvchi tizimda topilmadi" });
+
+            // Option B: Auto-create (Employee)
+            const randomName = `Xodim ${pinfl.slice(-4)}`;
+            user = await prisma.user.create({
+                data: {
+                    name: randomName,
+                    username: `eri_${pinfl}`,
+                    password: await bcrypt.hash(Math.random().toString(), 10), // Random password
+                    role: 'employee',
+                    pinfl: pinfl
+                }
+            });
+        }
+
+        // 4. Generate Token
+        res.json({
+            id: user.id,
+            name: user.name,
+            username: user.username,
+            role: user.role,
+            pinfl: user.pinfl,
+            token: generateToken(user.id, user.role, user.name),
+        });
+
+    } catch (error) {
+        console.error("E-IMZO Login Error:", error);
+        res.status(500).json({ message: 'Server xatosi (E-IMZO)' });
+    }
+};
+
+module.exports = { login, registerSetup, eimzoLogin };
