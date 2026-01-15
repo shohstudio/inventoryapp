@@ -53,6 +53,7 @@ const userRoutes = require('./routes/userRoutes');
 const itemRoutes = require('./routes/itemRoutes');
 const logRoutes = require('./routes/logRoutes');
 const requestRoutes = require('./routes/requestRoutes');
+const externalItemRoutes = require('./routes/externalItemRoutes');
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -60,6 +61,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/external-items', externalItemRoutes);
 
 // Make uploads folder static
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
