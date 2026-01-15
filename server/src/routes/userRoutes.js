@@ -6,7 +6,14 @@ const { protect, admin } = require('../middleware/authMiddleware');
 router.post('/check-availability', protect, admin, checkAvailability);
 
 router.route('/')
-    .get(protect, admin, getUsers)
+    .get(protect, (req, res, next) => {
+        if (req.user.role === 'admin' || req.user.role === 'accounter') {
+            next();
+        } else {
+            res.status(403);
+            throw new Error('Not authorized as admin or accounter');
+        }
+    }, getUsers)
     .post(protect, admin, createUser);
 
 router.route('/:id')
