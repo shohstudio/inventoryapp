@@ -397,8 +397,7 @@ const GuardDashboard = () => {
             )}
         </div>
     );
-        </div >
-    );
+
 };
 
 export default GuardDashboard;
