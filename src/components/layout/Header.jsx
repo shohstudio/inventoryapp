@@ -102,7 +102,7 @@ const Header = ({ onMenuClick }) => {
                                 </div>
 
                                 <Link
-                                    to={user?.role === 'admin' ? "/admin/profile" : "/employee/profile"}
+                                    to={user?.role === 'employee' ? "/employee/profile" : (user?.role === 'guard' ? "/guard/profile" : "/admin/profile")}
                                     className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 flex items-center gap-2 transition-colors"
                                     onClick={() => setIsDropdownOpen(false)}
                                 >

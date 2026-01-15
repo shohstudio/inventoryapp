@@ -1,19 +1,30 @@
 import { Link, useLocation } from "react-router-dom";
-import { RiDashboardLine, RiBox3Line, RiQrCodeLine, RiArchiveLine, RiUserLine } from "react-icons/ri";
+import { RiDashboardLine, RiBox3Line, RiQrCodeLine, RiArchiveLine, RiUserLine, RiShieldLine } from "react-icons/ri";
 import clsx from "clsx";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
 
 const MobileBottomNav = ({ onScanClick }) => {
     const { pathname } = useLocation();
     const { t } = useLanguage();
+    const { user } = useAuth();
 
-    const navItems = [
-        { name: t('dashboard'), path: "/admin", icon: <RiDashboardLine size={24} />, exact: true },
-        { name: t('inventory'), path: "/admin/inventory", icon: <RiBox3Line size={24} /> },
-        { name: "QR Scan", type: "button", icon: <RiQrCodeLine size={32} /> }, // Central Button
-        { name: t('warehouse'), path: "/admin/warehouse", icon: <RiArchiveLine size={24} /> },
-        { name: t('profile'), path: "/admin/profile", icon: <RiUserLine size={24} /> },
-    ];
+    let navItems = [];
+
+    if (user?.role === 'guard') {
+        navItems = [
+            { name: "Asosiy", path: "/guard", icon: <RiShieldLine size={24} />, exact: true },
+            { name: "Profil", path: "/guard/profile", icon: <RiUserLine size={24} /> },
+        ];
+    } else {
+        navItems = [
+            { name: t('dashboard'), path: "/admin", icon: <RiDashboardLine size={24} />, exact: true },
+            { name: t('inventory'), path: "/admin/inventory", icon: <RiBox3Line size={24} /> },
+            { name: "QR Scan", type: "button", icon: <RiQrCodeLine size={32} /> }, // Central Button
+            { name: t('warehouse'), path: "/admin/warehouse", icon: <RiArchiveLine size={24} /> },
+            { name: t('profile'), path: "/admin/profile", icon: <RiUserLine size={24} /> },
+        ];
+    }
 
     return (
         <div className="fixed bottom-0 left-0 right-0 h-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-indigo-100 dark:border-slate-800 flex items-center justify-around px-2 z-40 md:hidden shadow-[0_-5px_20px_rgba(0,0,0,0.05)] pb-safe">
