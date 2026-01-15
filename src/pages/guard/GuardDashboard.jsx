@@ -2,13 +2,19 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { RiLogoutBoxRLine, RiAddLine, RiTimeLine, RiCheckLine, RiTruckLine, RiFileList3Line } from 'react-icons/ri';
+import { RiLogoutBoxRLine, RiAddLine, RiTimeLine, RiCheckLine, RiTruckLine, RiFileList3Line, RiQrCodeLine, RiSearchLine } from 'react-icons/ri';
 
 const GuardDashboard = () => {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('exit_requests'); // 'exit_requests' or 'external_items'
 
-    // State for Exit Requests
+    // State for Exit Requests Create
+    const [showExitModal, setShowExitModal] = useState(false);
+    const [scanQuery, setScanQuery] = useState('');
+    const [scannedItem, setScannedItem] = useState(null);
+    const [loadingScan, setLoadingScan] = useState(false);
+
+    // State for Exit Requests List
     const [exitRequests, setExitRequests] = useState([]);
     const [loadingExits, setLoadingExits] = useState(false);
 
@@ -88,6 +94,47 @@ const GuardDashboard = () => {
         }
     };
 
+    const handleSearchItem = async () => {
+        if (!scanQuery) return;
+        setLoadingScan(true);
+        try {
+            // First try finding by serial number
+            const { data } = await api.get(`/items?search=${scanQuery}`);
+            if (data && data.length > 0) {
+                // Find exact match if possible, otherwise first result
+                const exactMatch = data.find(i => i.serialNumber?.toLowerCase() === scanQuery.toLowerCase());
+                setScannedItem(exactMatch || data[0]);
+            } else {
+                toast.error("Buyum topilmadi");
+                setScannedItem(null);
+            }
+        } catch (error) {
+            toast.error("Qidirishda xatolik");
+        } finally {
+            setLoadingScan(false);
+        }
+    };
+
+    const handleCreateExitRequest = async () => {
+        if (!scannedItem) return;
+        try {
+            await api.post('/requests', {
+                itemId: scannedItem.id,
+                type: 'exit',
+                status: 'pending_accountant', // Guard initiates, waiting for accountant
+                description: `Qoravul so'rovi: ${user.name}`
+            });
+            toast.success("So'rov yuborildi");
+            setShowExitModal(false);
+            setScannedItem(null);
+            setScanQuery('');
+            fetchExitRequests();
+        } catch (error) {
+            console.error(error);
+            toast.error(error.response?.data?.message || "So'rov yaratishda xatolik");
+        }
+    };
+
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6 text-gray-800">Qoravul Paneli (Guard Dashboard)</h1>
@@ -111,6 +158,15 @@ const GuardDashboard = () => {
             {/* EXIT REQUESTS TAB */}
             {activeTab === 'exit_requests' && (
                 <div>
+                    <div className="flex justify-end mb-4">
+                        <button
+                            onClick={() => setShowExitModal(true)}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl shadow-sm flex items-center gap-2 transition-colors"
+                        >
+                            <RiQrCodeLine size={20} /> Chiqishga Ruxsat (Scan)
+                        </button>
+                    </div>
+
                     <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
@@ -208,6 +264,81 @@ const GuardDashboard = () => {
                 </div>
             )}
 
+            {/* Modal for Creating Exit Request */}
+            {showExitModal && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><RiQrCodeLine /> Buyumni Tekshirish</h2>
+
+                        {!scannedItem ? (
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Seriya Raqami / QR Kod</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none uppercase"
+                                            placeholder="Masalan: PC-001"
+                                            value={scanQuery}
+                                            onChange={e => setScanQuery(e.target.value)}
+                                            onKeyDown={e => e.key === 'Enter' && handleSearchItem()}
+                                            autoFocus
+                                        />
+                                        <button
+                                            onClick={handleSearchItem}
+                                            disabled={loadingScan}
+                                            className="bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700"
+                                        >
+                                            {loadingScan ? '...' : <RiSearchLine />}
+                                        </button>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2">QR kodni skaner qilsangiz, raqam shu yerga tushadi.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                    <p className="text-sm text-gray-500">Buyum:</p>
+                                    <p className="font-bold text-gray-800 text-lg">{scannedItem.name}</p>
+                                    <p className="text-sm text-gray-500 mt-2">Egasi:</p>
+                                    <p className="font-medium text-indigo-600">{scannedItem.assignedTo?.name || "Biriktirilmagan"}</p>
+                                    <p className="text-xs text-gray-400 mt-1">S/N: {scannedItem.serialNumber}</p>
+                                </div>
+
+                                <div className="flex justify-end gap-3 mt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setScannedItem(null); setScanQuery(''); }}
+                                        className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                                    >
+                                        Boshqa
+                                    </button>
+                                    <button
+                                        onClick={handleCreateExitRequest}
+                                        disabled={!scannedItem.assignedTo}
+                                        className={`px-4 py-2 text-white rounded-lg shadow-md transition-colors font-medium ${!scannedItem.assignedTo ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
+                                    >
+                                        So'rov Yuborish
+                                    </button>
+                                </div>
+                                {!scannedItem.assignedTo && (
+                                    <p className="text-xs text-red-500 text-center">Bu buyum hech kimga biriktirilmagan. So'rov yuborib bo'lmaydi.</p>
+                                )}
+                            </div>
+                        )}
+
+                        {!scannedItem && (
+                            <button
+                                onClick={() => setShowExitModal(false)}
+                                className="w-full mt-4 text-gray-500 text-sm hover:text-gray-700"
+                            >
+                                Bekor qilish
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Modal for External Item */}
             {showExtModal && (
                 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -265,6 +396,8 @@ const GuardDashboard = () => {
                 </div>
             )}
         </div>
+    );
+        </div >
     );
 };
 
