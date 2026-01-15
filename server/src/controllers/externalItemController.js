@@ -30,12 +30,15 @@ const registerEntry = async (req, res) => {
     try {
         const { itemName, description, ownerName, notes } = req.body;
 
+        const shortId = Math.floor(10000 + Math.random() * 90000).toString(); // Simple 5-digit ID
+
         const newItem = await prisma.externalItem.create({
             data: {
                 itemName,
                 description,
                 ownerName,
                 notes,
+                shortId,
                 guardId: req.user.id
             }
         });

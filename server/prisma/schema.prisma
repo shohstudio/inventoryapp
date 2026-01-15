@@ -128,4 +128,5 @@ model ExternalItem {
   
   guardId     Int?
   guard       User?    @relation(fields: [guardId], references: [id])
+  shortId     String?  @unique // 5-digit auto ID
 }

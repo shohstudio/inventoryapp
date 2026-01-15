@@ -74,8 +74,13 @@ const GuardDashboard = () => {
     const handleRegisterExternal = async (e) => {
         e.preventDefault();
         try {
-            await api.post('/external-items', extFormData);
-            toast.success("Ro'yxatga olindi");
+            const { data } = await api.post('/external-items', extFormData);
+
+            // Show ID clearly to the user
+            toast.success(`Ro'yxatga olindi! ID: ${data.shortId}`, { duration: 5000, icon: '🎫' });
+            // Also show an alert for emphasis if needed, but toast is good.
+            // alert(`Buyum ID raqami: ${data.shortId}`); // Optional, stick to toast for now unless requested.
+
             setShowExtModal(false);
             setExtFormData({ itemName: '', ownerName: '', description: '', notes: '' });
             fetchExternalItems();
@@ -230,7 +235,24 @@ const GuardDashboard = () => {
             {/* EXTERNAL ITEMS TAB */}
             {activeTab === 'external_items' && (
                 <div>
-                    <div className="flex justify-end mb-4">
+                    <div className="flex justify-between items-center mb-4">
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="ID yoki Ism bo'yicha qidirish..."
+                                className="pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none w-64"
+                                onChange={(e) => {
+                                    const val = e.target.value.toLowerCase();
+                                    // Simple client-side filter
+                                    const rows = document.querySelectorAll('.ext-item-row');
+                                    rows.forEach(row => {
+                                        const text = row.innerText.toLowerCase();
+                                        row.style.display = text.includes(val) ? '' : 'none';
+                                    });
+                                }}
+                            />
+                            <RiSearchLine className="absolute left-3 top-3 text-gray-400" />
+                        </div>
                         <button
                             onClick={() => setShowExtModal(true)}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow-sm flex items-center gap-2"
@@ -243,6 +265,7 @@ const GuardDashboard = () => {
                         <table className="w-full text-left border-collapse">
                             <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
                                 <tr>
+                                    <th className="p-4">ID</th>
                                     <th className="p-4">Kirgan Vaqti</th>
                                     <th className="p-4">Buyum Nomi</th>
                                     <th className="p-4">Egasining Ismi</th>
@@ -253,10 +276,11 @@ const GuardDashboard = () => {
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {externalItems.length === 0 ? (
-                                    <tr><td colSpan="6" className="p-6 text-center text-gray-400">Hozir ichkarida tashqi buyumlar yo'q</td></tr>
+                                    <tr><td colSpan="7" className="p-6 text-center text-gray-400">Hozir ichkarida tashqi buyumlar yo'q</td></tr>
                                 ) : (
                                     externalItems.map(item => (
-                                        <tr key={item.id} className="hover:bg-gray-50">
+                                        <tr key={item.id} className="hover:bg-gray-50 ext-item-row">
+                                            <td className="p-4 font-mono font-bold text-blue-600 bg-blue-50/50 rounded-lg">{item.shortId || '---'}</td>
                                             <td className="p-4 text-sm text-gray-600">{new Date(item.enteredAt).toLocaleString('uz-UZ')}</td>
                                             <td className="p-4 font-medium text-gray-800">{item.itemName}</td>
                                             <td className="p-4 text-gray-600">{item.ownerName}</td>
