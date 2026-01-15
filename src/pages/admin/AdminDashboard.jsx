@@ -33,8 +33,8 @@ const AdminDashboard = () => {
                     api.get("/items")
                 ]);
 
-                // Check for pending requests if user is accounter or admin
-                if (['accounter', 'admin'].includes(user?.role)) {
+                // Check for pending requests if user is accounter
+                if (user?.role === 'accounter') {
                     try {
                         const { data: requests } = await api.get('/requests?status=pending_accountant');
                         const count = requests.length;
