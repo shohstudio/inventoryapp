@@ -196,7 +196,7 @@ const RequestsPage = () => {
                             <h3 className="text-xl font-bold text-gray-800 mb-4">Rad etish sababi</h3>
                             <p className="text-sm text-gray-500 mb-2">Nega bu so'rovni rad etyapsiz? Izoh qoldirish majburiy.</p>
                             <textarea
-                                className="textarea w-full h-32 mb-4"
+                                className="w-full h-32 mb-4 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none resize-none bg-gray-50 text-gray-800"
                                 placeholder="Masalan: Jihoz menga tegishli emas..."
                                 value={rejectionReason}
                                 onChange={(e) => setRejectionReason(e.target.value)}
