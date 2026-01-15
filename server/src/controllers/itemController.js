@@ -157,7 +157,7 @@ const updateItem = async (req, res) => {
         const {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
-            building, location, department, assignedUserId
+            building, location, department, assignedUserId, assignedPINFL
         } = req.body;
 
         const dataToUpdate = {
@@ -172,18 +172,31 @@ const updateItem = async (req, res) => {
             dataToUpdate.image = `/uploads/${req.file.filename}`;
         }
 
-        // Handle Assignment Logic
-        // If assignedUserId is present (even if it's the same), we update it.
-        // If it's explicitly 'null' string from formData, we unassign.
-        if (assignedUserId !== undefined) {
-            // Logic to update assignedUserId and assignedDate
+        // Handle Assignment Logic by PINFL or ID
+        if (assignedPINFL) {
+            // Check if user exists with this PINFL
+            const targetUser = await prisma.user.findFirst({ where: { pinfl: assignedPINFL } });
+
+            if (targetUser) {
+                // User found -> Reassign
+                dataToUpdate.assignedUserId = targetUser.id;
+                dataToUpdate.assignedDate = new Date();
+                dataToUpdate.initialPinfl = null; // Clear initial if linked
+                dataToUpdate.initialOwner = null;
+            } else {
+                // User NOT found -> Unassign from current user (if any) and store PINFL
+                dataToUpdate.assignedUserId = null;
+                dataToUpdate.assignedDate = null;
+                dataToUpdate.initialPinfl = assignedPINFL;
+                // We keep the name if provided, or maybe clear it? Let's leave name logic as is or untouched.
+            }
+        } else if (assignedUserId !== undefined) {
+            // Fallback to explicit ID assignment logic if PINFL not provided/priority
             if (assignedUserId === 'null' || assignedUserId === null || assignedUserId === "") {
                 dataToUpdate.assignedUserId = null;
                 dataToUpdate.assignedDate = null;
             } else {
                 dataToUpdate.assignedUserId = parseInt(assignedUserId);
-                // Only update date if it wasn't assigned before or changed user? 
-                // Simple logic: update date on assignment
                 dataToUpdate.assignedDate = new Date();
             }
         }
