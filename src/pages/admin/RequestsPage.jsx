@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
@@ -10,7 +11,8 @@ const RequestsPage = () => {
     const { user } = useAuth();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('assignment'); // 'assignment' or 'exit'
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'assignment'); // 'assignment' or 'exit'
     const [isProcessing, setIsProcessing] = useState(false);
 
     const fetchRequests = async () => {
