@@ -16,7 +16,7 @@ const getItems = async (req, res) => {
             where,
             include: {
                 assignedTo: {
-                    select: { name: true, pinfl: true }
+                    select: { name: true, pinfl: true, position: true }
                 },
                 requests: {
                     where: {
@@ -48,7 +48,7 @@ const getItemById = async (req, res) => {
             where: { id: parseInt(req.params.id) },
             include: {
                 assignedTo: {
-                    select: { name: true, pinfl: true }
+                    select: { name: true, pinfl: true, position: true }
                 }
             }
         });
@@ -107,7 +107,8 @@ const createItem = async (req, res) => {
             assignedDate: null,
             // Save initial info if user not found (for future linking)
             initialPinfl: !targetUser && assignedPINFL ? assignedPINFL : null,
-            initialOwner: !targetUser && assignedTo ? assignedTo : null
+            initialOwner: !targetUser && assignedTo ? assignedTo : null,
+            initialRole: !targetUser && assignedRole ? assignedRole : null
         };
 
         const item = await prisma.item.create({
@@ -157,7 +158,7 @@ const updateItem = async (req, res) => {
         const {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
-            building, location, department, assignedUserId, assignedPINFL
+            building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo
         } = req.body;
 
         const dataToUpdate = {
@@ -188,7 +189,8 @@ const updateItem = async (req, res) => {
                 dataToUpdate.assignedUserId = null;
                 dataToUpdate.assignedDate = null;
                 dataToUpdate.initialPinfl = assignedPINFL;
-                // We keep the name if provided, or maybe clear it? Let's leave name logic as is or untouched.
+                dataToUpdate.initialOwner = assignedTo; // Save Name
+                dataToUpdate.initialRole = assignedRole; // Save Role
             }
         } else if (assignedUserId !== undefined) {
             // Fallback to explicit ID assignment logic if PINFL not provided/priority

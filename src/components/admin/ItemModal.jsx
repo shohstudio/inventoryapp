@@ -30,8 +30,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (item) {
             setFormData({
                 ...item,
-                assignedPINFL: item.assignedPINFL || "",
-                assignedRole: item.assignedRole || "",
+                assignedTo: item.assignedTo ? item.assignedTo.name : (item.initialOwner || ""),
+                assignedRole: item.assignedTo ? item.assignedTo.position : (item.initialRole || ""),
+                assignedPINFL: item.assignedTo ? item.assignedTo.pinfl : (item.initialPinfl || ""),
                 images: item.images || [],
                 pdf: item.pdf || null
             });

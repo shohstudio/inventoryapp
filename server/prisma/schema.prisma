@@ -58,6 +58,7 @@ model Item {
 
   // If imported from Excel and user not found, store name here
   initialOwner String?
+  initialRole  String?  // Store role if user not found
   initialPinfl String?
   
   // Relations
