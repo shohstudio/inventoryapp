@@ -75,6 +75,8 @@ const LoginPage = () => {
             const user = await login(username, password);
             if (["admin", "warehouseman", "accounter"].includes(user.role)) {
                 navigate("/admin");
+            } else if (user.role === "guard") {
+                navigate("/guard");
             } else {
                 navigate("/employee");
             }
@@ -123,8 +125,8 @@ const LoginPage = () => {
                         <button
                             onClick={() => setLoginMethod("password")}
                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all ${loginMethod === "password"
-                                    ? "bg-gradient-to-tr from-indigo-500 to-purple-500 text-white shadow-lg"
-                                    : "text-gray-400 hover:text-white"
+                                ? "bg-gradient-to-tr from-indigo-500 to-purple-500 text-white shadow-lg"
+                                : "text-gray-400 hover:text-white"
                                 }`}
                         >
                             <RiLockPasswordLine size={18} />
@@ -136,8 +138,8 @@ const LoginPage = () => {
                                 if (keys.length === 0) handleLoadKeys();
                             }}
                             className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-all ${loginMethod === "eri"
-                                    ? "bg-gradient-to-tr from-indigo-500 to-purple-500 text-white shadow-lg"
-                                    : "text-gray-400 hover:text-white"
+                                ? "bg-gradient-to-tr from-indigo-500 to-purple-500 text-white shadow-lg"
+                                : "text-gray-400 hover:text-white"
                                 }`}
                         >
                             <RiKey2Line size={18} />

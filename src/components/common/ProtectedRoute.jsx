@@ -15,7 +15,8 @@ const ProtectedRoute = ({ children, roles = [] }) => {
 
     if (roles.length > 0 && !roles.includes(user.role)) {
         // Redirect based on role if unauthorized
-        if (user.role === "admin" || user.role === "accounter") return <Navigate to="/admin" replace />;
+        if (user.role === "admin" || user.role === "accounter" || user.role === "warehouseman") return <Navigate to="/admin" replace />;
+        if (user.role === "guard") return <Navigate to="/guard" replace />;
         return <Navigate to="/employee" replace />;
     }
 
