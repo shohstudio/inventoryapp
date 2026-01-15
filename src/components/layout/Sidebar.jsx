@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         `}>
             <div className="p-6 border-b border-indigo-900/50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">I</div>
+                    <img src="/logo.jpg" alt="Logo" className="w-8 h-8 rounded-lg object-contain bg-white" />
                     <span className="text-xl font-bold text-white tracking-tight">
                         Invertar
                     </span>
