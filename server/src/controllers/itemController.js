@@ -188,6 +188,14 @@ const updateItem = async (req, res) => {
                 dataToUpdate.initialPinfl = null;
                 dataToUpdate.initialOwner = null;
                 dataToUpdate.initialRole = null;
+
+                // SPECIAL FIX: If assignedRole is provided, UPDATE the user's position!
+                if (assignedRole) {
+                    await prisma.user.update({
+                        where: { id: targetUser.id },
+                        data: { position: assignedRole }
+                    });
+                }
             } else {
                 // User NOT found -> Unassign from current user (if any) and store PINFL/Role/Name
                 dataToUpdate.assignedUserId = null;
