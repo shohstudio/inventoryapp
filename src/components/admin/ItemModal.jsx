@@ -29,7 +29,10 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         setErrors({}); // Reset errors on open
         if (item) {
             setFormData({
-                ...item,
+                serial: item.serialNumber || "",
+                inn: item.inn || "",
+                orderNumber: item.orderNumber || "",
+                quantity: item.quantity || 1,
                 assignedTo: item.assignedTo ? item.assignedTo.name : (item.initialOwner || ""),
                 assignedRole: item.assignedTo ? item.assignedTo.position : (item.initialRole || ""),
                 assignedPINFL: item.assignedTo ? item.assignedTo.pinfl : (item.initialPinfl || ""),
