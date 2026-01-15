@@ -13,6 +13,7 @@ const GuardDashboard = () => {
     const [scanQuery, setScanQuery] = useState('');
     const [scannedItem, setScannedItem] = useState(null);
     const [loadingScan, setLoadingScan] = useState(false);
+    const [carrierName, setCarrierName] = useState('');
 
     // State for Exit Requests List
     const [exitRequests, setExitRequests] = useState([]);
