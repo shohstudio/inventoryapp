@@ -10,6 +10,9 @@ const EmployeeDashboard = () => {
     const navigate = useNavigate(); // Hook for navigation
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [pendingCount, setPendingCount] = useState(0);
+    const [myItemsCount, setMyItemsCount] = useState(0);
+    const [totalValue, setTotalValue] = useState(0);
+    const [recentItems, setRecentItems] = useState([]);
 
     // Fetch Real Items & Pending Requests
     useEffect(() => {
