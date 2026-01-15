@@ -239,7 +239,7 @@ const AdminDashboard = () => {
                             </h2>
 
                             <p className="text-lg text-gray-500 dark:text-gray-300 mb-8 max-w-xs">
-                                Sizda <span className="font-bold text-orange-600">{pendingCount} ta</span> tasdiqlanmagan chiqqish so'rovi bor.
+                                Sizda <span className="font-bold text-orange-600">{pendingCount} ta</span> tasdiqlanmagan chiqish so'rovi bor.
                             </p>
 
                             <div className="grid grid-cols-2 gap-4 w-full">
