@@ -105,7 +105,9 @@ const InventoryPage = () => {
         Object.keys(newItemData).forEach(key => {
             if (key === 'imageFile' && newItemData[key]) {
                 formData.append('image', newItemData[key]);
-            } else if (key !== 'images' && key !== 'imageFile') { // processing logic
+            } else if (key === 'serial') {
+                formData.append('serialNumber', newItemData[key]);
+            } else if (key !== 'images' && key !== 'imageFile') {
                 formData.append(key, newItemData[key]);
             }
         });
