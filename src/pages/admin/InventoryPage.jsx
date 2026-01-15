@@ -8,6 +8,7 @@ import QRScannerModal from "../../components/admin/QRScannerModal";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios"; // Import API
+import { toast } from "react-hot-toast";
 
 const InventoryPage = () => {
     const location = useLocation();
@@ -79,7 +80,7 @@ const InventoryPage = () => {
         if (foundItem) {
             openModal(foundItem);
         } else {
-            alert(`Jihoz topilmadi. QR Kod: ${decodedText}`);
+            toast.error(`Jihoz topilmadi. QR Kod: ${decodedText}`);
         }
     };
 
@@ -107,19 +108,19 @@ const InventoryPage = () => {
                 await api.put(`/items/${selectedItem.id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                alert("Jihoz yangilandi!");
+                toast.success("Jihoz yangilandi!");
             } else {
                 // Create
                 await api.post('/items', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                alert("Jihoz qo'shildi!");
+                toast.success("Jihoz qo'shildi!");
             }
             fetchItems(); // Refresh list
             setSelectedWarehouseItem(null);
         } catch (err) {
             console.error("Save failed", err);
-            alert("Saqlashda xatolik: " + (err.response?.data?.message || err.message));
+            toast.error("Saqlashda xatolik: " + (err.response?.data?.message || err.message));
         }
     };
 
@@ -147,11 +148,11 @@ const InventoryPage = () => {
             const { data } = await api.post('/items/import', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            alert(data.message);
+            toast.success(data.message);
             fetchItems(); // Refresh
         } catch (err) {
             console.error("Import failed", err);
-            alert("Import xatoligi: " + (err.response?.data?.message || err.message));
+            toast.error("Import xatoligi: " + (err.response?.data?.message || err.message));
         } finally {
             setLoading(false);
             e.target.value = null; // Reset input
@@ -235,11 +236,11 @@ const InventoryPage = () => {
 
         try {
             await api.post('/items/delete-many', { ids: selectedIds });
-            alert(`${selectedIds.length} ta jihoz o'chirildi.`);
+            toast.success(`${selectedIds.length} ta jihoz o'chirildi.`);
             fetchItems(); // Refresh
         } catch (err) {
             console.error("Bulk delete failed", err);
-            alert("O'chirishda xatolik: " + (err.response?.data?.message || err.message));
+            toast.error("O'chirishda xatolik: " + (err.response?.data?.message || err.message));
         }
     };
 

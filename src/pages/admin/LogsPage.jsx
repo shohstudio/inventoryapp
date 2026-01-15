@@ -3,6 +3,7 @@ import { useLanguage } from "../../context/LanguageContext";
 import { RiHistoryLine, RiFileList3Line, RiTruckLine, RiLogoutBoxRLine, RiFileExcel2Line, RiSearchLine } from "react-icons/ri";
 import api from "../../api/axios";
 import * as XLSX from 'xlsx';
+import { toast } from "react-hot-toast";
 
 const LogsPage = () => {
     const { t } = useLanguage();
@@ -50,7 +51,7 @@ const LogsPage = () => {
 
     const exportToExcel = () => {
         if (logs.length === 0) {
-            alert("Export qilish uchun ma'lumot yo'q");
+            toast.error("Export qilish uchun ma'lumot yo'q");
             return;
         }
 

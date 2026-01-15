@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { RiUserSmileLine, RiShieldKeyholeLine, RiSave3Line, RiSmartphoneLine, RiMailLine, RiUserStarLine } from "react-icons/ri";
+import api from "../../api/axios";
+import { toast } from "react-hot-toast";
 
 const ProfilePage = () => {
     const { user } = useAuth();
@@ -31,22 +33,38 @@ const ProfilePage = () => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
 
-    const saveProfile = (e) => {
+    const saveProfile = async (e) => {
         e.preventDefault();
-        // Here you would call API to update user info
-        setIsEditing(false);
-        alert("Profil ma'lumotlari yangilandi! (Mock)");
+        try {
+            await api.put(`/users/${user.id}`, {
+                name: profile.name,
+                phone: profile.phone,
+                department: profile.department
+            });
+            setIsEditing(false);
+            toast.success("Profil ma'lumotlari muvaffaqiyatli yangilandi!");
+        } catch (error) {
+            console.error(error);
+            toast.error("Xatolik yuz berdi");
+        }
     };
 
-    const savePassword = (e) => {
+    const savePassword = async (e) => {
         e.preventDefault();
         if (passwords.new !== passwords.confirm) {
-            alert("Parollar mos kelmadi!");
+            toast.error("Parollar mos kelmadi!");
             return;
         }
-        // Here you would call API to change password
-        alert("Parol o'zgartirildi! (Mock)");
-        setPasswords({ current: "", new: "", confirm: "" });
+        try {
+            await api.put(`/users/${user.id}`, {
+                password: passwords.new
+            });
+            toast.success("Parol muvaffaqiyatli o'zgartirildi!");
+            setPasswords({ current: "", new: "", confirm: "" });
+        } catch (error) {
+            console.error(error);
+            toast.error("Parolni o'zgartirishda xatolik");
+        }
     };
 
     return (

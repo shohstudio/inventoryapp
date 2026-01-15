@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { RiQrCodeLine, RiLogoutBoxRLine, RiCheckDoubleLine, RiSave3Line, RiArchiveLine } from "react-icons/ri";
 import QRScannerModal from "../../components/admin/QRScannerModal";
+import { toast } from "react-hot-toast";
 
 const GuardDashboard = () => {
     const { user, logout } = useAuth();
@@ -60,7 +61,7 @@ const GuardDashboard = () => {
             // Auto fill responsible if assigned
             if (item.assignedTo) setResponsiblePerson(item.assignedTo.name || item.assignedTo);
         } else {
-            alert("Jihoz topilmadi. Kod: " + code);
+            toast.error("Jihoz topilmadi. Kod: " + code);
             setFoundItem(null);
         }
     };
@@ -68,7 +69,7 @@ const GuardDashboard = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!foundItem) {
-            alert("Iltimos, avval jihozni skaner qiling yoki kodini kiriting.");
+            toast.error("Iltimos, avval jihozni skaner qiling yoki kodini kiriting.");
             return;
         }
 
@@ -110,7 +111,7 @@ const GuardDashboard = () => {
         setResponsiblePerson("");
         setQuantity(1);
 
-        alert("Chiqish so'rovi yuborildi!");
+        toast.success("Chiqish so'rovi yuborildi!");
     };
 
     return (

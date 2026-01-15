@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { RiAlertLine, RiSendPlaneFill, RiImageAddLine } from "react-icons/ri";
+import { toast } from "react-hot-toast";
 
 const ReportIssuePage = () => {
     const [formData, setFormData] = useState({
@@ -11,7 +12,7 @@ const ReportIssuePage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        alert("Xabar yuborildi! (Mock)");
+        toast.success("Xabar yuborildi!");
         // Reset form
         setFormData({ title: "", category: "Broken", priority: "Medium", description: "" });
     };
