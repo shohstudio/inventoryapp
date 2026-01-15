@@ -158,8 +158,13 @@ const updateItem = async (req, res) => {
         const {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
-            building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo
-        } = req.body;
+            const {
+                name, model, serialNumber, inn, orderNumber, category, subCategory,
+                price, quantity, purchaseDate, status, condition,
+                building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo
+            } = req.body;
+
+        console.log(`[Item Update ${req.params.id}] Body:`, JSON.stringify(req.body, null, 2));
 
         const dataToUpdate = {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
