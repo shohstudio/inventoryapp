@@ -94,8 +94,11 @@ const GuardDashboard = () => {
         }
     };
 
-    const handleSearchItem = async () => {
-        if (!scanQuery) return;
+    // Search Item by Serial or QR
+    const handleSearchItem = async (e) => {
+        e?.preventDefault();
+        if (!scanQuery.trim()) return;
+
         setLoadingScan(true);
         try {
             // First try finding by serial number
@@ -103,10 +106,13 @@ const GuardDashboard = () => {
             if (data && data.length > 0) {
                 // Find exact match if possible, otherwise first result
                 const exactMatch = data.find(i => i.serialNumber?.toLowerCase() === scanQuery.toLowerCase());
-                setScannedItem(exactMatch || data[0]);
+                const item = exactMatch || data[0];
+                setScannedItem(item);
+                setCarrierName(item.assignedTo?.name || ''); // Default to owner
             } else {
                 toast.error("Buyum topilmadi");
                 setScannedItem(null);
+                setCarrierName('');
             }
         } catch (error) {
             toast.error("Qidirishda xatolik");
@@ -122,12 +128,13 @@ const GuardDashboard = () => {
                 itemId: scannedItem.id,
                 type: 'exit',
                 status: 'pending_accountant', // Guard initiates, waiting for accountant
-                description: `Qoravul so'rovi: ${user.name}`
+                description: `Olib chiquvchi: ${carrierName}. Qoravul: ${user.name}`
             });
             toast.success("So'rov yuborildi");
             setShowExitModal(false);
             setScannedItem(null);
             setScanQuery('');
+            setCarrierName('');
             fetchExitRequests();
         } catch (error) {
             console.error(error);
@@ -302,6 +309,16 @@ const GuardDashboard = () => {
                                     <p className="font-bold text-gray-800 text-lg">{scannedItem.name}</p>
                                     <p className="text-sm text-gray-500 mt-2">Egasi:</p>
                                     <p className="font-medium text-indigo-600">{scannedItem.assignedTo?.name || "Biriktirilmagan"}</p>
+
+                                    <div className="mt-2">
+                                        <label className="text-sm text-gray-500">Olib chiqib ketayotgan xodim:</label>
+                                        <input
+                                            type="text"
+                                            value={carrierName}
+                                            onChange={(e) => setCarrierName(e.target.value)}
+                                            className="w-full bg-white border border-gray-300 rounded px-2 py-1 mt-1 text-gray-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
                                     <p className="text-xs text-gray-400 mt-1">S/N: {scannedItem.serialNumber}</p>
                                 </div>
 
