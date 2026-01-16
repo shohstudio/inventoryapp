@@ -113,6 +113,61 @@ const InventoryPage = () => {
 
     const { user } = useAuth();
 
+    const handleImportExcel = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            setLoading(true);
+            const { data } = await api.post('/items/import', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            toast.success(data.message);
+            fetchItems(); // Refresh
+        } catch (err) {
+            console.error("Import failed", err);
+            toast.error("Import xatoligi: " + (err.response?.data?.message || err.message));
+        } finally {
+            setLoading(false);
+            e.target.value = null; // Reset input
+        }
+    };
+
+    const handleExportExcel = async () => {
+        // Export CURRENT page items ? OR ALL items? 
+        // Ideally all filtered items. Server side export is better. 
+        // But for now, let's just export visible items or fetch all for export.
+        // Let's implement a simple client side export of CURRENT page for safety, 
+        // or ideally we need a backend endpoint for export.
+        // Let's fallback to current items for now to avoid complexity or errors.
+
+        const exportData = items.map(item => ({
+            [t('order_number')]: item.orderNumber || item.id,
+            [t('name')]: item.name,
+            [t('model')]: item.model,
+            [t('inn')]: item.inn,
+            ["JSHShIR"]: item.assignedPINFL || "",
+            [t('category')]: item.category,
+            [t('building')]: item.building,
+            [t('location')]: item.location,
+            [t('status')]: item.status === 'working' ? t('status_working') :
+                item.status === 'repair' ? t('status_repair') :
+                    item.status === 'written-off' ? t('status_written_off') :
+                        t('status_broken'),
+            [t('assigned_to')]: item.assignedTo?.name || "",
+            [t('purchase_year')]: item.purchaseDate,
+            [t('price')]: item.price
+        }));
+
+        const ws = utils.json_to_sheet(exportData);
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, "Jihozlar");
+        writeFile(wb, "jihozlar_ruyxati.xlsx");
+    };
+
     // Filter logic REMOVED - Using Server Side now.
     // We use `items` directly as `filteredItems`.
     const filteredItems = items;
@@ -121,6 +176,7 @@ const InventoryPage = () => {
 
     // ... (rest of logic)
 
+    // Extract categories from current items for dropdown (limited to current page, but better than nothing)
     const uniqueCategories = [...new Set(items.map(item => item.category))];
     const uniqueBuildings = [...new Set(items.map(item => item.building))];
 
