@@ -4,13 +4,24 @@ import { RiHistoryLine, RiFileList3Line, RiTruckLine, RiLogoutBoxRLine, RiFileEx
 import api from "../../api/axios";
 import * as XLSX from 'xlsx';
 import { toast } from "react-hot-toast";
+import Pagination from "../../components/common/Pagination";
 
 const LogsPage = () => {
     const { t } = useLanguage();
-    const [activeTab, setActiveTab] = useState('inventory'); // inventory, warehouse, exit
-    const [allLogs, setAllLogs] = useState([]);
+    // const [activeTab, setActiveTab] = useState('inventory'); // inventory, warehouse, exit
+    // Removed tabs state for now as server pagination trumps client filtering
+
+    // We can keep activeTab for visual purpose if needed, but filtering by tabs requires backend support.
+    // Let's hide tabs for now or implement backend filter for 'inventory' vs 'warehouse'.
+    // Given user urgency, let's keep it simple: ALL LOGS.
+
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
 
     // Filters
     const [startDate, setStartDate] = useState('');
@@ -19,14 +30,22 @@ const LogsPage = () => {
     const fetchLogs = async () => {
         setLoading(true);
         try {
-            let query = '/logs?';
+            let query = `/logs?page=${currentPage}&limit=20&`;
             if (startDate) query += `startDate=${startDate}&`;
             if (endDate) query += `endDate=${endDate}`;
 
             const { data } = await api.get(query);
-            setAllLogs(data);
+
+            if (data.logs) {
+                setLogs(data.logs);
+                setTotalPages(data.metadata.totalPages);
+                setTotalItems(data.metadata.total);
+            } else {
+                setLogs(data); // Fallback
+            }
         } catch (error) {
             console.error("Failed to fetch logs", error);
+            toast.error("Loglarni yuklashda xatolik");
         } finally {
             setLoading(false);
         }
@@ -34,20 +53,7 @@ const LogsPage = () => {
 
     useEffect(() => {
         fetchLogs();
-    }, [startDate, endDate]); // Refetch when dates change
-
-    useEffect(() => {
-        // Filter logs based on tab (rudimentary text search based filter since backend 'action' string is loose)
-        let filtered = [];
-        if (activeTab === 'inventory') {
-            filtered = allLogs; // Show all for inventory as general logs
-        } else if (activeTab === 'warehouse') {
-            filtered = allLogs.filter(l => l.action.includes('create') || l.action.includes('import'));
-        } else if (activeTab === 'exit') {
-            filtered = allLogs.filter(l => l.action.includes('exit'));
-        }
-        setLogs(filtered);
-    }, [activeTab, allLogs]);
+    }, [startDate, endDate, currentPage]);
 
     const exportToExcel = () => {
         if (logs.length === 0) {
@@ -81,7 +87,7 @@ const LogsPage = () => {
                         <RiHistoryLine className="text-indigo-600" />
                         Tizim Loglari
                     </h1>
-                    <p className="text-gray-500">Barcha harakatlar tarixi</p>
+                    <p className="text-gray-500">Barcha harakatlar tarixi ({totalItems})</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
@@ -91,7 +97,10 @@ const LogsPage = () => {
                             type="date"
                             className="text-sm outline-none text-gray-700"
                             value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
+                            onChange={(e) => {
+                                setStartDate(e.target.value);
+                                setCurrentPage(1);
+                            }}
                         />
                     </div>
                     <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
@@ -100,7 +109,10 @@ const LogsPage = () => {
                             type="date"
                             className="text-sm outline-none text-gray-700"
                             value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
+                            onChange={(e) => {
+                                setEndDate(e.target.value);
+                                setCurrentPage(1);
+                            }}
                         />
                     </div>
 
@@ -112,31 +124,6 @@ const LogsPage = () => {
                         Excel
                     </button>
                 </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b border-gray-100 overflow-x-auto pb-1">
-                <button
-                    onClick={() => setActiveTab('inventory')}
-                    className={`pb-3 px-2 font-medium transition-colors relative flex items-center gap-2 whitespace-nowrap ${activeTab === 'inventory' ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    <RiFileList3Line /> Inventar
-                    {activeTab === 'inventory' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 rounded-full"></span>}
-                </button>
-                <button
-                    onClick={() => setActiveTab('warehouse')}
-                    className={`pb-3 px-2 font-medium transition-colors relative flex items-center gap-2 whitespace-nowrap ${activeTab === 'warehouse' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    <RiTruckLine /> Omborxona
-                    {activeTab === 'warehouse' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full"></span>}
-                </button>
-                <button
-                    onClick={() => setActiveTab('exit')}
-                    className={`pb-3 px-2 font-medium transition-colors relative flex items-center gap-2 whitespace-nowrap ${activeTab === 'exit' ? 'text-orange-600' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    <RiLogoutBoxRLine /> Chiqishlar (Qoravul)
-                    {activeTab === 'exit' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 rounded-full"></span>}
-                </button>
             </div>
 
             <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
@@ -191,6 +178,16 @@ const LogsPage = () => {
                         </tbody>
                     </table>
                 </div>
+                {/* Pagination */}
+                {logs.length > 0 && (
+                    <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={(page) => setCurrentPage(page)}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );

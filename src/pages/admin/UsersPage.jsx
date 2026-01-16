@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, RiDeleteBinLine, RiCalculatorLine } from "react-icons/ri";
-import UserModal from "../../components/admin/UserModal";
+import Pagination from "../../components/common/Pagination";
+import UserModal from "../../components/admin/UserModal"; // Restored
 import { useLanguage } from "../../context/LanguageContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
@@ -12,10 +13,32 @@ const UsersPage = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    // Pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Search
+    const [searchQuery, setSearchQuery] = useState("");
+
     const fetchUsers = async () => {
+        setLoading(true);
         try {
-            const res = await api.get('/users');
-            setUsers(res.data);
+            const res = await api.get('/users', {
+                params: {
+                    page: currentPage,
+                    limit: 20,
+                    search: searchQuery
+                }
+            });
+
+            if (res.data.users) {
+                setUsers(res.data.users);
+                setTotalPages(res.data.metadata.totalPages);
+                setTotalItems(res.data.metadata.total);
+            } else {
+                setUsers(res.data); // Fallback
+            }
         } catch (error) {
             console.error("Error fetching users:", error);
             toast.error("Foydalanuvchilarni yuklashda xatolik");
@@ -25,8 +48,12 @@ const UsersPage = () => {
     };
 
     useEffect(() => {
-        fetchUsers();
-    }, []);
+        // Debounce search
+        const timeout = setTimeout(() => {
+            fetchUsers();
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [currentPage, searchQuery]);
 
     const handleSaveUser = async (userData) => {
         try {
@@ -172,6 +199,16 @@ const UsersPage = () => {
                             </tbody>
                         </table>
                     </div>
+                    {/* Pagination */}
+                    {users.length > 0 && (
+                        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={(page) => setCurrentPage(page)}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 
