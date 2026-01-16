@@ -29,21 +29,22 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [usersRes, itemsRes] = await Promise.all([
-                    api.get("/users"),
-                    api.get("/items")
+                // Fetch Stats from dedicated endpoint
+                const [statsRes] = await Promise.all([
+                    api.get("/stats/dashboard")
                 ]);
+
+                const stats = statsRes.data;
 
                 // Check for pending requests if user is accounter
                 if (user?.role === 'accounter') {
                     try {
                         const { data: requests } = await api.get('/requests?status=pending_accountant');
-                        const count = requests.length;
+                        const count = requests.requests ? requests.requests.length : requests.length; // Handle paginated or array response
                         if (count > 0) {
                             setPendingCount(count);
                             // Determine which tab has pending requests (prioritize exit if mixed or mostly exit?)
-                            // If any is exit, go to exit. Else assignment.
-                            const hasExit = requests.some(r => r.type === 'exit');
+                            const hasExit = Array.isArray(requests) ? requests.some(r => r.type === 'exit') : requests.requests?.some(r => r.type === 'exit');
                             setPendingTab(hasExit ? 'exit' : 'assignment');
                             setShowPendingModal(true);
                         }
@@ -52,35 +53,11 @@ const AdminDashboard = () => {
                     }
                 }
 
-                // Users
-                setUserCount(usersRes.data.length);
+                // Set Data from Stats API
+                setUserCount(stats.userCount);
+                setInventoryStats(stats.inventory);
 
-                // Inventory
-                const items = itemsRes.data;
-
-                const totalItems = items.length;
-                const repairItems = items.filter(item => item.status === 'repair').length;
-                const writtenOffItems = items.filter(item => item.status === 'written-off').length;
-
-                // Calculate total value
-                const totalValue = items.reduce((acc, item) => {
-                    // Exclude written-off items
-                    if (item.status === 'written-off') return acc;
-
-                    const price = parseFloat(item.price) || 0;
-                    const quantity = parseInt(item.quantity) || 1;
-                    return acc + (price * quantity);
-                }, 0);
-
-                setInventoryStats({
-                    totalItems,
-                    repairItems,
-                    writtenOffItems,
-                    totalValue,
-                    recentItems: items.slice(0, 5) // Items are already ordered by desc in backend usually
-                });
-
-                // TODO: Connect to /api/logs when available
+                // Logs (future)
                 setLogs([]);
 
             } catch (error) {
