@@ -111,6 +111,8 @@ const InventoryPage = () => {
         setCurrentPage(page);
     };
 
+    const { user } = useAuth();
+
     // Filter logic REMOVED - Using Server Side now.
     // We use `items` directly as `filteredItems`.
     const filteredItems = items;
