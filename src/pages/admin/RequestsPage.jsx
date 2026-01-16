@@ -15,11 +15,24 @@ const RequestsPage = () => {
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'assignment'); // 'assignment' or 'exit'
     const [isProcessing, setIsProcessing] = useState(false);
 
+    // Pagination
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+
     const fetchRequests = async () => {
         setLoading(true);
         try {
-            const { data } = await api.get('/requests');
-            setRequests(data);
+            const { data } = await api.get('/requests', {
+                params: { page, limit: 50 }
+            });
+
+            if (data.requests) {
+                setRequests(data.requests);
+                setTotalPages(data.metadata?.totalPages || 1);
+            } else {
+                // Fallback for old API just in case
+                setRequests(data);
+            }
         } catch (error) {
             console.error("Failed to fetch requests", error);
             const msg = error.response?.data?.message || "So'rovlarni yuklashda xatolik";
@@ -31,7 +44,7 @@ const RequestsPage = () => {
 
     useEffect(() => {
         fetchRequests();
-    }, []);
+    }, [page]); // Re-fetch on page change
 
     const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
@@ -208,6 +221,27 @@ const RequestsPage = () => {
                     </table>
                 </div>
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 mt-6">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-gray-700"
+                    >
+                        Ortga
+                    </button>
+                    <span className="text-gray-600 font-medium">Sahifa {page} / {totalPages}</span>
+                    <button
+                        disabled={page >= totalPages}
+                        onClick={() => setPage(p => p + 1)}
+                        className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 text-gray-700"
+                    >
+                        Oldinga
+                    </button>
+                </div>
+            )}
 
 
             {/* Rejection Modal */}

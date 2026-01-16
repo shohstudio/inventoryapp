@@ -51,10 +51,14 @@ const createRequest = async (req, res) => {
 // @access  Private
 const getRequests = async (req, res) => {
     try {
-        console.log("GET /api/requests called by user:", req.user?.id, req.user?.role);
+        const { status, page = 1, limit = 50 } = req.query;
+
+        console.log("GET /api/requests called by user:", req.user?.id, req.user?.role, "Page:", page);
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const take = parseInt(limit);
 
         let where = {};
-        const { status } = req.query;
 
         if (status) where.status = status;
 
@@ -67,26 +71,36 @@ const getRequests = async (req, res) => {
             ];
         }
 
-        // Ensure Request table exists implicitly by catching error specifically? 
-        // No, just log error.
-
-        const requests = await prisma.request.findMany({
-            where,
-            include: {
-                item: {
-                    include: {
-                        assignedTo: {
-                            select: { name: true }
+        const [requests, total] = await prisma.$transaction([
+            prisma.request.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    item: {
+                        include: {
+                            assignedTo: {
+                                select: { name: true }
+                            }
                         }
-                    }
+                    },
+                    requester: { select: { name: true, role: true } },
+                    targetUser: { select: { name: true, pinfl: true } }
                 },
-                requester: { select: { name: true, role: true } },
-                targetUser: { select: { name: true, pinfl: true } }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
+                orderBy: { createdAt: 'desc' }
+            }),
+            prisma.request.count({ where })
+        ]);
 
-        res.json(requests);
+        res.json({
+            requests,
+            metadata: {
+                total,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(total / parseInt(limit))
+            }
+        });
     } catch (error) {
         console.error("getRequests ERROR:", error);
         res.status(500).json({ message: "Server xatoligi: " + error.message });
