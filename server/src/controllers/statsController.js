@@ -14,31 +14,22 @@ const getDashboardStats = async (req, res) => {
         const writtenOffItems = await prisma.item.count({ where: { status: 'written-off' } });
 
         // 3. Total Value (Sum of price * quantity, excluding written-off)
-        // Prisma aggregate
-        const totalValueAgg = await prisma.item.aggregate({
-            _sum: {
-                price: true
-            },
+        // Fetch only necessary fields to calculate in memory (safer than raw query)
+        const itemsForValue = await prisma.item.findMany({
             where: {
                 status: { not: 'written-off' }
+            },
+            select: {
+                price: true,
+                quantity: true
             }
         });
-        // Note: We assume quantity is 1 for now if not stored or handled separately in sum. 
-        // If quantity exists in schema, we might need raw query or handle differently.
-        // Schema has `quantity Int @default(1)`.
-        // Prisma doesn't support sum(price * quantity) directly in aggregate without raw query.
-        // Let's check schema again. Yes, has quantity.
-        // For accurate value, we should use raw query or fetch all prices/quantities (but that's heavy).
-        // OR better: average quantity is 1? 
-        // Let's use raw query for speed and accuracy.
 
-        const totalValueRaw = await prisma.$queryRaw`
-            SELECT SUM(price * quantity) as total 
-            FROM Item 
-            WHERE status != 'written-off'
-        `;
-
-        const totalValue = totalValueRaw[0]?.total || 0;
+        const totalValue = itemsForValue.reduce((acc, item) => {
+            const price = Number(item.price) || 0; // Ensure number (Prisma Decimal to Number)
+            const quantity = item.quantity || 1;
+            return acc + (price * quantity);
+        }, 0);
 
         // 4. Recent Items
         const recentItems = await prisma.item.findMany({
