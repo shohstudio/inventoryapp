@@ -38,7 +38,7 @@ const GuardDashboard = () => {
             const { data } = await api.get('/requests?type=exit');
             // Filter: Show only relevant exit requests (pending or approved, not rejected/completed?)
             // Or maybe show history too. Let's show all for now, filter in UI.
-            setExitRequests(data);
+            setExitRequests(data.requests || data);
         } catch (error) {
             console.error(error);
             toast.error("So'rovlarni yuklashda xatolik");

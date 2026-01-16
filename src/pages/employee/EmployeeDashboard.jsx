@@ -38,7 +38,8 @@ const EmployeeDashboard = () => {
                     }
 
                     // Handle paginated response structure ({ items, metadata } or array)
-                    const myItems = itemsRes.data.items || itemsRes.data;
+                    const rawItems = itemsRes.data.items || itemsRes.data;
+                    const myItems = Array.isArray(rawItems) ? rawItems : []; // Safety check
 
                     setMyItemsCount(myItems.length);
 
