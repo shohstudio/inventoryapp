@@ -33,8 +33,70 @@ const InventoryPage = () => {
         }
     }, [location.state]);
 
-
+    const [isWarehouseModalOpen, setIsWarehouseModalOpen] = useState(false);
+    const [selectedWarehouseItem, setSelectedWarehouseItem] = useState(null);
+    const [isQRGenOpen, setIsQRGenOpen] = useState(false);
+    const [qrItem, setQrItem] = useState(null);
     const [showQRScanner, setShowQRScanner] = useState(false);
+
+    const openModal = (item = null) => {
+        setSelectedItem(item);
+        setIsModalOpen(true);
+    };
+
+    const openQRModal = (item) => {
+        setQrItem(item);
+        setIsQRGenOpen(true);
+    };
+
+    const handleAddItem = async (itemData) => {
+        try {
+            const formData = new FormData();
+            Object.keys(itemData).forEach(key => {
+                if (key === 'imageFile' && itemData[key]) {
+                    formData.append('image', itemData[key]);
+                } else if (key !== 'images' && key !== 'imageFile') {
+                    formData.append(key, itemData[key]);
+                }
+            });
+
+            if (selectedItem) {
+                await api.put(`/items/${selectedItem.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                toast.success("Jihoz yangilandi");
+            } else {
+                await api.post('/items', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                toast.success("Jihoz qo'shildi");
+            }
+            fetchItems();
+            setIsModalOpen(false);
+            setSelectedItem(null);
+            setSelectedWarehouseItem(null);
+        } catch (error) {
+            console.error("Error saving item:", error);
+            toast.error("Xatolik: " + (error.response?.data?.message || error.message));
+        }
+    };
+
+    const handleSelectFromWarehouse = (item) => {
+        setSelectedItem(null); // Clear any selected item
+        setSelectedWarehouseItem({
+            ...item,
+            name: item.name,
+            model: item.model,
+            category: item.category,
+            building: item.building,
+            location: item.location,
+            price: item.price,
+            image: item.image,
+            warehouseItemId: item.id
+        });
+        setIsWarehouseModalOpen(false);
+        setIsModalOpen(true); // Open ItemModal with pre-filled data
+    };
 
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
