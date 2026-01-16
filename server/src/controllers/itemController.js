@@ -5,36 +5,104 @@ const prisma = require('../utils/prisma');
 // @access  Private
 const getItems = async (req, res) => {
     try {
-        const { assignedUserId } = req.query;
+        const {
+            page = 1,
+            limit = 20,
+            search = '',
+            status,
+            category,
+            building,
+            location,
+            assignedUserId,
+            isAssigned // 'unassigned', 'pending', 'all'
+        } = req.query;
+
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const take = parseInt(limit);
+
         let where = {};
+
+        // Search Filter
+        if (search) {
+            where.OR = [
+                { name: { contains: search } }, // SQLite is case-insensitive by default roughly, or basic
+                { model: { contains: search } },
+                { serialNumber: { contains: search } },
+                { inn: { contains: search } },
+                { orderNumber: { contains: search } },
+                { assignedTo: { name: { contains: search } } } // Search by assigned user name too
+            ];
+            // Try to parse search as ID if number
+            if (!isNaN(search)) {
+                where.OR.push({ id: parseInt(search) });
+            }
+        }
+
+        // Exact Filters
+        if (status && status !== 'all') where.status = status;
+        if (category) where.category = category;
+        if (building) where.building = building;
+        if (location) where.location = { contains: location }; // Loose match for location
 
         if (assignedUserId) {
             where.assignedUserId = parseInt(assignedUserId);
         }
 
-        const items = await prisma.item.findMany({
-            where,
-            include: {
-                assignedTo: {
-                    select: { name: true, pinfl: true, position: true }
-                },
-                requests: {
-                    where: {
-                        status: { in: ['pending_accountant', 'pending_employee'] }
-                    },
-                    select: {
-                        id: true,
-                        status: true,
-                        targetUser: { select: { name: true } }
-                    }
+        // Warehouse Specific Filters
+        if (isAssigned === 'unassigned') {
+            where.assignedUserId = null;
+            // Also ensure no active requests if strict "Available in Warehouse"
+            where.requests = {
+                none: {
+                    status: { in: ['pending_accountant', 'pending_employee'] }
                 }
-            },
-            orderBy: {
-                createdAt: 'desc'
+            };
+        } else if (isAssigned === 'pending') {
+            where.requests = {
+                some: {
+                    status: { in: ['pending_accountant', 'pending_employee'] }
+                }
+            };
+        }
+
+        const [items, total] = await prisma.$transaction([
+            prisma.item.findMany({
+                where,
+                skip,
+                take,
+                include: {
+                    assignedTo: {
+                        select: { name: true, pinfl: true, position: true }
+                    },
+                    requests: {
+                        where: {
+                            status: { in: ['pending_accountant', 'pending_employee'] }
+                        },
+                        select: {
+                            id: true,
+                            status: true,
+                            targetUser: { select: { name: true } }
+                        }
+                    }
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            }),
+            prisma.item.count({ where })
+        ]);
+
+        res.json({
+            items,
+            metadata: {
+                total,
+                page: parseInt(page),
+                limit: parseInt(limit),
+                totalPages: Math.ceil(total / parseInt(limit))
             }
         });
-        res.json(items);
     } catch (error) {
+        console.error("getItems Error:", error);
         res.status(500).json({ message: error.message });
     }
 };
