@@ -109,10 +109,12 @@ const GuardDashboard = () => {
         try {
             // First try finding by serial number
             const { data } = await api.get(`/items?search=${scanQuery}`);
-            if (data && data.length > 0) {
+            const results = data.items || data; // Handle paginated response
+
+            if (results && results.length > 0) {
                 // Find exact match if possible, otherwise first result
-                const exactMatch = data.find(i => i.serialNumber?.toLowerCase() === scanQuery.toLowerCase());
-                const item = exactMatch || data[0];
+                const exactMatch = results.find(i => i.serialNumber?.toLowerCase() === scanQuery.toLowerCase());
+                const item = exactMatch || results[0];
                 setScannedItem(item);
                 setCarrierName(item.assignedTo?.name || ''); // Default to owner
             } else {

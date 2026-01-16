@@ -20,24 +20,25 @@ const EmployeeDashboard = () => {
             const fetchData = async () => {
                 try {
                     const [itemsRes, requestsRes] = await Promise.all([
-                        api.get("/items"),
+                        // Fetch ONLY items assigned to this user, with a high limit to get all for stats
+                        api.get("/items", {
+                            params: {
+                                assignedUserId: user.id,
+                                limit: 1000
+                            }
+                        }),
                         api.get("/requests?status=pending_employee")
                     ]);
 
                     // Check for pending requests
-                    const pendingRequests = requestsRes.data;
-                    if (pendingRequests.length > 0) {
+                    const pendingRequests = requestsRes.data.requests || requestsRes.data; // Handle pagination structure
+                    if (pendingRequests && pendingRequests.length > 0) {
                         setPendingCount(pendingRequests.length);
                         setShowConfirmModal(true);
                     }
 
-                    const allItems = itemsRes.data;
-
-                    // Filter logic
-                    const myItems = allItems.filter(item =>
-                        (item.assignedUserId === user.id) ||
-                        (item.assignedTo?.name === user.name)
-                    );
+                    // Handle paginated response structure ({ items, metadata } or array)
+                    const myItems = itemsRes.data.items || itemsRes.data;
 
                     setMyItemsCount(myItems.length);
 
