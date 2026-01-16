@@ -100,6 +100,17 @@ const GuardDashboard = () => {
         }
     };
 
+    // Debounced Search for Guard
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (scanQuery.trim()) {
+                handleSearchItem();
+            }
+        }, 500); // 500ms delay
+
+        return () => clearTimeout(timer);
+    }, [scanQuery]);
+
     // Search Item by Serial or QR
     const handleSearchItem = async (e) => {
         e?.preventDefault();
@@ -117,13 +128,16 @@ const GuardDashboard = () => {
                 const item = exactMatch || results[0];
                 setScannedItem(item);
                 setCarrierName(item.assignedTo?.name || ''); // Default to owner
+                toast.success("Buyum topildi");
             } else {
+                // Only show error if scanning manually, not on every type (optional but better UX not to spam toast while typing)
                 toast.error("Buyum topilmadi");
                 setScannedItem(null);
                 setCarrierName('');
             }
         } catch (error) {
-            toast.error("Qidirishda xatolik");
+            console.error("Search error", error);
+            // toast.error("Qidirishda xatolik"); // Suppress global error spam while typing
         } finally {
             setLoadingScan(false);
         }
