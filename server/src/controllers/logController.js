@@ -25,21 +25,39 @@ const getLogs = async (req, res) => {
             }
         }
 
-        const logs = await prisma.log.findMany({
-            where,
-            include: {
-                user: {
-                    select: { name: true, role: true }
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 50;
+        const skip = (page - 1) * limit;
+
+        const [logs, total] = await prisma.$transaction([
+            prisma.log.findMany({
+                where,
+                skip,
+                take: limit,
+                include: {
+                    user: {
+                        select: { name: true, role: true }
+                    },
+                    item: {
+                        select: { name: true, serialNumber: true }
+                    }
                 },
-                item: {
-                    select: { name: true, serialNumber: true }
+                orderBy: {
+                    createdAt: 'desc'
                 }
-            },
-            orderBy: {
-                createdAt: 'desc'
+            }),
+            prisma.log.count({ where })
+        ]);
+
+        res.json({
+            logs,
+            metadata: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
             }
         });
-        res.json(logs);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

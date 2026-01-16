@@ -72,8 +72,13 @@ model Item {
   logs         Log[]
   requests     Request[]
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([category])
+  @@index([assignedUserId])
+  @@index([createdAt])
 }
 
 model Log {
@@ -88,6 +93,9 @@ model Log {
   itemId    Int?
 
   createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([itemId])
 }
 
 model Request {
@@ -114,6 +122,10 @@ model Request {
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([targetUserId])
+  @@index([requesterId])
 }
 
 model ExternalItem {

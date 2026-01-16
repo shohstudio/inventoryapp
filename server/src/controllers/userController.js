@@ -4,26 +4,75 @@ const bcrypt = require('bcryptjs');
 // @desc    Get all users
 // @route   GET /api/users
 // @access  Private/Admin
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
 const getUsers = async (req, res) => {
     try {
-        const users = await prisma.user.findMany({
-            select: {
-                id: true,
-                name: true,
-                username: true,
-                email: true,
-                role: true,
-                department: true,
-                position: true,
-                status: true,
-                pinfl: true,
-                createdAt: true,
-                _count: {
-                    select: { items: true }
+        const { page, limit, search, role } = req.query;
+
+        // If no pagination params are provided, return all users (for backwards compatibility with dropdowns that expect all)
+        // BUT strict pagination is better. Let's return all if no page is defined, 
+        // effectively 'limit: undefined' which means all. 
+
+        // However, if we want to force optimizations, we should maybe default to something large or just return all if page not specified.
+        // Let's keep existing behavior (return all) if no page/limit specified, but support filtering.
+
+        let shouldPaginate = page !== undefined || limit !== undefined;
+
+        const take = limit ? parseInt(limit) : undefined;
+        const skip = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
+
+        let where = {};
+        if (search) {
+            where.OR = [
+                { name: { contains: search } },
+                { username: { contains: search } },
+                { pinfl: { contains: search } }
+            ];
+        }
+        if (role) {
+            where.role = role;
+        }
+
+        const [users, total] = await prisma.$transaction([
+            prisma.user.findMany({
+                where,
+                select: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    email: true,
+                    role: true,
+                    department: true,
+                    position: true,
+                    status: true,
+                    pinfl: true,
+                    createdAt: true,
+                    _count: {
+                        select: { items: true }
+                    }
+                },
+                take,
+                skip,
+                orderBy: { createdAt: 'desc' }
+            }),
+            prisma.user.count({ where })
+        ]);
+
+        if (shouldPaginate) {
+            res.json({
+                users,
+                metadata: {
+                    total,
+                    page: parseInt(page) || 1,
+                    limit: parseInt(limit) || total,
+                    totalPages: limit ? Math.ceil(total / parseInt(limit)) : 1
                 }
-            }
-        });
-        res.json(users);
+            });
+        } else {
+            res.json(users);
+        }
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
