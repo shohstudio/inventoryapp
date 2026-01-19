@@ -14,26 +14,47 @@ const EmployeeDashboard = () => {
     const [totalValue, setTotalValue] = useState(0);
     const [recentItems, setRecentItems] = useState([]);
 
+    // New Real Stats
+    const [activeRequestsCount, setActiveRequestsCount] = useState(0);
+    const [notificationsCount, setNotificationsCount] = useState(0);
+
     // Fetch Real Items & Pending Requests
     useEffect(() => {
         if (user) {
             const fetchData = async () => {
                 try {
                     const [itemsRes, requestsRes] = await Promise.all([
-                        // Fetch ONLY items assigned to this user, with a high limit to get all for stats
+                        // Fetch ONLY items assigned to this user
                         api.get("/items", {
                             params: {
                                 assignedUserId: user.id,
                                 limit: 1000
                             }
                         }),
-                        api.get("/requests?status=pending_employee")
+                        // Fetch ALL requests related to this user (recieved or sent)
+                        api.get("/requests")
                     ]);
 
-                    // Check for pending requests
-                    const pendingRequests = requestsRes.data.requests || requestsRes.data; // Handle pagination structure
-                    if (pendingRequests && pendingRequests.length > 0) {
-                        setPendingCount(pendingRequests.length);
+                    const requestsData = requestsRes.data.requests || requestsRes.data;
+                    const allRequests = Array.isArray(requestsData) ? requestsData : [];
+
+                    // 1. Pending Assignment Requests (Targeting Me) -> For Modal & "Xabarnomalar"
+                    const pendingAssignments = allRequests.filter(r =>
+                        r.targetUserId === user.id &&
+                        (r.status === 'pending_employee' || r.status === 'pending_accountant')
+                    );
+
+                    // 2. My Active Issues/Requests (Sent by Me) -> For "Faol so'rovlar"
+                    const myActiveRequests = allRequests.filter(r =>
+                        r.requesterId === user.id &&
+                        !['completed', 'rejected'].includes(r.status)
+                    );
+
+                    setPendingCount(pendingAssignments.length); // For Modal
+                    setNotificationsCount(pendingAssignments.length); // "Xabarnomalar"
+                    setActiveRequestsCount(myActiveRequests.length); // "Faol so'rovlar"
+
+                    if (pendingAssignments.length > 0) {
                         setShowConfirmModal(true);
                     }
 
@@ -97,7 +118,7 @@ const EmployeeDashboard = () => {
                 />
                 <StatsCard
                     title="Faol so'rovlar"
-                    value="0" // Keep mock or implement real if needed
+                    value={activeRequestsCount} // REAL VALUE
                     icon={<RiAlertLine size={24} />}
                     variant="featured"
                     onClick={() => navigate("/employee/report")}
@@ -106,11 +127,11 @@ const EmployeeDashboard = () => {
                 />
                 <StatsCard
                     title="Xabarnomalar"
-                    value="3"
+                    value={notificationsCount} // REAL VALUE
                     icon={<RiNotification3Line size={24} />}
                     variant="featured"
-                    onClick={() => { }}
-                    trend={3}
+                    onClick={() => navigate("/employee/requests")}
+                    trend={notificationsCount}
                     trendLabel="yangilik"
                 />
             </div>
