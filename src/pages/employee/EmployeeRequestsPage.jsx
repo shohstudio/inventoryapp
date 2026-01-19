@@ -16,6 +16,8 @@ const EmployeeRequestsPage = () => {
             // Fetch ALL requests for this employee (handled by backend role check)
             const { data } = await api.get('/requests');
 
+            const requestsList = Array.isArray(data) ? data : (data.requests || []);
+
             // Filter to show relevant assignment requests
             // We want to see:
             // 1. pending_employee (Action required)
@@ -23,7 +25,7 @@ const EmployeeRequestsPage = () => {
             // 3. rejected (For history/info - optional, maybe just active flows?)
             // Let's show active flows: pending_accountant AND pending_employee
 
-            const activeRequests = data.filter(r => {
+            const activeRequests = requestsList.filter(r => {
                 // Requests targeted to me (Assignment to me)
                 if (r.targetUserId === user.id && (r.status === 'pending_employee' || r.status === 'pending_accountant')) {
                     return true;
