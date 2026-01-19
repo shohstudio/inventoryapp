@@ -56,7 +56,8 @@ model Item {
   location     String?
   department   String?
   
-  image        String?  // URL to image
+  image        String?  // URL to MAIN image
+  images       String?  // JSON array of all image URLs
 
   // If imported from Excel and user not found, store name here
   initialOwner String?

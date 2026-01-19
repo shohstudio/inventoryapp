@@ -38,7 +38,7 @@ const InventoryPage = () => {
     const [isQRGenOpen, setIsQRGenOpen] = useState(false);
     const [qrItem, setQrItem] = useState(null);
     const [showQRScanner, setShowQRScanner] = useState(false);
-    const [previewImage, setPreviewImage] = useState(null);
+    const [previewInfo, setPreviewInfo] = useState({ open: false, images: [], index: 0 });
 
     const openModal = (item = null) => {
         setSelectedItem(item);
@@ -54,9 +54,13 @@ const InventoryPage = () => {
         try {
             const formData = new FormData();
             Object.keys(itemData).forEach(key => {
-                if (key === 'imageFile' && itemData[key]) {
-                    formData.append('image', itemData[key]);
-                } else if (key !== 'images' && key !== 'imageFile') {
+                if (key === 'newImages' && Array.isArray(itemData[key])) {
+                    itemData[key].forEach(file => {
+                        formData.append('images', file);
+                    });
+                } else if (key === 'existingImages') {
+                    formData.append('existingImages', JSON.stringify(itemData[key]));
+                } else if (key !== 'images' && key !== 'imageFile' && key !== 'image') {
                     formData.append(key, itemData[key]);
                 }
             });
@@ -495,7 +499,14 @@ const InventoryPage = () => {
                                             {item.image ? (
                                                 <div
                                                     className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
-                                                    onClick={() => setPreviewImage(item.image)}
+                                                    onClick={() => {
+                                                        let imgs = [];
+                                                        try {
+                                                            imgs = item.images ? (typeof item.images === 'string' ? JSON.parse(item.images) : item.images) : [item.image];
+                                                        } catch (e) { imgs = [item.image]; }
+                                                        if (imgs.length === 0) imgs = [item.image];
+                                                        setPreviewInfo({ open: true, images: imgs, index: 0 });
+                                                    }}
                                                 >
                                                     <img
                                                         src={item.image}
@@ -556,24 +567,72 @@ const InventoryPage = () => {
                 </div>
             </div>
 
-            {/* Image Preview Modal */}
-            {previewImage && (
+            {/* Image Gallery Modal */}
+            {previewInfo.open && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
-                    onClick={() => setPreviewImage(null)}
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
+                    onClick={() => setPreviewInfo({ ...previewInfo, open: false })}
                 >
-                    <div className="relative max-w-4xl max-h-[90vh] p-2">
+                    <div className="relative w-full max-w-5xl h-[90vh] flex flex-col items-center justify-center p-4" onClick={e => e.stopPropagation()}>
                         <button
-                            onClick={() => setPreviewImage(null)}
-                            className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+                            onClick={() => setPreviewInfo({ ...previewInfo, open: false })}
+                            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors z-50 bg-black/20 rounded-full p-2"
                         >
                             <RiCloseLine size={32} />
                         </button>
-                        <img
-                            src={previewImage}
-                            alt="Preview"
-                            className="w-full h-full object-contain rounded-lg shadow-2xl"
-                        />
+
+                        <div className="relative flex items-center justify-center w-full h-full">
+                            {/* Prev Button */}
+                            {previewInfo.images.length > 1 && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPreviewInfo(prev => ({
+                                            ...prev,
+                                            index: prev.index === 0 ? prev.images.length - 1 : prev.index - 1
+                                        }));
+                                    }}
+                                    className="absolute left-0 p-3 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+                                >
+                                    <RiArrowLeftLine size={40} />
+                                </button>
+                            )}
+
+                            <img
+                                src={previewInfo.images[previewInfo.index]}
+                                alt={`Preview ${previewInfo.index + 1}`}
+                                className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                            />
+
+                            {/* Next Button */}
+                            {previewInfo.images.length > 1 && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPreviewInfo(prev => ({
+                                            ...prev,
+                                            index: prev.index === prev.images.length - 1 ? 0 : prev.index + 1
+                                        }));
+                                    }}
+                                    className="absolute right-0 p-3 text-white hover:bg-white/10 rounded-full transition-colors z-10"
+                                >
+                                    <RiArrowRightLine size={40} />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Thumbnails / Counter */}
+                        <div className="mt-4 flex gap-2 overflow-x-auto max-w-full p-2 bg-black/40 rounded-xl backdrop-blur-md">
+                            {previewInfo.images.map((img, i) => (
+                                <div
+                                    key={i}
+                                    onClick={(e) => { e.stopPropagation(); setPreviewInfo(prev => ({ ...prev, index: i })); }}
+                                    className={`w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${i === previewInfo.index ? 'border-white scale-110' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                >
+                                    <img src={img} className="w-full h-full object-cover" />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}

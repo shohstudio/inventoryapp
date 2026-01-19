@@ -143,7 +143,19 @@ const createItem = async (req, res) => {
             assignedPINFL, assignedTo, assignedRole // Extract new fields
         } = req.body;
 
-        const image = req.file ? `/uploads/${req.file.filename}` : null;
+        // MULTI-IMAGE HANDLING
+        let image = null;
+        let images = [];
+
+        if (req.files && req.files.length > 0) {
+            // New multi-upload
+            images = req.files.map(file => `/uploads/${file.filename}`);
+            image = images[0]; // Set first image as Main Image
+        } else if (req.file) {
+            // Fallback for single file (legacy) if someone uses old endpoint
+            image = `/uploads/${req.file.filename}`;
+            images = [image];
+        }
 
         // Check if User exists by PINFL or assignedUserId
         let targetUser = null;
@@ -169,7 +181,8 @@ const createItem = async (req, res) => {
             building,
             location,
             department,
-            image,
+            image, // Main image
+            images: JSON.stringify(images), // All images as JSON
             // Do NOT assign directly yet
             assignedUserId: null,
             assignedDate: null,
@@ -223,10 +236,12 @@ const createItem = async (req, res) => {
 // @access  Private/Admin/Warehouseman
 const updateItem = async (req, res) => {
     try {
+
         const {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
-            building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo
+            building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo,
+            existingImages // JSON string or array of strings of OLD images to keep
         } = req.body;
 
         const dataToUpdate = {
@@ -237,8 +252,42 @@ const updateItem = async (req, res) => {
             building, location, department
         };
 
-        if (req.file) {
-            dataToUpdate.image = `/uploads/${req.file.filename}`;
+        // IMAGE HANDLING
+        // 1. Get existing images from request (frontend should send what is kept)
+        let finalImages = [];
+        if (existingImages) {
+            try {
+                // If it's a string (JSON), parse it. If array, use it.
+                finalImages = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+                if (!Array.isArray(finalImages)) finalImages = [finalImages];
+            } catch (e) {
+                // if simple string
+                finalImages = [existingImages];
+            }
+        }
+
+        // 2. Add NEW files
+        if (req.files && req.files.length > 0) {
+            const newImagePaths = req.files.map(file => `/uploads/${file.filename}`);
+            finalImages = [...finalImages, ...newImagePaths];
+        } else if (req.file) {
+            finalImages.push(`/uploads/${req.file.filename}`);
+        }
+
+        // 3. Update fields if we have a final list
+        if (finalImages.length > 0) {
+            dataToUpdate.images = JSON.stringify(finalImages);
+            dataToUpdate.image = finalImages[0]; // Main image is first one
+        } else {
+            // If existingImages was empty AND no new files, does it mean "Delete All"?
+            // Or does it mean "No Change"?
+            // Usually if existingImages is explicit (even empty), we update. 
+            // If undefined, we might skip.
+            // Let's assume if 'existingImages' field is present in body (even empty), we treat it as the new state.
+            if (existingImages !== undefined) {
+                dataToUpdate.images = "[]";
+                dataToUpdate.image = null;
+            }
         }
 
         // Handle Assignment Logic by PINFL or ID

@@ -8,11 +8,11 @@ router.post('/import', protect, admin, upload.single('file'), importItems);
 
 router.route('/')
     .get(protect, getItems)
-    .post(protect, upload.single('image'), createItem);
+    .post(protect, upload.array('images', 5), createItem);
 
 router.route('/:id')
     .get(protect, getItemById)
-    .put(protect, upload.single('image'), updateItem)
+    .put(protect, upload.array('images', 5), updateItem)
     .delete(protect, admin, deleteItem);
 
 router.post('/delete-many', protect, admin, deleteManyItems);

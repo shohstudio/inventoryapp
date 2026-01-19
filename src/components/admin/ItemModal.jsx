@@ -62,10 +62,19 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 purchaseDate: item.purchaseDate || "",
                 price: formattedPrice,
                 status: item.status || "working",
-                assignedTo: item.assignedTo ? item.assignedTo.name : (item.initialOwner || ""),
                 assignedRole: item.assignedTo ? item.assignedTo.position : (item.initialRole || ""),
                 assignedPINFL: item.assignedTo ? item.assignedTo.pinfl : (item.initialPinfl || ""),
-                images: item.images || [],
+                images: (() => {
+                    let imgs = [];
+                    if (item.images) {
+                        try {
+                            imgs = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
+                        } catch (e) { imgs = []; }
+                    } else if (item.image) {
+                        imgs = [item.image];
+                    }
+                    return imgs.map((url, i) => ({ id: `existing-${i}`, url, file: null }));
+                })(),
                 pdf: item.pdf || null
             });
         } else {
@@ -87,7 +96,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 assignedTo: "",
                 assignedRole: "",
                 assignedPINFL: "",
-                images: initialData?.images || [],
+                images: [], // Start empty for new items, or parse initialData if needed
                 pdf: null
             });
             setIsCustomCategory(false);
@@ -162,8 +171,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
 
     const handleImageChange = (e) => {
         if (e.target.files) {
-            const filesArray = Array.from(e.target.files).map(file => URL.createObjectURL(file));
-            setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
+            const newFiles = Array.from(e.target.files).map(file => ({
+                id: `new-${Date.now()}-${Math.random()}`,
+                url: URL.createObjectURL(file),
+                file: file
+            }));
+            setFormData(prev => ({ ...prev, images: [...prev.images, ...newFiles] }));
         }
     };
 
@@ -179,9 +192,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (!validate()) return;
 
         // Clean up price (remove spaces) before sending
+        // Clean up price (remove spaces) before sending
         const cleanData = {
             ...formData,
-            price: formData.price.replace(/\s/g, '')
+            price: formData.price.replace(/\s/g, ''),
+            existingImages: formData.images.filter(img => !img.file).map(img => img.url),
+            newImages: formData.images.filter(img => img.file).map(img => img.file)
         };
 
         onSave(cleanData);
@@ -506,8 +522,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                         {formData.images.length > 0 && (
                             <div className="grid grid-cols-4 gap-2 mt-4">
                                 {formData.images.map((img, index) => (
-                                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100">
-                                        <img src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                    <div key={img.id || index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100">
+                                        <img src={img.url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => removeImage(index)}
