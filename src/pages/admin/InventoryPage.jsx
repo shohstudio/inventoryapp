@@ -211,12 +211,12 @@ const InventoryPage = () => {
         // or ideally we need a backend endpoint for export.
         // Let's fallback to current items for now to avoid complexity or errors.
 
-        const exportData = items.map(item => ({
-            [t('order_number')]: item.orderNumber || item.id,
+        const exportData = items.map((item, index) => ({
+            [t('order_number')]: (currentPage - 1) * 20 + index + 1,
             [t('name')]: item.name,
             [t('model')]: item.model,
             [t('inn')]: item.inn,
-            ["JSHShIR"]: item.assignedPINFL || "",
+            ["JSHShIR"]: item.assignedTo?.pinfl || item.requests?.[0]?.targetUser?.pinfl || item.initialPinfl || "",
             [t('category')]: item.category,
             [t('building')]: item.building,
             [t('location')]: item.location,
@@ -224,7 +224,7 @@ const InventoryPage = () => {
                 item.status === 'repair' ? t('status_repair') :
                     item.status === 'written-off' ? t('status_written_off') :
                         t('status_broken'),
-            [t('assigned_to')]: item.assignedTo?.name || "",
+            [t('assigned_to')]: item.assignedTo?.name || item.requests?.[0]?.targetUser?.name || item.initialOwner || "",
             [t('purchase_year')]: item.purchaseDate,
             [t('price')]: item.price
         }));
@@ -452,7 +452,7 @@ const InventoryPage = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredItems.map((item) => (
+                            {filteredItems.map((item, index) => (
                                 <tr key={item.id} className={`hover:bg-gray-50/80 transition-colors group ${selectedIds.includes(item.id) ? "bg-blue-50/50" : ""}`}>
                                     <td className="py-4 px-6 text-center">
                                         <input
@@ -462,7 +462,7 @@ const InventoryPage = () => {
                                             onChange={() => toggleSelectItem(item.id)}
                                         />
                                     </td>
-                                    <td className="py-4 px-6 text-gray-800 font-medium">#{item.orderNumber}</td>
+                                    <td className="py-4 px-6 text-gray-800 font-medium">{(currentPage - 1) * 20 + index + 1}</td>
                                     <td className="py-4 px-6">
                                         <div className="font-medium text-gray-900">{item.name}</div>
                                         <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
