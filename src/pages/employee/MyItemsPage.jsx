@@ -16,14 +16,19 @@ const MyItemsPage = () => {
         try {
             // 1. Fetch Items Assigned to ME (Optimized Backend Filter)
             const itemsRes = await api.get(`/items?assignedUserId=${user.id}`);
+            const itemsData = itemsRes.data.items || itemsRes.data;
+            const itemsList = Array.isArray(itemsData) ? itemsData : [];
 
             // 2. Fetch My Pending Requests (Targeting Me)
             // Backend should handle filtering for employee role, but we can be explicit if needed
             const requestsRes = await api.get('/requests?status=pending_employee');
-            const myRequests = requestsRes.data.filter(r => r.targetUserId === user.id && r.status === 'pending_employee');
+            const requestsData = requestsRes.data.requests || requestsRes.data; // Handle both structures
+            const requestsList = Array.isArray(requestsData) ? requestsData : [];
+
+            const myRequests = requestsList.filter(r => r.targetUserId === user.id && r.status === 'pending_employee');
 
             // 3. Process Items with Dates (using assignedDate directly from item provided by backend)
-            const processedItems = itemsRes.data.map(item => ({
+            const processedItems = itemsList.map(item => ({
                 ...item,
                 dateAssigned: item.assignedDate ? new Date(item.assignedDate).toLocaleDateString('uz-UZ') : "Noma'lum"
             }));
