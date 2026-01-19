@@ -62,6 +62,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 purchaseDate: item.purchaseDate || "",
                 price: formattedPrice,
                 status: item.status || "working",
+                assignedTo: item.assignedTo ? item.assignedTo.name : (item.initialOwner || ""),
                 assignedRole: item.assignedTo ? item.assignedTo.position : (item.initialRole || ""),
                 assignedPINFL: item.assignedTo ? item.assignedTo.pinfl : (item.initialPinfl || ""),
                 images: (() => {
@@ -111,8 +112,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (!formData.name.trim()) newErrors.name = "Shu joyni to'ldirish majburiy";
         if (!formData.model.trim()) newErrors.model = "Shu joyni to'ldirish majburiy";
 
-        // Serial only needed in Edit
-        if (item && !formData.serial.trim()) newErrors.serial = "Shu joyni to'ldirish majburiy";
+
 
         if (!formData.category.trim()) newErrors.category = "Shu joyni to'ldirish majburiy";
         if (!formData.building.trim()) newErrors.building = "Shu joyni to'ldirish majburiy";
@@ -259,20 +259,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {item && (
-                            <div>
-                                <label className="label">Seriya raqami <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    name="serial"
-                                    className={`input ${errors.serial ? 'border-red-500 ring-red-500' : ''}`}
-                                    value={formData.serial}
-                                    onChange={handleChange}
-                                    placeholder="FVFD1234"
-                                />
-                                {errors.serial && <span className="text-red-500 text-xs mt-1 block">{errors.serial}</span>}
-                            </div>
-                        )}
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="label">INN Raqami <span className="text-red-500">*</span></label>
