@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { RiAlertLine, RiSendPlaneFill, RiImageAddLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
+import api from "../../api/axios";
+import { useNavigate } from "react-router-dom";
 
 const ReportIssuePage = () => {
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         title: "",
         category: "Broken",
@@ -10,11 +14,31 @@ const ReportIssuePage = () => {
         description: "",
     });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        toast.success("Xabar yuborildi!");
-        // Reset form
-        setFormData({ title: "", category: "Broken", priority: "Medium", description: "" });
+        setLoading(true);
+
+        try {
+            await api.post('/requests', {
+                type: 'issue',
+                status: 'pending_admin',
+                title: formData.title,
+                category: formData.category,
+                priority: formData.priority,
+                description: formData.description
+            });
+
+            toast.success("Xabar yuborildi!");
+            // Reset form
+            setFormData({ title: "", category: "Broken", priority: "Medium", description: "" });
+            navigate('/employee/requests'); // Redirect to requests to see status
+        } catch (error) {
+            console.error("Report error:", error);
+            const msg = error.response?.data?.message || "Xatolik yuz berdi";
+            toast.error(msg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -86,9 +110,17 @@ const ReportIssuePage = () => {
                         <p className="text-sm text-gray-500">Rasm yuklash (ixtiyoriy)</p>
                     </div>
 
-                    <button type="submit" className="btn btn-primary w-full py-3 shadow-lg shadow-red-100 bg-red-600 hover:bg-red-700">
-                        <RiSendPlaneFill size={20} />
-                        Yuborish
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-full py-3 shadow-lg shadow-red-100 bg-red-600 hover:bg-red-700 disabled:opacity-70 disabled:cursor-not-allowed"
+                        disabled={loading}
+                    >
+                        {loading ? "Yuborilmoqda..." : (
+                            <>
+                                <RiSendPlaneFill size={20} />
+                                Yuborish
+                            </>
+                        )}
                     </button>
                 </form>
             </div>

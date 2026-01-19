@@ -23,10 +23,17 @@ const EmployeeRequestsPage = () => {
             // 3. rejected (For history/info - optional, maybe just active flows?)
             // Let's show active flows: pending_accountant AND pending_employee
 
-            const activeRequests = data.filter(r =>
-                (r.status === 'pending_employee' || r.status === 'pending_accountant') &&
-                r.targetUserId === user.id
-            );
+            const activeRequests = data.filter(r => {
+                // Requests targeted to me (Assignment to me)
+                if (r.targetUserId === user.id && (r.status === 'pending_employee' || r.status === 'pending_accountant')) {
+                    return true;
+                }
+                // Requests sent by me (My Issue Reports or Returns)
+                if (r.requesterId === user.id) {
+                    return true;
+                }
+                return false;
+            });
 
             setRequests(activeRequests);
         } catch (error) {

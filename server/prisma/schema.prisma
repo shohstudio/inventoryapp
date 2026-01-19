@@ -104,6 +104,10 @@ model Request {
   status    String   @default("pending") // pending_accountant, pending_employee, approved, rejected, completed
   
   description String?
+  title       String?  // For issue reports
+  category    String?  // For issue reports
+  priority    String?  // For issue reports
+  image       String?  // URL to image
 
   // Relations
   item      Item?    @relation(fields: [itemId], references: [id], onDelete: Cascade)

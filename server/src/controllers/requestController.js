@@ -5,11 +5,15 @@ const prisma = require('../utils/prisma');
 // @access  Private
 const createRequest = async (req, res) => {
     try {
-        const { itemId, targetUserId, type, description, quantity } = req.body;
+        const { itemId, targetUserId, type, description, quantity, title, category, priority, image } = req.body;
 
         // Validation
-        if (!itemId || !type) {
-            return res.status(400).json({ message: "Jihoz va tur tanlanishi shart" });
+        if (!type) {
+            return res.status(400).json({ message: "So'rov turi tanlanishi shart" });
+        }
+
+        if (type !== 'issue' && !itemId) {
+            return res.status(400).json({ message: "Jihoz tanlanishi shart" });
         }
 
         // Determine initial status based on type
@@ -17,16 +21,28 @@ const createRequest = async (req, res) => {
         if (type === 'exit' && !req.body.status) {
             status = 'pending_accountant';
         }
+        if (type === 'issue') {
+            status = 'pending_admin'; // Issues go to admin/warehouseman
+        }
+
+        const requestData = {
+            type,
+            status,
+            description,
+            requester: { connect: { id: req.user.id } },
+            ...(title && { title }),
+            ...(category && { category }),
+            ...(priority && { priority }),
+            ...(image && { image }),
+            ...(targetUserId && { targetUser: { connect: { id: parseInt(targetUserId) } } })
+        };
+
+        if (itemId) {
+            requestData.item = { connect: { id: parseInt(itemId) } };
+        }
 
         const request = await prisma.request.create({
-            data: {
-                type,
-                status,
-                description,
-                item: { connect: { id: parseInt(itemId) } },
-                requester: { connect: { id: req.user.id } },
-                ...(targetUserId && { targetUser: { connect: { id: parseInt(targetUserId) } } })
-            }
+            data: requestData
         });
 
         // Log action
@@ -34,8 +50,8 @@ const createRequest = async (req, res) => {
             data: {
                 action: `So'rov yaratildi: ${type}`,
                 userId: req.user.id,
-                itemId: parseInt(itemId),
-                details: `Status: ${status}`
+                ...(itemId && { itemId: parseInt(itemId) }),
+                details: `Status: ${status} ${title ? `| ${title}` : ''}`
             }
         });
 
@@ -67,8 +83,10 @@ const getRequests = async (req, res) => {
             // Employee sees requests where they are target or requester
             where.OR = [
                 { targetUserId: req.user.id },
-                { requesterId: req.user.id }
+                { requesterId: req.user.id },
+                { requesterId: req.user.id } // Add redundancy just in case, or simplify.
             ];
+            // If searching for specific status, applied on top of OR
         }
 
         const [requests, total] = await prisma.$transaction([
