@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { read, utils, writeFile } from 'xlsx';
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line, RiDeleteBinLine, RiQrCodeLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line, RiDeleteBinLine, RiQrCodeLine, RiCloseLine, RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionModal";
 import QRScannerModal from "../../components/admin/QRScannerModal";
