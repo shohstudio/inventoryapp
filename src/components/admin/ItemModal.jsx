@@ -62,9 +62,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 purchaseDate: item.purchaseDate || "",
                 price: formattedPrice,
                 status: item.status || "working",
-                assignedTo: item.assignedTo ? item.assignedTo.name : (item.initialOwner || ""),
-                assignedRole: item.assignedTo ? item.assignedTo.position : (item.initialRole || ""),
-                assignedPINFL: item.assignedTo ? item.assignedTo.pinfl : (item.initialPinfl || ""),
+                assignedTo: item.assignedTo ? item.assignedTo.name : (item.requests?.[0]?.targetUser?.name || item.initialOwner || ""),
+                assignedRole: item.assignedTo ? item.assignedTo.position : (item.requests?.[0]?.targetUser?.position || item.initialRole || ""),
+                assignedPINFL: item.assignedTo ? item.assignedTo.pinfl : (item.requests?.[0]?.targetUser?.pinfl || item.initialPinfl || ""),
                 images: (() => {
                     let imgs = [];
                     if (item.images) {
