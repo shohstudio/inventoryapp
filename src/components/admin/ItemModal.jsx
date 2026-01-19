@@ -94,7 +94,10 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         const newErrors = {};
         if (!formData.name.trim()) newErrors.name = "Shu joyni to'ldirish majburiy";
         if (!formData.model.trim()) newErrors.model = "Shu joyni to'ldirish majburiy";
-        if (!formData.serial.trim()) newErrors.serial = "Shu joyni to'ldirish majburiy";
+        // Serial is only mandatory when EDITING (if user wants to keep it strict there) 
+        // OR simply make it optional generally? User said "Remove from Add".
+        // Let's assume if it's hidden in Add, we skip validation.
+        if (item && !formData.serial.trim()) newErrors.serial = "Shu joyni to'ldirish majburiy";
         if (!formData.category.trim()) newErrors.category = "Shu joyni to'ldirish majburiy";
         if (!formData.building.trim()) newErrors.building = "Shu joyni to'ldirish majburiy";
         if (!formData.location.trim()) newErrors.location = "Shu joyni to'ldirish majburiy";
@@ -206,18 +209,20 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="label">Seriya raqami <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                name="serial"
-                                className={`input ${errors.serial ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.serial}
-                                onChange={handleChange}
-                                placeholder="FVFD1234"
-                            />
-                            {errors.serial && <span className="text-red-500 text-xs mt-1 block">{errors.serial}</span>}
-                        </div>
+                        {item && (
+                            <div>
+                                <label className="label">Seriya raqami <span className="text-red-500">*</span></label>
+                                <input
+                                    type="text"
+                                    name="serial"
+                                    className={`input ${errors.serial ? 'border-red-500 ring-red-500' : ''}`}
+                                    value={formData.serial}
+                                    onChange={handleChange}
+                                    placeholder="FVFD1234"
+                                />
+                                {errors.serial && <span className="text-red-500 text-xs mt-1 block">{errors.serial}</span>}
+                            </div>
+                        )}
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="label">INN Raqami <span className="text-red-500">*</span></label>
