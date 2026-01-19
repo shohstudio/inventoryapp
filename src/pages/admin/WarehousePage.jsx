@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine, RiDeleteBinLine, RiQrCodeLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine, RiDeleteBinLine, RiQrCodeLine, RiCloseLine } from "react-icons/ri";
 import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
 import QRGeneratorModal from "../../components/admin/QRGeneratorModal";
 import Pagination from "../../components/common/Pagination"; // Import Pagination
@@ -16,6 +16,7 @@ const WarehousePage = () => {
     const [qrItem, setQrItem] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
+    const [previewImage, setPreviewImage] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState({
         status: 'all',
@@ -382,7 +383,10 @@ const WarehousePage = () => {
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-3">
                                             {item.image ? (
-                                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200">
+                                                <div
+                                                    className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:ring-2 hover:ring-orange-300 transition-all"
+                                                    onClick={() => setPreviewImage(item.image)}
+                                                >
                                                     <img
                                                         src={item.image}
                                                         alt={item.name}
@@ -438,6 +442,28 @@ const WarehousePage = () => {
                     </div>
                 </div>
             </div>
+            {/* Image Preview Modal */}
+            {previewImage && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <div className="relative max-w-4xl max-h-[90vh] p-2">
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+                        >
+                            <RiCloseLine size={32} />
+                        </button>
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="w-full h-full object-cover rounded-lg shadow-2xl"
+                        />
+                    </div>
+                </div>
+            )}
+
             {/* Modals */}
             {isModalOpen && (
                 <WarehouseItemModal

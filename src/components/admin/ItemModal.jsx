@@ -10,9 +10,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         orderNumber: "",
         category: "",
         building: "Bosh Ofis",
-        department: "",
+        department: "RTTM",
         location: "",
-        quantity: 1, // NEW FIELD
+        quantity: 1,
         purchaseDate: "",
         price: "",
         status: "working",
@@ -23,12 +23,31 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         pdf: null
     });
 
+    // Custom Input States
+    const [isCustomCategory, setIsCustomCategory] = useState(false);
+    const [isCustomDepartment, setIsCustomDepartment] = useState(false);
+
     const [errors, setErrors] = useState({});
+
+    // Options
+    const categories = ["NOTEBOOK", "PRINTER", "TV", "KONDITSIONER", "IN PANEL", "MEBEL JIHOZLAR"];
+    const departments = ["RTTM", "Bino komendanti"];
 
     useEffect(() => {
         setErrors({}); // Reset errors on open
         if (item) {
             console.log("ItemModal received item:", item);
+
+            // Check if existing values are in our predefined lists
+            const isStandardCategory = categories.includes(item.category?.toUpperCase());
+            const isStandardDepartment = departments.includes(item.department);
+
+            setIsCustomCategory(!isStandardCategory && !!item.category);
+            setIsCustomDepartment(!isStandardDepartment && !!item.department);
+
+            // Format price with spaces for display
+            const formattedPrice = item.price ? item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : "";
+
             setFormData({
                 name: item.name || "",
                 model: item.model || "",
@@ -37,11 +56,11 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 orderNumber: item.orderNumber || "",
                 category: item.category || "",
                 building: item.building || "Bosh Ofis",
-                department: item.department || "",
+                department: item.department || "RTTM",
                 location: item.location || "",
                 quantity: item.quantity || 1,
                 purchaseDate: item.purchaseDate || "",
-                price: item.price || "",
+                price: formattedPrice,
                 status: item.status || "working",
                 assignedTo: item.assignedTo ? item.assignedTo.name : (item.initialOwner || ""),
                 assignedRole: item.assignedTo ? item.assignedTo.position : (item.initialRole || ""),
@@ -49,42 +68,30 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 images: item.images || [],
                 pdf: item.pdf || null
             });
-        } else if (initialData) {
-            // Pre-fill from warehouse data
-            setFormData({
-                name: initialData.name || "",
-                model: initialData.model || "",
-                serial: "", // Warehouse items might not have serials yet, or user needs to input it
-                inn: "",
-                orderNumber: "",
-                category: initialData.category || "",
-                building: "Bosh Ofis",
-                location: "",
-                status: "working",
-                assignedTo: "",
-                assignedRole: "",
-                assignedPINFL: "",
-                images: initialData.images || [], // Inherit images
-                pdf: null,
-                price: initialData.price || "" // Inherit price
-            });
         } else {
+            // New Item or Initial Data
             setFormData({
-                name: "",
-                model: "",
+                name: initialData?.name || "",
+                model: initialData?.model || "",
                 serial: "",
                 inn: "",
                 orderNumber: "",
-                category: "",
+                category: initialData?.category || categories[0],
                 building: "Bosh Ofis",
+                department: "RTTM",
                 location: "",
+                quantity: 1,
+                purchaseDate: "",
+                price: initialData?.price ? initialData.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : "",
                 status: "working",
                 assignedTo: "",
                 assignedRole: "",
                 assignedPINFL: "",
-                images: [],
+                images: initialData?.images || [],
                 pdf: null
             });
+            setIsCustomCategory(false);
+            setIsCustomDepartment(false);
         }
     }, [item, initialData, isOpen]);
 
@@ -94,15 +101,19 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         const newErrors = {};
         if (!formData.name.trim()) newErrors.name = "Shu joyni to'ldirish majburiy";
         if (!formData.model.trim()) newErrors.model = "Shu joyni to'ldirish majburiy";
-        // Serial is only mandatory when EDITING (if user wants to keep it strict there) 
-        // OR simply make it optional generally? User said "Remove from Add".
-        // Let's assume if it's hidden in Add, we skip validation.
+
+        // Serial only needed in Edit
         if (item && !formData.serial.trim()) newErrors.serial = "Shu joyni to'ldirish majburiy";
+
         if (!formData.category.trim()) newErrors.category = "Shu joyni to'ldirish majburiy";
         if (!formData.building.trim()) newErrors.building = "Shu joyni to'ldirish majburiy";
         if (!formData.location.trim()) newErrors.location = "Shu joyni to'ldirish majburiy";
         if (!formData.price) newErrors.price = "Shu joyni to'ldirish majburiy";
-        if (!formData.quantity) newErrors.quantity = "Shu joyni to'ldirish majburiy";
+
+        // Fix quantity validation: Check for existence, allowing 1
+        if (formData.quantity === undefined || formData.quantity === null || formData.quantity === "") {
+            newErrors.quantity = "Shu joyni to'ldirish majburiy";
+        }
 
         // New Mandatory Fields
         if (!formData.inn.trim()) newErrors.inn = "Shu joyni to'ldirish majburiy";
@@ -121,9 +132,31 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user types
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: "" }));
+        }
+    };
+
+    // Special handlers for dropdowns with "Other"
+    const handleCategoryChange = (e) => {
+        const val = e.target.value;
+        if (val === "OTHER") {
+            setIsCustomCategory(true);
+            setFormData(prev => ({ ...prev, category: "" }));
+        } else {
+            setIsCustomCategory(false);
+            setFormData(prev => ({ ...prev, category: val }));
+        }
+    };
+
+    const handleDepartmentChange = (e) => {
+        const val = e.target.value;
+        if (val === "OTHER") {
+            setIsCustomDepartment(true);
+            setFormData(prev => ({ ...prev, department: "" }));
+        } else {
+            setIsCustomDepartment(false);
+            setFormData(prev => ({ ...prev, department: val }));
         }
     };
 
@@ -131,12 +164,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files).map(file => URL.createObjectURL(file));
             setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
-        }
-    };
-
-    const handlePdfChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            setFormData(prev => ({ ...prev, pdf: e.target.files[0] }));
         }
     };
 
@@ -150,7 +177,14 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!validate()) return;
-        onSave(formData);
+
+        // Clean up price (remove spaces) before sending
+        const cleanData = {
+            ...formData,
+            price: formData.price.replace(/\s/g, '')
+        };
+
+        onSave(cleanData);
         onClose();
     };
 
@@ -199,7 +233,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 type="number"
                                 name="quantity"
                                 className={`input ${errors.quantity ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.quantity || 1}
+                                value={formData.quantity}
                                 onChange={handleChange}
                                 min="1"
                                 placeholder="1"
@@ -242,7 +276,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                     type="date"
                                     name="purchaseDate"
                                     className={`input ${errors.purchaseDate ? 'border-red-500 ring-red-500' : ''}`}
-                                    value={formData.purchaseDate || ""}
+                                    value={formData.purchaseDate}
                                     onChange={handleChange}
                                 />
                                 {errors.purchaseDate && <span className="text-red-500 text-xs mt-1 block">{errors.purchaseDate}</span>}
@@ -254,22 +288,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                         type="text"
                                         name="price"
                                         className={`input pr-12 ${errors.price ? 'border-red-500 ring-red-500' : ''}`}
-                                        value={formData.price || ""}
+                                        value={formData.price}
                                         onChange={(e) => {
-                                            // Allow numbers, spaces, and ONE comma
-                                            let val = e.target.value.replace(/[^0-9\s,]/g, '');
-
-                                            // Ensure only one comma
-                                            const parts = val.split(',');
-                                            if (parts.length > 2) {
-                                                val = parts[0] + ',' + parts.slice(1).join('');
-                                            }
-
+                                            // Allow numbers and spaces
+                                            let val = e.target.value.replace(/[^0-9\s]/g, '');
+                                            // Format with spaces
+                                            val = val.replace(/\s/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                                             setFormData(prev => ({ ...prev, price: val }));
-                                            // Clear error manually for this custom handler
                                             if (errors.price) setErrors(prev => ({ ...prev, price: "" }));
                                         }}
-                                        placeholder="14 000 000,00"
+                                        placeholder="14 000 000"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">
                                         so'm
@@ -284,14 +312,38 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">Kategoriya <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                name="category"
-                                className={`input ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.category}
-                                onChange={handleChange}
-                                placeholder="Laptop, Mebel, Printer..."
-                            />
+                            {!isCustomCategory ? (
+                                <select
+                                    name="category"
+                                    className={`input ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
+                                    value={categories.includes(formData.category.toUpperCase()) ? formData.category.toUpperCase() : "OTHER"}
+                                    onChange={handleCategoryChange}
+                                >
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                    <option value="OTHER">Boshqa (Yozish)</option>
+                                </select>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        name="category"
+                                        className={`input flex-1 ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
+                                        value={formData.category}
+                                        onChange={handleChange}
+                                        placeholder="Kategoriya nomini yozing..."
+                                        autoFocus
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsCustomCategory(false)}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        <RiCloseLine size={24} />
+                                    </button>
+                                </div>
+                            )}
                             {errors.category && <span className="text-red-500 text-xs mt-1 block">{errors.category}</span>}
                         </div>
                         <div>
@@ -324,15 +376,39 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                             {errors.building && <span className="text-red-500 text-xs mt-1 block">{errors.building}</span>}
                         </div>
                         <div>
-                            <label className="label">Bo'lim <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                name="department"
-                                className={`input ${errors.department ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.department || ""}
-                                onChange={handleChange}
-                                placeholder="IT Bo'limi"
-                            />
+                            <label className="label">Mas'ul Bo'lim <span className="text-red-500">*</span></label>
+                            {!isCustomDepartment ? (
+                                <select
+                                    name="department"
+                                    className={`input ${errors.department ? 'border-red-500 ring-red-500' : ''}`}
+                                    value={departments.includes(formData.department) ? formData.department : "OTHER"}
+                                    onChange={handleDepartmentChange}
+                                >
+                                    {departments.map(dept => (
+                                        <option key={dept} value={dept}>{dept}</option>
+                                    ))}
+                                    <option value="OTHER">Boshqa (Yozish)</option>
+                                </select>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        name="department"
+                                        className={`input flex-1 ${errors.department ? 'border-red-500 ring-red-500' : ''}`}
+                                        value={formData.department}
+                                        onChange={handleChange}
+                                        placeholder="Bo'lim nomini yozing..."
+                                        autoFocus
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsCustomDepartment(false)}
+                                        className="text-gray-500 hover:text-gray-700"
+                                    >
+                                        <RiCloseLine size={24} />
+                                    </button>
+                                </div>
+                            )}
                             {errors.department && <span className="text-red-500 text-xs mt-1 block">{errors.department}</span>}
                         </div>
                         <div>
@@ -388,7 +464,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                     onChange={(e) => {
                                         const val = e.target.value.replace(/\D/g, '').slice(0, 14);
                                         setFormData(prev => ({ ...prev, assignedPINFL: val }));
-                                        // Clear error manually for custom handler
                                         if (errors.assignedPINFL) setErrors(prev => ({ ...prev, assignedPINFL: "" }));
                                     }}
                                     placeholder="14 xonali raqam"

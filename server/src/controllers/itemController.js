@@ -333,6 +333,16 @@ const deleteItem = async (req, res) => {
             }
         });
 
+        // RESET ID SEQUENCE IF TABLE IS EMPTY
+        const count = await prisma.item.count();
+        if (count === 0) {
+            try {
+                await prisma.$executeRawUnsafe("DELETE FROM sqlite_sequence WHERE name='Item'");
+            } catch (e) {
+                console.error("Failed to reset sequence:", e);
+            }
+        }
+
         res.json({ message: 'Item removed' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -523,7 +533,7 @@ const deleteManyItems = async (req, res) => {
 
         const deleted = await prisma.item.deleteMany({
             where: {
-                id: { in: ids }
+                id: { in: ids } // Correct filtering
             }
         });
 
@@ -535,6 +545,16 @@ const deleteManyItems = async (req, res) => {
                 userId: req.user.id
             }
         });
+
+        // RESET ID SEQUENCE IF TABLE IS EMPTY
+        const count = await prisma.item.count();
+        if (count === 0) {
+            try {
+                await prisma.$executeRawUnsafe("DELETE FROM sqlite_sequence WHERE name='Item'");
+            } catch (e) {
+                console.error("Failed to reset sequence:", e);
+            }
+        }
 
         res.json({ message: `${deleted.count} ta jihoz o'chirildi` });
     } catch (error) {
