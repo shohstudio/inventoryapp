@@ -26,7 +26,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
     return (
         <div className={`
-            fixed top-0 left-0 h-full bg-[#1e1b4b] border-r border-indigo-900/50 shadow-2xl z-40 transition-transform duration-300 ease-in-out
+            fixed top-0 left-0 h-full bg-[#1e1b4b] border-r border-indigo-900/50 shadow-2xl z-40 transition-transform duration-300 ease-in-out flex flex-col
             md:translate-x-0 w-64
             ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}>
