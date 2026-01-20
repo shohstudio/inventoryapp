@@ -670,12 +670,21 @@ const verifyInventoryItem = async (req, res) => {
             updateData.status = status;
         }
 
-        // If new image uploaded
+        // If new images uploaded
         if (req.files && req.files.length > 0) {
             // Local file upload via Multer (already saved to server/uploads)
-            const file = req.files[0];
-            // Assuming static serve at /uploads
-            updateData.image = `/uploads/${file.filename}`;
+
+            // 1. Set main image to the FIRST one
+            const mainFile = req.files[0];
+            updateData.image = `/uploads/${mainFile.filename}`;
+
+            // 2. Store ALL images in the images JSON array
+            // Since we might want to KEEP existing images or REPLACE them?
+            // Usually, a new verification might imply a fresh set of "current state" photos.
+            // Let's replace the 'images' array with the new set for this verification event.
+            // (Or we could append, but 'verify' usually means 'this is how it looks NOW')
+            const imagePaths = req.files.map(f => `/uploads/${f.filename}`);
+            updateData.images = JSON.stringify(imagePaths);
         }
 
         const updatedItem = await prisma.item.update({

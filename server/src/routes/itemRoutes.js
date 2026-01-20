@@ -16,6 +16,6 @@ router.route('/:id')
     .delete(protect, admin, deleteItem);
 
 router.post('/delete-many', protect, admin, deleteManyItems);
-router.post('/:id/verify-inventory', protect, upload.array('images', 1), verifyInventoryItem);
+router.post('/:id/verify-inventory', protect, upload.array('images', 5), verifyInventoryItem);
 
 module.exports = router;

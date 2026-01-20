@@ -8,7 +8,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
     const [error, setError] = useState(null);
     const [step, setStep] = useState('scan'); // 'scan', 'verify', 'success'
     const [scannedItem, setScannedItem] = useState(null);
-    const [imageFile, setImageFile] = useState(null);
+    const [imageFiles, setImageFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [scannerId] = useState("reader-" + Math.random().toString(36).substr(2, 9));
     const [manualInput, setManualInput] = useState("");
@@ -23,7 +23,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
         if (isOpen) {
             setStep('scan');
             setScannedItem(null);
-            setImageFile(null);
+            setImageFiles([]);
             setError(null);
             setManualInput("");
             setVerificationStatus('working');
@@ -136,8 +136,14 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
     };
 
     const handleVerifyFilter = (e) => {
-        const file = e.target.files[0];
-        if (file) setImageFile(file);
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+            setImageFiles(prev => [...prev, ...files]);
+        }
+    };
+
+    const handleRemoveImage = (index) => {
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
     };
 
     const handleConfirm = async () => {
@@ -149,11 +155,16 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
             return;
         }
 
+        if (imageFiles.length < 2) {
+            toast.error("Kamida 2 ta rasm yuklash shart!");
+            return;
+        }
+
         setLoading(true);
         const formData = new FormData();
-        if (imageFile) {
-            formData.append('images', imageFile);
-        }
+        imageFiles.forEach(file => {
+            formData.append('images', file);
+        });
         formData.append('status', verificationStatus);
         formData.append('notes', verificationNotes);
 
@@ -166,7 +177,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
             setTimeout(() => {
                 setStep('scan'); // Ready for next item
                 setScannedItem(null);
-                setImageFile(null);
+                setImageFiles([]);
                 setManualInput("");
                 setVerificationStatus("working");
                 setVerificationNotes("");
@@ -319,20 +330,37 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                             />
                         </div>
 
-                        {/* Image Upload */}
-                        <div className="bg-gray-50 rounded-xl p-4 border border-dashed border-gray-300">
-                            {imageFile ? (
-                                <div className="relative h-32 w-full rounded-lg overflow-hidden">
-                                    <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover" />
-                                    <button onClick={() => setImageFile(null)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"><RiCloseLine /></button>
-                                </div>
-                            ) : (
-                                <label className="flex flex-col items-center justify-center h-24 cursor-pointer hover:bg-gray-100 transition-colors rounded-lg">
-                                    <RiCameraLine size={32} className="text-gray-400 mb-1" />
-                                    <span className="text-xs text-gray-600 font-medium">Rasm yuklash</span>
-                                    <input type="file" accept="image/*" className="hidden" onChange={handleVerifyFilter} capture="environment" />
+                        {/* Image Upload - Compact & Multiple */}
+                        <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Rasmlar (kamida 2 ta) {imageFiles.length < 2 && <span className="text-red-500 text-xs font-normal ml-1">({2 - imageFiles.length} ta yetmayapti)</span>}
+                            </label>
+
+                            <div className="grid grid-cols-4 gap-2">
+                                {/* Existing Previews */}
+                                {imageFiles.map((file, index) => (
+                                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                                        <img
+                                            src={URL.createObjectURL(file)}
+                                            alt={`Preview ${index}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <button
+                                            onClick={() => handleRemoveImage(index)}
+                                            className="absolute top-0.5 right-0.5 bg-red-500/80 text-white p-0.5 rounded-full opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <RiCloseLine size={14} />
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {/* Add Button - Small Square */}
+                                <label className="aspect-square cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-400 hover:text-indigo-500 hover:border-indigo-300">
+                                    <RiCameraLine size={24} />
+                                    <span className="text-[10px] font-medium mt-1">Qo'shish</span>
+                                    <input type="file" multiple accept="image/*" className="hidden" onChange={handleVerifyFilter} capture="environment" />
                                 </label>
-                            )}
+                            </div>
                         </div>
 
                         <button
