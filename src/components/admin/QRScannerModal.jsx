@@ -210,9 +210,9 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                 </button>
 
                 {step === 'scan' && (
-                    <div className="flex-1 flex flex-col h-full">
-                        {/* Scanner Area - Fixed Height */}
-                        <div className="relative h-64 bg-black flex flex-col items-center justify-center shrink-0">
+                    <div className="flex-1 flex flex-col h-full overflow-hidden">
+                        {/* Scanner Area - Flexible Height but constrained */}
+                        <div className="relative flex-1 bg-black flex flex-col items-center justify-center overflow-hidden min-h-[250px]">
                             {error ? (
                                 <div className="text-white text-center p-6">
                                     <p className="text-red-400 mb-2 font-bold">Xatolik</p>
@@ -221,34 +221,33 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                                 </div>
                             ) : (
                                 <>
-                                    <div id={scannerId} className="w-full h-full"></div>
-                                    <div className="absolute inset-0 border-2 border-indigo-500/50 pointer-events-none">
+                                    <div id={scannerId} className="w-full h-full object-cover"></div>
+                                    <div className="absolute inset-0 border-2 border-indigo-500/50 pointer-events-none z-10">
                                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-indigo-400 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"></div>
                                     </div>
-                                    <p className="absolute bottom-4 left-0 right-0 text-center text-white/80 text-xs font-medium">
+                                    <p className="absolute bottom-4 left-0 right-0 text-center text-white/80 text-xs font-medium z-10 px-4">
                                         QR kodni skanerlang
                                     </p>
                                 </>
                             )}
                         </div>
 
-                        {/* Manual Input Area - Fixed Minimum Height */}
-                        <div className="p-6 bg-white flex-1 flex flex-col justify-center min-h-[200px] border-t border-gray-100">
-                            <form onSubmit={handleManualSubmit} className="flex flex-col gap-4">
-                                <div className="text-center mb-2">
-                                    <p className="text-sm font-medium text-gray-700">QR kod ishlamayaptimi?</p>
-                                    <p className="text-xs text-gray-500">ID yoki INN raqamini qo'lda kiriting</p>
+                        {/* Manual Input Area - Fixed Height & On Top */}
+                        <div className="relative z-20 bg-white p-5 shrink-0 shadow-[0_-5px_20px_rgba(0,0,0,0.1)]">
+                            <form onSubmit={handleManualSubmit} className="flex flex-col gap-3">
+                                <div className="text-center">
+                                    <p className="text-sm font-bold text-gray-800">QR kod ishlamayaptimi?</p>
                                 </div>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
                                         value={manualInput}
                                         onChange={(e) => setManualInput(e.target.value)}
-                                        placeholder="Masalan: 0130600029"
-                                        className="form-input flex-1 border-gray-300 focus:border-indigo-500 py-2.5"
+                                        placeholder="ID yoki INN (masalan: 0130600029)"
+                                        className="form-input flex-1 border-gray-300 focus:border-indigo-500 py-3"
                                     />
-                                    <button type="submit" className="btn btn-primary px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all" disabled={loading}>
-                                        {loading ? <RiLoader4Line className="animate-spin" /> : <RiSearchLine size={20} />}
+                                    <button type="submit" className="btn btn-primary px-5 py-3 rounded-lg shadow-md hover:shadow-lg transition-all" disabled={loading}>
+                                        {loading ? <RiLoader4Line className="animate-spin" /> : <RiSearchLine size={22} />}
                                     </button>
                                 </div>
                             </form>
