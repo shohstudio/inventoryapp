@@ -30,7 +30,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const [errors, setErrors] = useState({});
 
     // Options
-    const categories = ["NOTEBOOK", "PRINTER", "TV", "KONDITSIONER", "IN PANEL", "MEBEL JIHOZLAR"];
+    const categories = ["NOTEBOOK", "PRINTER", "TV", "KONDITSIONER", "Interaktiv panel", "MEBEL JIHOZLAR"];
     const departments = ["RTTM", "Bino komendanti"];
     const buildings = [
         "1-bino Asosiy",
