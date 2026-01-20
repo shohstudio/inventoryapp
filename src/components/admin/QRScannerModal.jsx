@@ -271,6 +271,13 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                                 </div>
                             )}
 
+                            {/* Department Info */}
+                            {(scannedItem.department || scannedItem.building) && (
+                                <div className="mt-2 text-sm text-gray-600 border-t pt-2">
+                                    <span className="font-medium text-gray-800">Inventar o'tkazgan bo'lim:</span> {scannedItem.department || scannedItem.building}
+                                </div>
+                            )}
+
                             {/* Last Inventory Date */}
                             {scannedItem.lastCheckedAt && (
                                 <div className="mt-2 text-xs text-gray-500">
