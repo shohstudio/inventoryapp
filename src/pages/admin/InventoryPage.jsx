@@ -464,7 +464,7 @@ const InventoryPage = () => {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-blue-600 text-white">
-                                <th className="py-4 px-6 w-12 text-center">
+                                <th className="py-3 px-3 w-10 text-center">
                                     <input
                                         type="checkbox"
                                         className="checkbox checkbox-sm border-white"
@@ -473,22 +473,22 @@ const InventoryPage = () => {
                                         disabled={filteredItems.length === 0}
                                     />
                                 </th>
-                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('order_number')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('name')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('inn')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('purchase_date')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm whitespace-nowrap">{t('current_value')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('building')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Inventarizatsiya</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('status')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('image')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm rounded-tl-lg whitespace-nowrap">{t('order_number')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm min-w-[200px]">{t('name')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('inn')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('purchase_date')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('current_value')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('building')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">Inventarizatsiya</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('status')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm text-center">{t('image')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredItems.map((item, index) => (
                                 <tr key={item.id} className={`hover:bg-gray-50/80 transition-colors group ${selectedIds.includes(item.id) ? "bg-blue-50/50" : ""}`}>
-                                    <td className="py-4 px-6 text-center">
+                                    <td className="py-3 px-3 text-center">
                                         <input
                                             type="checkbox"
                                             className="checkbox checkbox-sm"
@@ -496,14 +496,14 @@ const InventoryPage = () => {
                                             onChange={() => toggleSelectItem(item.id)}
                                         />
                                     </td>
-                                    <td className="py-4 px-6 text-gray-800 font-medium">{(currentPage - 1) * 20 + index + 1}</td>
-                                    <td className="py-4 px-6">
-                                        <div className="font-medium text-gray-900">{item.name}</div>
+                                    <td className="py-3 px-3 text-gray-800 font-medium text-center">{(currentPage - 1) * 20 + index + 1}</td>
+                                    <td className="py-3 px-3">
+                                        <div className="font-medium text-gray-900 line-clamp-2" title={item.name}>{item.name}</div>
                                         <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
                                     </td>
-                                    <td className="py-4 px-6 text-gray-600 font-mono text-xs">{item.inn}</td>
-                                    <td className="py-4 px-6 text-gray-600">{item.purchaseDate}</td>
-                                    <td className="py-4 px-6 text-gray-900 font-medium whitespace-nowrap">
+                                    <td className="py-3 px-3 text-gray-600 font-mono text-xs whitespace-nowrap">{item.inn}</td>
+                                    <td className="py-3 px-3 text-gray-600 whitespace-nowrap">{item.purchaseDate}</td>
+                                    <td className="py-3 px-3 text-gray-900 font-medium whitespace-nowrap">
                                         {(() => {
                                             const priceStr = (item.price || "0").toString().replace(/\s/g, '').replace(',', '.');
                                             const price = parseFloat(priceStr) || 0;
@@ -512,24 +512,24 @@ const InventoryPage = () => {
                                             return total.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                                         })()} so'm
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <div className="text-gray-900">{item.building}</div>
-                                        <div className="text-xs text-gray-400">{item.location}</div>
+                                    <td className="py-3 px-3">
+                                        <div className="text-gray-900 whitespace-nowrap">{item.building}</div>
+                                        <div className="text-xs text-gray-400 whitespace-nowrap">{item.location}</div>
                                     </td>
-                                    <td className="py-4 px-6">
+                                    <td className="py-3 px-3">
                                         {(() => {
                                             // Dynamic check
                                             const isPassed = inventoryStartDate && item.lastCheckedAt && item.lastCheckedAt >= inventoryStartDate;
                                             return (
                                                 <div className="flex flex-col items-start gap-1">
-                                                    <span className={`px-2 py-1 rounded-md text-xs font-bold border ${isPassed
+                                                    <span className={`px-2 py-1 rounded-md text-[10px] font-bold border whitespace-nowrap ${isPassed
                                                         ? 'bg-green-50 text-green-600 border-green-200'
                                                         : 'bg-gray-50 text-gray-500 border-gray-200'
                                                         }`}>
                                                         {isPassed ? 'O\'tgan ✅' : 'O\'tmagan ❌'}
                                                     </span>
                                                     {item.lastCheckedAt && (
-                                                        <span className="text-[10px] text-gray-400 font-mono">
+                                                        <span className="text-[10px] text-gray-400 font-mono whitespace-nowrap">
                                                             {new Date(item.lastCheckedAt).toLocaleDateString("ru-RU")}
                                                         </span>
                                                     )}
@@ -537,23 +537,23 @@ const InventoryPage = () => {
                                             );
                                         })()}
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.status === 'working' ? 'bg-green-100 text-green-700' :
+                                    <td className="py-3 px-3">
+                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold whitespace-nowrap ${item.status === 'working' ? 'bg-green-100 text-green-700' :
                                             item.status === 'repair' ? 'bg-orange-100 text-orange-700' :
                                                 item.status === 'written-off' ? 'bg-gray-100 text-gray-500 line-through' :
                                                     'bg-red-100 text-red-700'
                                             }`}>
                                             {item.status === 'working' ? 'Ishchi' :
                                                 item.status === 'repair' ? 'Ta\'mir talab' :
-                                                    item.status === 'written-off' ? 'Ro\'yxatdan chiqarilgan' :
+                                                    item.status === 'written-off' ? 'Ro\'y. chiqdigan' :
                                                         'Buzilgan'}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center gap-3">
+                                    <td className="py-3 px-3">
+                                        <div className="flex items-center justify-center gap-2">
                                             {item.image ? (
                                                 <div
-                                                    className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                                                    className="w-8 h-8 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all shrink-0"
                                                     onClick={() => {
                                                         let imgs = [];
                                                         try {
@@ -570,36 +570,36 @@ const InventoryPage = () => {
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                                                    <RiImage2Line size={20} />
+                                                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 shrink-0">
+                                                    <RiImage2Line size={16} />
                                                 </div>
                                             )}
 
                                             {/* QR Button next to image */}
                                             <button
                                                 onClick={() => openQRModal(item)}
-                                                className="w-8 h-8 rounded-full bg-blue-50 hover:bg-blue-100 flex items-center justify-center text-blue-600 transition-colors border border-blue-200"
+                                                className="w-7 h-7 rounded-full bg-blue-50 hover:bg-blue-100 flex items-center justify-center text-blue-600 transition-colors border border-blue-200 shrink-0"
                                                 title="QR Kodni ko'rish"
                                             >
-                                                <RiQrCodeLine size={18} />
+                                                <RiQrCodeLine size={16} />
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6 text-right">
+                                    <td className="py-3 px-3 text-right whitespace-nowrap">
 
                                         <button
                                             onClick={() => openModal(item)}
-                                            className="p-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all"
+                                            className="p-1.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all"
                                             title={t('edit_item')}
                                         >
-                                            <RiEditLine size={18} />
+                                            <RiEditLine size={16} />
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                             {filteredItems.length === 0 && (
                                 <tr>
-                                    <td colSpan="10" className="text-center py-12 text-gray-500">
+                                    <td colSpan="11" className="text-center py-12 text-gray-500">
                                         Jihozlar topilmadi
                                     </td>
                                 </tr>
