@@ -48,18 +48,26 @@ const getItems = async (req, res) => {
         if (location) where.location = { contains: location }; // Loose match for location
 
         // Filter by Inventory Status (Passed / Not Passed)
+        // Filter by Inventory Status (Passed / Not Passed)
+        console.log("Filter Params:", { inventoryStatus, inventoryStartDate });
+
         if (inventoryStatus && inventoryStartDate) {
+            const startDate = new Date(inventoryStartDate);
+            console.log("Parsed Start Date:", startDate);
+
             if (inventoryStatus === 'passed') {
                 where.lastCheckedAt = {
-                    gte: inventoryStartDate // Checked AFTER start date
+                    gte: startDate // Checked AFTER start date (as Date object)
                 };
             } else if (inventoryStatus === 'not_passed') {
                 where.OR = [
                     { lastCheckedAt: null },
-                    { lastCheckedAt: { lt: inventoryStartDate } } // Checked BEFORE start date
+                    { lastCheckedAt: { lt: startDate } } // Checked BEFORE start date
                 ];
             }
         }
+
+        console.log("Final Where Clause:", JSON.stringify(where, null, 2));
 
         if (assignedUserId) {
             where.assignedUserId = parseInt(assignedUserId);
