@@ -243,6 +243,25 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                                 <span className="bg-gray-100 px-2 py-1 rounded">INN: {scannedItem.inn || 'Yo\'q'}</span>
                                 <span className="bg-gray-100 px-2 py-1 rounded">ID: {scannedItem.id}</span>
                             </div>
+
+                            {/* Assigned User Info */}
+                            {scannedItem.assignedTo ? (
+                                <div className="mt-3 p-2 bg-blue-50 rounded-lg text-sm text-blue-800">
+                                    <p className="font-semibold">{scannedItem.assignedTo.name}</p>
+                                    <p className="text-xs opacity-75">{scannedItem.assignedTo.position || 'Lavozim ko\'rsatilmagan'}</p>
+                                </div>
+                            ) : (
+                                <div className="mt-3 p-2 bg-yellow-50 rounded-lg text-sm text-yellow-800">
+                                    <p>Javobgar biriktirilmagan</p>
+                                </div>
+                            )}
+
+                            {/* Last Inventory Date */}
+                            {scannedItem.lastCheckedAt && (
+                                <div className="mt-2 text-xs text-gray-500">
+                                    Oxirgi inventarizatsiya: <span className="font-medium text-gray-700">{new Date(scannedItem.lastCheckedAt).toLocaleDateString("ru-RU")}</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Status Selection */}
@@ -327,7 +346,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                             <RiCheckLine size={40} />
                         </div>
                         <h3 className="text-2xl font-bold text-gray-900 mb-2">Muvaffaqiyatli!</h3>
-                        <p className="text-gray-500">Jihoz inventarizatsiyadan o'tdi.</p>
+                        <p className="text-gray-500">Jihoz {new Date().toLocaleDateString("ru-RU")} sanasida<br />inventarizatsiyadan o'tdi.</p>
                         <p className="mt-8 text-sm text-gray-400">Keyingi jihozga o'tilmoqda...</p>
                     </div>
                 )}
