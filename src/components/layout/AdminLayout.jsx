@@ -5,6 +5,7 @@ import Header from "./Header";
 import MobileBottomNav from "./MobileBottomNav"; // Import
 import QRScannerModal from "../admin/QRScannerModal";
 import { RiQrCodeLine } from "react-icons/ri";
+import GlobalAlert from "../common/GlobalAlert";
 
 const AdminLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,6 +24,7 @@ const AdminLayout = () => {
             <Header onMenuClick={() => setIsSidebarOpen(true)} />
 
             <main className="md:pl-64 pt-16 min-h-screen transition-all duration-300">
+                <GlobalAlert />
                 <div className="container mx-auto p-6 max-w-7xl animate-fade-in">
                     <Outlet />
                 </div>

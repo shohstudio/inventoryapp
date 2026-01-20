@@ -62,6 +62,7 @@ app.use('/api/items', itemRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/external-items', externalItemRoutes);
+app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/stats', require('./routes/statsRoutes'));
 
 // Make uploads folder static
