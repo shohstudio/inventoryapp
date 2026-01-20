@@ -521,12 +521,19 @@ const InventoryPage = () => {
                                             // Dynamic check
                                             const isPassed = inventoryStartDate && item.lastCheckedAt && item.lastCheckedAt >= inventoryStartDate;
                                             return (
-                                                <span className={`px-2 py-1 rounded-md text-xs font-bold border ${isPassed
-                                                    ? 'bg-green-50 text-green-600 border-green-200'
-                                                    : 'bg-gray-50 text-gray-500 border-gray-200'
-                                                    }`}>
-                                                    {isPassed ? 'O\'tgan ✅' : 'O\'tmagan ❌'}
-                                                </span>
+                                                <div className="flex flex-col items-start gap-1">
+                                                    <span className={`px-2 py-1 rounded-md text-xs font-bold border ${isPassed
+                                                        ? 'bg-green-50 text-green-600 border-green-200'
+                                                        : 'bg-gray-50 text-gray-500 border-gray-200'
+                                                        }`}>
+                                                        {isPassed ? 'O\'tgan ✅' : 'O\'tmagan ❌'}
+                                                    </span>
+                                                    {item.lastCheckedAt && (
+                                                        <span className="text-[10px] text-gray-400 font-mono">
+                                                            {new Date(item.lastCheckedAt).toLocaleDateString("ru-RU")}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             );
                                         })()}
                                     </td>
