@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../../api/axios";
-import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine, RiDeleteBinLine } from "react-icons/ri";
+import { RiBox3Line, RiUserLine, RiAlertLine, RiMoneyDollarCircleLine, RiDeleteBinLine, RiCheckboxCircleLine } from "react-icons/ri";
 import clsx from "clsx";
 import StatsCard from "../../components/admin/StatsCard";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ const AdminDashboard = () => {
         repairItems: 0,
         writtenOffItems: 0,
         totalValue: 0,
+        totalVerifiedItems: 0,
         recentItems: []
     });
     const [logs, setLogs] = useState([]);
@@ -108,6 +109,17 @@ const AdminDashboard = () => {
                     trendLabel={t('trend_vs_last_month')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory")}
+                />
+
+                <StatsCard
+                    title="Inventardan o'tganlar"
+                    value={inventoryStats.totalVerifiedItems}
+                    icon={<RiCheckboxCircleLine size={24} />}
+                    trend={0} // Can be calculated if needed
+                    trendLabel="O'tganlar"
+                    variant="featured"
+                    color="bg-green-50 text-green-600"
+                    onClick={() => navigate("/admin/reports")}
                 />
 
                 <StatsCard

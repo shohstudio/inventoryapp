@@ -31,7 +31,33 @@ const getDashboardStats = async (req, res) => {
             return acc + (price * quantity);
         }, 0);
 
-        // 4. Recent Items
+        // 4. Verified Items (Checked in current inventory period)
+        let totalVerifiedItems = 0;
+        const startDateSetting = await prisma.settings.findUnique({
+            where: { key: 'inventory_start_date' }
+        });
+
+        if (startDateSetting && startDateSetting.value) {
+            const startDate = new Date(startDateSetting.value);
+            totalVerifiedItems = await prisma.item.count({
+                where: {
+                    lastCheckedAt: {
+                        gte: startDate
+                    }
+                }
+            });
+        } else {
+            // If no date set, count all that have ever been checked? Or 0?
+            // Usually implies no active inventory period, but let's count all with lastCheckedAt for now or 0.
+            // Better to be 0 or all. Let's count all checked for safety if no date.
+            totalVerifiedItems = await prisma.item.count({
+                where: {
+                    lastCheckedAt: { not: null }
+                }
+            });
+        }
+
+        // 5. Recent Items
         const recentItems = await prisma.item.findMany({
             take: 5,
             orderBy: { createdAt: 'desc' },
@@ -47,6 +73,7 @@ const getDashboardStats = async (req, res) => {
                 repairItems,
                 writtenOffItems,
                 totalValue,
+                totalVerifiedItems,
                 recentItems
             }
         });

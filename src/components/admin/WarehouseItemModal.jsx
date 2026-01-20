@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line } from "react-icons/ri";
+import { toast } from "react-hot-toast";
 
 const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
+    // Categories matching ItemModal
+    const categories = ["NOTEBOOK", "PRINTER", "TV", "KONDITSIONER", "IN PANEL", "MEBEL JIHOZLAR"];
+
     const [formData, setFormData] = useState({
         name: "",
-        category: "",
+        category: categories[0],
         model: "",
         manufactureYear: "",
         arrivalDate: new Date().toISOString().split('T')[0],
@@ -15,16 +19,19 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
         images: []
     });
 
+    const [errors, setErrors] = useState({});
+
     useEffect(() => {
         if (item) {
             setFormData({
                 ...item,
+                category: item.category || categories[0],
                 images: item.images || []
             });
         } else {
             setFormData({
                 name: "",
-                category: "",
+                category: categories[0],
                 model: "",
                 manufactureYear: "",
                 arrivalDate: new Date().toISOString().split('T')[0],
@@ -35,19 +42,55 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                 images: []
             });
         }
+        setErrors({});
     }, [item, isOpen]);
 
     if (!isOpen) return null;
 
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.name.trim()) newErrors.name = "Nomi kiritilishi shart";
+        if (!formData.model.trim()) newErrors.model = "Model kiritilishi shart";
+        if (!formData.manufactureYear.trim()) newErrors.manufactureYear = "Yil kiritilishi shart";
+        if (!formData.supplier.trim()) newErrors.supplier = "Yetkazib beruvchi kiritilishi shart";
+        if (!formData.warranty.trim()) newErrors.warranty = "Kafolat muddati kiritilishi shart";
+        if (!formData.price.toString().trim()) newErrors.price = "Narx kiritilishi shart";
+        if (!formData.quantity) newErrors.quantity = "Soni kiritilishi shart";
+
+        // Strict image validation
+        if (formData.images.length === 0) {
+            newErrors.images = "Kamida 1 ta rasm yuklash shart";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+
+        let newValue = value;
+        if (name === 'price') {
+            // Removes all non-digits
+            const raw = value.replace(/\D/g, '');
+            // Format with spaces
+            newValue = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        setFormData(prev => ({ ...prev, [name]: newValue }));
+
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: null }));
+        }
     };
 
     const handleImageChange = (e) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files).map(file => URL.createObjectURL(file));
             setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
+            if (errors.images) {
+                setErrors(prev => ({ ...prev, images: null }));
+            }
         }
     };
 
@@ -60,6 +103,10 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!validateForm()) {
+            toast.error("Barcha maydonlarni to'ldiring!");
+            return;
+        }
         onSave(formData);
         onClose();
     };
@@ -80,48 +127,49 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                     {/* Basic Info */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Nomi</label>
+                            <label className="label">Nomi <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="name"
-                                className="input"
-                                required
+                                className={`input ${errors.name ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.name}
                                 onChange={handleChange}
                                 placeholder="Masalan: Monitor Dell"
                             />
                         </div>
                         <div>
-                            <label className="label">Kategoriya</label>
-                            <input
-                                type="text"
+                            <label className="label">Kategoriya <span className="text-red-500">*</span></label>
+                            <select
                                 name="category"
-                                className="input"
+                                className={`input ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.category}
                                 onChange={handleChange}
-                                placeholder="Masalan: Elektronika"
-                            />
+                            >
+                                {categories.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Model</label>
+                            <label className="label">Model <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="model"
-                                className="input"
+                                className={`input ${errors.model ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.model}
                                 onChange={handleChange}
                                 placeholder="P2419H"
                             />
                         </div>
                         <div>
-                            <label className="label">Ishlab chiqarilgan yili</label>
+                            <label className="label">Ishlab chiqarilgan yili <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="manufactureYear"
-                                className="input"
+                                className={`input ${errors.manufactureYear ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.manufactureYear}
                                 onChange={handleChange}
                                 placeholder="2023"
@@ -131,7 +179,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Omborga kelgan kuni</label>
+                            <label className="label">Omborga kelgan kuni <span className="text-red-500">*</span></label>
                             <input
                                 type="date"
                                 name="arrivalDate"
@@ -141,11 +189,11 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                             />
                         </div>
                         <div>
-                            <label className="label">Olingan magazin (Yetkazib beruvchi)</label>
+                            <label className="label">Olingan magazin (Yetkazib beruvchi) <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="supplier"
-                                className="input"
+                                className={`input ${errors.supplier ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.supplier}
                                 onChange={handleChange}
                                 placeholder="MediaPark, Texnomart..."
@@ -155,22 +203,22 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Kafolat muddati</label>
+                            <label className="label">Kafolat muddati <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="warranty"
-                                className="input"
+                                className={`input ${errors.warranty ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.warranty}
                                 onChange={handleChange}
                                 placeholder="1 yil"
                             />
                         </div>
                         <div>
-                            <label className="label">Narxi (dona)</label>
+                            <label className="label">Narxi (dona) <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="price"
-                                className="input"
+                                className={`input ${errors.price ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.price}
                                 onChange={handleChange}
                                 placeholder="So'm"
@@ -180,11 +228,11 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Soni</label>
+                            <label className="label">Soni <span className="text-red-500">*</span></label>
                             <input
                                 type="number"
                                 name="quantity"
-                                className="input"
+                                className={`input ${errors.quantity ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.quantity}
                                 onChange={handleChange}
                                 min="1"
@@ -196,9 +244,10 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                     {/* Image Upload Section */}
                     <div>
                         <label className="label flex justify-between">
-                            Jihoz rasmlari
+                            Jihoz rasmlari <span className="text-red-500">*</span>
+                            {errors.images && <span className="text-red-500 text-xs font-bold">{errors.images}</span>}
                         </label>
-                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-orange-300 transition-colors">
+                        <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors ${errors.images ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-orange-300'}`}>
                             <input
                                 type="file"
                                 multiple

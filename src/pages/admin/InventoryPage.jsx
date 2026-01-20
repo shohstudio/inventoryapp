@@ -231,23 +231,28 @@ const InventoryPage = () => {
         // or ideally we need a backend endpoint for export.
         // Let's fallback to current items for now to avoid complexity or errors.
 
-        const exportData = items.map((item, index) => ({
-            [t('order_number')]: (currentPage - 1) * 20 + index + 1,
-            [t('name')]: item.name,
-            [t('model')]: item.model,
-            [t('inn')]: item.inn,
-            ["JSHShIR"]: item.assignedTo?.pinfl || item.requests?.[0]?.targetUser?.pinfl || item.initialPinfl || "",
-            [t('category')]: item.category,
-            [t('building')]: item.building,
-            [t('location')]: item.location,
-            [t('status')]: item.status === 'working' ? t('status_working') :
-                item.status === 'repair' ? t('status_repair') :
-                    item.status === 'written-off' ? t('status_written_off') :
-                        t('status_broken'),
-            [t('assigned_to')]: item.assignedTo?.name || item.requests?.[0]?.targetUser?.name || item.initialOwner || "",
-            [t('purchase_year')]: item.purchaseDate,
-            [t('price')]: item.price
-        }));
+        const exportData = items.map((item, index) => {
+            const isPassed = inventoryStartDate && item.lastCheckedAt && item.lastCheckedAt >= inventoryStartDate;
+            return {
+                [t('order_number')]: (currentPage - 1) * 20 + index + 1,
+                [t('name')]: item.name,
+                [t('model')]: item.model,
+                [t('inn')]: item.inn,
+                ["JSHShIR"]: item.assignedTo?.pinfl || item.requests?.[0]?.targetUser?.pinfl || item.initialPinfl || "",
+                [t('category')]: item.category,
+                [t('building')]: item.building,
+                [t('location')]: item.location,
+                ["Inventar Statusi"]: isPassed ? "O'tgan" : "O'tmagan",
+                ["Tekshirilgan Sana"]: item.lastCheckedAt ? new Date(item.lastCheckedAt).toLocaleDateString("ru-RU") : "-",
+                [t('status')]: item.status === 'working' ? t('status_working') :
+                    item.status === 'repair' ? t('status_repair') :
+                        item.status === 'written-off' ? t('status_written_off') :
+                            t('status_broken'),
+                [t('assigned_to')]: item.assignedTo?.name || item.requests?.[0]?.targetUser?.name || item.initialOwner || "",
+                [t('purchase_year')]: item.purchaseDate,
+                [t('price')]: item.price
+            };
+        });
 
         const ws = utils.json_to_sheet(exportData);
         const wb = utils.book_new();
