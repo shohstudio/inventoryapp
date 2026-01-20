@@ -17,13 +17,14 @@ const EmployeeDashboard = () => {
     // New Real Stats
     const [activeRequestsCount, setActiveRequestsCount] = useState(0);
     const [notificationsCount, setNotificationsCount] = useState(0);
+    const [inventoryDates, setInventoryDates] = useState(null);
 
     // Fetch Real Items & Pending Requests
     useEffect(() => {
         if (user) {
             const fetchData = async () => {
                 try {
-                    const [itemsRes, requestsRes] = await Promise.all([
+                    const [itemsRes, requestsRes, settingsRes] = await Promise.all([
                         // Fetch ONLY items assigned to this user
                         api.get("/items", {
                             params: {
@@ -32,11 +33,20 @@ const EmployeeDashboard = () => {
                             }
                         }),
                         // Fetch ALL requests related to this user (recieved or sent)
-                        api.get("/requests")
+                        api.get("/requests"),
+                        // Fetch Settings
+                        api.get("/settings")
                     ]);
 
                     const requestsData = requestsRes.data.requests || requestsRes.data;
                     const allRequests = Array.isArray(requestsData) ? requestsData : [];
+
+                    if (settingsRes.data.inventoryStartDate && settingsRes.data.inventoryEndDate) {
+                        setInventoryDates({
+                            start: settingsRes.data.inventoryStartDate,
+                            end: settingsRes.data.inventoryEndDate
+                        });
+                    }
 
                     // 1. Pending Assignment Requests (Targeting Me) -> For Modal & "Xabarnomalar"
                     const pendingAssignments = allRequests.filter(r =>
@@ -200,15 +210,23 @@ const EmployeeDashboard = () => {
 
                     <div>
                         <h2 className="text-lg font-bold text-gray-900 mb-4">Eslatma</h2>
-                        <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 mb-4">
-                            <h3 className="font-bold text-blue-800 flex items-center gap-2 mb-2">
-                                <RiCheckDoubleLine /> Inventarizatsiya
-                            </h3>
-                            <p className="text-sm text-blue-600 leading-relaxed">
-                                Hurmatli xodim, keyingi oy boshida yillik inventarizatsiya o'tkaziladi.
-                                Iltimos, o'z jihozlaringizni to'liqligini tekshirib chiqing.
-                            </p>
-                        </div>
+                        {inventoryDates ? (
+                            <div className="p-4 bg-blue-50/50 rounded-xl border border-blue-100 mb-4 animate-in slide-in-from-right-4">
+                                <h3 className="font-bold text-blue-800 flex items-center gap-2 mb-2">
+                                    <RiCheckDoubleLine /> Inventarizatsiya
+                                </h3>
+                                <p className="text-sm text-blue-600 leading-relaxed">
+                                    Hurmatli xodim, <b>{inventoryDates.start}</b> dan <b>{inventoryDates.end}</b> gacha invertarizatsiya o'tkaziladi.
+                                    Iltimos, o'z jihozlaringizni to'liqligini tekshirib chiqing.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 mb-4">
+                                <p className="text-sm text-gray-400 italic text-center">
+                                    Hozircha muhim eslatmalar yo'q
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     <Link to="/employee/report" className="btn btn-primary w-full justify-center shadow-lg shadow-indigo-200 mt-4">

@@ -3,7 +3,6 @@ import { RiHomeLine, RiFileListLine, RiAlertLine, RiLogoutBoxRLine, RiUserLine, 
 import { useAuth } from "../../context/AuthContext";
 import Header from "./Header";
 import clsx from "clsx";
-import GlobalAlert from "../common/GlobalAlert";
 
 const EmployeeLayout = () => {
     const { pathname } = useLocation();
@@ -59,7 +58,6 @@ const EmployeeLayout = () => {
 
             {/* Main Content */}
             <main className="md:ml-64 p-6 pt-24 transition-all duration-300">
-                <GlobalAlert />
                 <Outlet />
             </main>
 
