@@ -144,7 +144,7 @@ const InventoryPage = () => {
                 building: filters.building,
                 location: filters.location,
                 inventoryStatus: filters.inventoryStatus !== 'all' ? filters.inventoryStatus : undefined,
-                inventoryStartDate: inventoryStartDate // Pass start date for comparison
+                inventoryStartDate: filters.inventoryStatus !== 'all' ? inventoryStartDate : undefined // Only pass if filtering
             };
 
             const { data } = await api.get('/items', { params });
