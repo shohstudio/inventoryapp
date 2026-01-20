@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { read, utils, writeFile } from 'xlsx';
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line, RiDeleteBinLine, RiQrCodeLine, RiCloseLine, RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiEditLine, RiMore2Fill, RiImage2Line, RiStackLine, RiFileExcel2Line, RiDeleteBinLine, RiQrCodeLine, RiCloseLine, RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
 import ItemModal from "../../components/admin/ItemModal";
 import WarehouseSelectionModal from "../../components/admin/WarehouseSelectionModal";
 import QRScannerModal from "../../components/admin/QRScannerModal";
@@ -589,9 +589,10 @@ const InventoryPage = () => {
 
                                         <button
                                             onClick={() => openModal(item)}
-                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                            className="p-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all"
+                                            title={t('edit_item')}
                                         >
-                                            <RiMore2Fill size={20} />
+                                            <RiEditLine size={18} />
                                         </button>
                                     </td>
                                 </tr>
