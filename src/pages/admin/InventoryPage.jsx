@@ -176,7 +176,7 @@ const InventoryPage = () => {
         }, 500); // 500ms delay for typing
 
         return () => clearTimeout(timer);
-    }, [searchQuery, filters]);
+    }, [searchQuery, filters, inventoryStartDate]);
 
     // Fetch on Page Change
     useEffect(() => {
