@@ -91,46 +91,38 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                 id = code.split('/items/')[1];
             } else if (code.trim() === '') {
                 setError("Iltimos, ID yoki INN kiriting");
-                return;
-            }
-
-            // Try to fetch by ID first, if fails maybe search?
-            // Simple logic: if numeric, try ID. If not, try search? 
-            // For now assume ID or INN search needs specific endpoint or filter?
-            // Let's rely on basic GET /items/:id first. If it fails, maybe code is INN?
-            // But API needs ID.
-            // Let's assume the user enters ID or scans QR containing ID.
-            // If manual input is INN, we need a search.
-
-            // If manual input (might be INN)
-            let endpoint = `/items/${id}`;
-            // Regex to check if purely numeric ID
-            if (!/^\d+$/.test(id)) {
-                // If not numeric, maybe it's INN?
-                // We need to SEARCH by INN. 
-                // api.get('/items', { params: { search: id } })
-                const { data } = await api.get('/items', { params: { search: id } });
-                if (data.items && data.items.length > 0) {
-                    setScannedItem(data.items[0]); // Pick first match
-                    setStep('verify');
-                    setVerificationStatus(data.items[0].status || 'working'); // Default to current status
-                } else {
-                    throw new Error("Jihoz topilmadi");
-                }
                 setLoading(false);
                 return;
             }
 
-            const { data } = await api.get(endpoint);
-            setScannedItem(data);
-            setVerificationStatus(data.status || 'working');
-            setStep('verify');
+            // Strategy: 
+            // 1. Try to get by ID directly (fastest, most common for QRs)
+            // 2. If 404/error, try to SEARCH by query (INN, Serial, etc.)
+
+            try {
+                // If it looks like a simple ID (small number), prioritize ID fetch
+                // But INN is also numeric. Start with ID fetch.
+                const { data } = await api.get(`/items/${id}`);
+                setScannedItem(data);
+                setVerificationStatus(data.status || 'working');
+                setStep('verify');
+            } catch (err) {
+                // If 404 or other error, fallback to SEARCH
+                console.log("ID fetch failed, trying search...");
+                const { data } = await api.get('/items', { params: { search: code } });
+
+                if (data.items && data.items.length > 0) {
+                    setScannedItem(data.items[0]); // Pick first match
+                    setVerificationStatus(data.items[0].status || 'working');
+                    setStep('verify');
+                } else {
+                    throw new Error("Jihoz topilmadi");
+                }
+            }
+
         } catch (err) {
             console.error(err);
             setError("Jihoz topilmadi. ID yoki INN noto'g'ri.");
-            if (step === 'scan') {
-                // Keep in scan mode to retry
-            }
         } finally {
             setLoading(false);
         }
@@ -261,8 +253,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                                     type="button"
                                     onClick={() => setVerificationStatus('working')}
                                     className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'working'
-                                            ? 'bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500'
-                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        ? 'bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500'
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                         }`}
                                 >
                                     🟢 Yaxshi
@@ -271,8 +263,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                                     type="button"
                                     onClick={() => setVerificationStatus('repair')}
                                     className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'repair'
-                                            ? 'bg-orange-50 border-orange-500 text-orange-700 ring-1 ring-orange-500'
-                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        ? 'bg-orange-50 border-orange-500 text-orange-700 ring-1 ring-orange-500'
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                         }`}
                                 >
                                     🟠 Ta'mir
@@ -281,8 +273,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                                     type="button"
                                     onClick={() => setVerificationStatus('broken')}
                                     className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'broken'
-                                            ? 'bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500'
-                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        ? 'bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500'
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                         }`}
                                 >
                                     🔴 Yomon
