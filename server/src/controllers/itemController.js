@@ -14,7 +14,9 @@ const getItems = async (req, res) => {
             building,
             location,
             assignedUserId,
-            isAssigned // 'unassigned', 'pending', 'all'
+            isAssigned, // 'unassigned', 'pending', 'all'
+            inventoryStatus,
+            inventoryStartDate
         } = req.query;
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
