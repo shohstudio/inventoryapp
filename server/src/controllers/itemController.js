@@ -653,6 +653,8 @@ const deleteManyItems = async (req, res) => {
 const verifyInventoryItem = async (req, res) => {
     try {
         const { id } = req.params;
+        const { status, notes } = req.body;
+
         const item = await prisma.item.findUnique({ where: { id: parseInt(id) } });
 
         if (!item) {
@@ -663,17 +665,17 @@ const verifyInventoryItem = async (req, res) => {
             lastCheckedAt: new Date()
         };
 
+        // Update status if provided
+        if (status) {
+            updateData.status = status;
+        }
+
         // If new image uploaded
         if (req.files && req.files.length > 0) {
-            // Assuming single image upload for verification usually, or replace main image?
-            // User asked: "new photo upload". Let's assume it replaces the main image to keep it current.
-            // Or we could store it in a history? For now, updating main image seems most practical for "current state".
-            const result = await cloudinary.uploader.upload(req.files[0].path);
-            updateData.image = result.secure_url;
-
-            // Clean up local file
-            const fs = require('fs');
-            fs.unlinkSync(req.files[0].path);
+            // Local file upload via Multer (already saved to server/uploads)
+            const file = req.files[0];
+            // Assuming static serve at /uploads
+            updateData.image = `/uploads/${file.filename}`;
         }
 
         const updatedItem = await prisma.item.update({
@@ -685,7 +687,11 @@ const verifyInventoryItem = async (req, res) => {
         await prisma.log.create({
             data: {
                 action: 'inventory_check',
-                details: `Inventarizatsiyadan o'tkazildi. Sana: ${new Date().toLocaleDateString()}`,
+                details: JSON.stringify({
+                    status: status || item.status,
+                    notes: notes || '',
+                    imageUpdated: !!(req.files && req.files.length > 0)
+                }),
                 userId: req.user.id,
                 itemId: updatedItem.id
             }

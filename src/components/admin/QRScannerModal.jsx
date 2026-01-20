@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
-import { RiCloseLine, RiCheckLine, RiCameraLine, RiLoader4Line } from "react-icons/ri";
+import { RiCloseLine, RiCheckLine, RiCameraLine, RiLoader4Line, RiSearchLine, RiInformationLine } from "react-icons/ri";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
 
@@ -11,7 +11,12 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
     const [imageFile, setImageFile] = useState(null);
     const [loading, setLoading] = useState(false);
     const [scannerId] = useState("reader-" + Math.random().toString(36).substr(2, 9));
+    const [manualInput, setManualInput] = useState("");
     const html5QrCodeRef = useRef(null);
+
+    // Verification Form State
+    const [verificationStatus, setVerificationStatus] = useState('working'); // 'working', 'broken', 'repair'
+    const [verificationNotes, setVerificationNotes] = useState("");
 
     // Reset state on open
     useEffect(() => {
@@ -20,6 +25,9 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
             setScannedItem(null);
             setImageFile(null);
             setError(null);
+            setManualInput("");
+            setVerificationStatus('working');
+            setVerificationNotes("");
         }
     }, [isOpen]);
 
@@ -75,26 +83,63 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
 
     const fetchItemDetails = async (code) => {
         setLoading(true);
+        setError(null);
         try {
             // Assume code is ID or URL ending with ID
-            // If URL like https://domain.com/items/123 -> extract 123
             let id = code;
             if (code.includes('/items/')) {
                 id = code.split('/items/')[1];
+            } else if (code.trim() === '') {
+                setError("Iltimos, ID yoki INN kiriting");
+                return;
             }
-            // Or if just number
 
-            const { data } = await api.get(`/items/${id}`);
+            // Try to fetch by ID first, if fails maybe search?
+            // Simple logic: if numeric, try ID. If not, try search? 
+            // For now assume ID or INN search needs specific endpoint or filter?
+            // Let's rely on basic GET /items/:id first. If it fails, maybe code is INN?
+            // But API needs ID.
+            // Let's assume the user enters ID or scans QR containing ID.
+            // If manual input is INN, we need a search.
+
+            // If manual input (might be INN)
+            let endpoint = `/items/${id}`;
+            // Regex to check if purely numeric ID
+            if (!/^\d+$/.test(id)) {
+                // If not numeric, maybe it's INN?
+                // We need to SEARCH by INN. 
+                // api.get('/items', { params: { search: id } })
+                const { data } = await api.get('/items', { params: { search: id } });
+                if (data.items && data.items.length > 0) {
+                    setScannedItem(data.items[0]); // Pick first match
+                    setStep('verify');
+                    setVerificationStatus(data.items[0].status || 'working'); // Default to current status
+                } else {
+                    throw new Error("Jihoz topilmadi");
+                }
+                setLoading(false);
+                return;
+            }
+
+            const { data } = await api.get(endpoint);
             setScannedItem(data);
+            setVerificationStatus(data.status || 'working');
             setStep('verify');
         } catch (err) {
-            setError("Jihoz topilmadi. QR kod noto'g'ri yoki bazada mavjud emas.");
-            setTimeout(() => {
-                setStep('scan'); // Auto retry
-                setError(null);
-            }, 3000);
+            console.error(err);
+            setError("Jihoz topilmadi. ID yoki INN noto'g'ri.");
+            if (step === 'scan') {
+                // Keep in scan mode to retry
+            }
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleManualSubmit = (e) => {
+        e.preventDefault();
+        if (manualInput) {
+            fetchItemDetails(manualInput);
         }
     };
 
@@ -106,11 +151,19 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
     const handleConfirm = async () => {
         if (!scannedItem) return;
 
+        // Validation
+        if (verificationStatus !== 'working' && !verificationNotes.trim()) {
+            toast.error("Izoh yozish majburiy!");
+            return;
+        }
+
         setLoading(true);
         const formData = new FormData();
         if (imageFile) {
             formData.append('images', imageFile);
         }
+        formData.append('status', verificationStatus);
+        formData.append('notes', verificationNotes);
 
         try {
             await api.post(`/items/${scannedItem.id}/verify-inventory`, formData, {
@@ -122,6 +175,9 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                 setStep('scan'); // Ready for next item
                 setScannedItem(null);
                 setImageFile(null);
+                setManualInput("");
+                setVerificationStatus("working");
+                setVerificationNotes("");
             }, 2000);
         } catch (err) {
             toast.error("Xatolik: " + (err.response?.data?.message || err.message));
@@ -134,7 +190,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in relative min-h-[400px] flex flex-col">
+            <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in relative min-h-[400px] flex flex-col max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 z-10 p-2 bg-black/10 hover:bg-black/20 text-gray-800 rounded-full transition-colors"
@@ -143,43 +199,121 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                 </button>
 
                 {step === 'scan' && (
-                    <div className="relative h-96 bg-black flex flex-col items-center justify-center">
-                        {error ? (
-                            <div className="text-white text-center p-6">
-                                <p className="text-red-400 mb-2 font-bold">Xatolik</p>
-                                <p>{error}</p>
-                                <button onClick={() => setStep('scan')} className="mt-4 btn btn-sm bg-white text-black">Qayta urinish</button>
-                            </div>
-                        ) : (
-                            <>
-                                <div id={scannerId} className="w-full h-full"></div>
-                                <div className="absolute inset-0 border-2 border-indigo-500/50 pointer-events-none">
-                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-2 border-indigo-400 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"></div>
+                    <div className="flex-1 flex flex-col">
+                        <div className="relative h-64 bg-black flex flex-col items-center justify-center shrink-0">
+                            {error ? (
+                                <div className="text-white text-center p-6">
+                                    <p className="text-red-400 mb-2 font-bold">Xatolik</p>
+                                    <p>{error}</p>
+                                    <button onClick={() => { setError(null); setManualInput(""); }} className="mt-4 btn btn-sm bg-white text-black">Qayta urinish</button>
                                 </div>
-                                <p className="absolute bottom-8 left-0 right-0 text-center text-white/80 text-sm font-medium">
-                                    Jihozning QR kodini skanerlang
-                                </p>
-                            </>
-                        )}
+                            ) : (
+                                <>
+                                    <div id={scannerId} className="w-full h-full"></div>
+                                    <div className="absolute inset-0 border-2 border-indigo-500/50 pointer-events-none">
+                                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-2 border-indigo-400 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"></div>
+                                    </div>
+                                    <p className="absolute bottom-4 left-0 right-0 text-center text-white/80 text-xs font-medium">
+                                        QR kodni skanerlang
+                                    </p>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="p-6 bg-white flex-1 flex flex-col justify-center">
+                            <form onSubmit={handleManualSubmit} className="flex flex-col gap-4">
+                                <div className="text-center mb-2">
+                                    <p className="text-sm text-gray-500">Yoki ID / INN raqamini kiriting</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={manualInput}
+                                        onChange={(e) => setManualInput(e.target.value)}
+                                        placeholder="ID yoki INN..."
+                                        className="form-input flex-1"
+                                    />
+                                    <button type="submit" className="btn btn-primary px-4" disabled={loading}>
+                                        {loading ? <RiLoader4Line className="animate-spin" /> : <RiSearchLine />}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 )}
 
                 {step === 'verify' && scannedItem && (
-                    <div className="p-6 flex flex-col items-center text-center">
-                        <h3 className="text-xl font-bold text-gray-900 mb-1">{scannedItem.name}</h3>
-                        <p className="text-sm text-gray-500 mb-6">{scannedItem.category} • {scannedItem.model}</p>
+                    <div className="p-6 flex flex-col gap-5">
+                        <div className="text-center border-b pb-4">
+                            <h3 className="text-xl font-bold text-gray-900">{scannedItem.name}</h3>
+                            <p className="text-sm text-gray-500 mt-1">{scannedItem.category} • {scannedItem.model}</p>
+                            <div className="flex justify-center gap-4 mt-2 text-xs text-gray-500">
+                                <span className="bg-gray-100 px-2 py-1 rounded">INN: {scannedItem.inn || 'Yo\'q'}</span>
+                                <span className="bg-gray-100 px-2 py-1 rounded">ID: {scannedItem.id}</span>
+                            </div>
+                        </div>
 
-                        <div className="w-full bg-gray-50 rounded-xl p-4 mb-6 border border-dashed border-gray-300">
+                        {/* Status Selection */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Holati</label>
+                            <div className="grid grid-cols-3 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setVerificationStatus('working')}
+                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'working'
+                                            ? 'bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500'
+                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    🟢 Yaxshi
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setVerificationStatus('repair')}
+                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'repair'
+                                            ? 'bg-orange-50 border-orange-500 text-orange-700 ring-1 ring-orange-500'
+                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    🟠 Ta'mir
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setVerificationStatus('broken')}
+                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'broken'
+                                            ? 'bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500'
+                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    🔴 Yomon
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Notes */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Izoh {verificationStatus !== 'working' && <span className="text-red-500">*</span>}
+                            </label>
+                            <textarea
+                                value={verificationNotes}
+                                onChange={(e) => setVerificationNotes(e.target.value)}
+                                placeholder={verificationStatus === 'working' ? "Ixtiyoriy izoh..." : "Nima nosozligi bor? Batafsil yozing..."}
+                                className="form-input w-full min-h-[80px]"
+                            />
+                        </div>
+
+                        {/* Image Upload */}
+                        <div className="bg-gray-50 rounded-xl p-4 border border-dashed border-gray-300">
                             {imageFile ? (
-                                <div className="relative h-48 w-full rounded-lg overflow-hidden">
+                                <div className="relative h-32 w-full rounded-lg overflow-hidden">
                                     <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover" />
                                     <button onClick={() => setImageFile(null)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"><RiCloseLine /></button>
                                 </div>
                             ) : (
-                                <label className="flex flex-col items-center justify-center h-48 cursor-pointer hover:bg-gray-100 transition-colors rounded-lg">
-                                    <RiCameraLine size={48} className="text-gray-400 mb-2" />
-                                    <span className="text-sm text-gray-600 font-medium">Yangi rasm yuklash</span>
-                                    <span className="text-xs text-gray-400 mt-1">Skaner qilinganidan keyin holati</span>
+                                <label className="flex flex-col items-center justify-center h-24 cursor-pointer hover:bg-gray-100 transition-colors rounded-lg">
+                                    <RiCameraLine size={32} className="text-gray-400 mb-1" />
+                                    <span className="text-xs text-gray-600 font-medium">Rasm yuklash</span>
                                     <input type="file" accept="image/*" className="hidden" onChange={handleVerifyFilter} capture="environment" />
                                 </label>
                             )}
@@ -187,8 +321,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
 
                         <button
                             onClick={handleConfirm}
-                            disabled={loading || !imageFile} // Require image? Maybe optional. User said "skaner qilgandean keyin jihoz haqida yangi rasm joylaydi". Let's verify instructions. "joylaydi" implies imperative. Let's make it optional but recommended? Or mandatory. User said "yangi rasm joylaydi va hammasi joyida ekanligini tasdiqlaydi". I'll make it mandatory to ensure verification quality.
-                            className={`btn w-full py-3 text-lg ${imageFile ? 'btn-primary shadow-lg shadow-indigo-200' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+                            disabled={loading || (verificationStatus !== 'working' && !verificationNotes.trim())}
+                            className={`btn w-full py-3 text-lg mt-2 ${loading ? 'opacity-75' : ''} btn-primary shadow-lg shadow-indigo-200`}
                         >
                             {loading ? <RiLoader4Line className="animate-spin mx-auto" /> : "Tasdiqlash va O'tkazish"}
                         </button>

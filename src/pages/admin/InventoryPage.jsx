@@ -345,14 +345,7 @@ const InventoryPage = () => {
                             </button>
                         </>
                     )}
-                    <button
-                        onClick={() => setShowQRScanner(true)}
-                        className="btn bg-gray-900 text-white shadow-lg hover:bg-gray-800"
-                        title="Inventarizatsiya Skaneri"
-                    >
-                        <RiQrCodeLine size={20} className="mr-2" />
-                        Skanerlash
-                    </button>
+
                     <button
                         onClick={() => setIsWarehouseModalOpen(true)}
                         className="btn bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 shadow-sm"
