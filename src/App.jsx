@@ -20,6 +20,7 @@ import RequestsPage from "./pages/admin/RequestsPage";
 import LogsPage from "./pages/admin/LogsPage";
 import InventoryDatesPage from "./pages/admin/InventoryDatesPage";
 import InventoryCheckPage from "./pages/admin/InventoryCheckPage";
+import InventoryReportPage from "./pages/admin/InventoryReportPage";
 import GuardDashboard from "./pages/guard/GuardDashboard";
 
 import { LanguageProvider } from "./context/LanguageContext";
@@ -42,6 +43,7 @@ function App() {
                 <Route path="warehouse" element={<WarehousePage />} />
                 <Route path="inventory-dates" element={<InventoryDatesPage />} />
                 <Route path="inventory-check" element={<InventoryCheckPage />} />
+                <Route path="reports" element={<InventoryReportPage />} />
                 <Route path="users" element={
                   <ProtectedRoute roles={["admin"]}>
                     <UsersPage />
