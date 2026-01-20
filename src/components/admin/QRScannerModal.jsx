@@ -146,12 +146,20 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
         setImageFiles(prev => prev.filter((_, i) => i !== index));
     };
 
+    const [selectedDepartment, setSelectedDepartment] = useState('RTTM');
+    const [customDepartment, setCustomDepartment] = useState('');
+
     const handleConfirm = async () => {
         if (!scannedItem) return;
 
         // Validation
         if (verificationStatus !== 'working' && !verificationNotes.trim()) {
             toast.error("Izoh yozish majburiy!");
+            return;
+        }
+
+        if (selectedDepartment === 'Boshqa' && !customDepartment.trim()) {
+            toast.error("Bo'lim nomini kiritish majburiy!");
             return;
         }
 
@@ -168,6 +176,9 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
         formData.append('status', verificationStatus);
         formData.append('notes', verificationNotes);
 
+        const outputDepartment = selectedDepartment === 'Boshqa' ? customDepartment : selectedDepartment;
+        formData.append('department', outputDepartment);
+
         try {
             await api.post(`/items/${scannedItem.id}/verify-inventory`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
@@ -181,6 +192,11 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                 setManualInput("");
                 setVerificationStatus("working");
                 setVerificationNotes("");
+                // Keep selected department as convenience, check user preference? 
+                // Maybe reset custom but keep selection if it's common.
+                // Resetting for safety.
+                setSelectedDepartment("RTTM");
+                setCustomDepartment("");
             }, 2000);
         } catch (err) {
             toast.error("Xatolik: " + (err.response?.data?.message || err.message));
@@ -286,6 +302,35 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                             )}
                         </div>
 
+
+                        {/* Department Selection */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Inventar o'tkazgan bo'lim</label>
+                            <div className="flex flex-wrap gap-2 mb-2">
+                                {['RTTM', 'Bino komendanti', 'Boshqa'].map((dept) => (
+                                    <button
+                                        key={dept}
+                                        type="button"
+                                        onClick={() => setSelectedDepartment(dept)}
+                                        className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${selectedDepartment === dept
+                                            ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
+                                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        {dept}
+                                    </button>
+                                ))}
+                            </div>
+                            {selectedDepartment === 'Boshqa' && (
+                                <input
+                                    type="text"
+                                    value={customDepartment}
+                                    onChange={(e) => setCustomDepartment(e.target.value)}
+                                    placeholder="Bo'lim nomini kiritng..."
+                                    className="form-input w-full"
+                                />
+                            )}
+                        </div>
 
                         {/* Status Selection */}
                         <div>

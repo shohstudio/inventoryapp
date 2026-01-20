@@ -653,7 +653,7 @@ const deleteManyItems = async (req, res) => {
 const verifyInventoryItem = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status, notes } = req.body;
+        const { status, notes, department } = req.body;
 
         const item = await prisma.item.findUnique({ where: { id: parseInt(id) } });
 
@@ -668,6 +668,14 @@ const verifyInventoryItem = async (req, res) => {
         // Update status if provided
         if (status) {
             updateData.status = status;
+        }
+
+        // Update department if provided
+        if (department) {
+            updateData.department = department;
+            // Also optionally update building if logic requires, but department is specific field now
+            // If the schema has both, we update department. 
+            // In schema: department String?
         }
 
         // If new images uploaded
