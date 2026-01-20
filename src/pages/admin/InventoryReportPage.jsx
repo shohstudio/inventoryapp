@@ -3,8 +3,10 @@ import { RiFileExcel2Line, RiSearchLine, RiLoader4Line, RiImage2Line, RiCalendar
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
 import * as XLSX from "xlsx";
+import { useLanguage } from "../../context/LanguageContext";
 
 const InventoryReportPage = () => {
+    const { t } = useLanguage();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
@@ -60,22 +62,22 @@ const InventoryReportPage = () => {
 
     const handleExportExcel = () => {
         if (items.length === 0) {
-            toast.error("Yuklash uchun ma'lumot yo'q");
+            toast.error(t('no_data'));
             return;
         }
 
         const dataToExport = items.map((item, index) => ({
-            "№": index + 1,
-            "Jihoz nomi": item.name,
-            "Model": item.model || "-",
-            "ID raqami": item.id,
-            "INN": item.inn || "-",
-            "Holati": item.status === 'working' ? 'Ishchi' :
-                item.status === 'repair' ? 'Ta\'mir talab' :
-                    item.status === 'broken' ? 'Yaroqsiz' : item.status,
-            "Tekshirilgan sana": new Date(item.lastCheckedAt).toLocaleDateString("ru-RU"),
-            "Inventar o'tkazgan bo'lim": item.department || item.building || "-",
-            "Rasm (Link)": item.image ? (window.location.origin + item.image) : "Rasm yo'q"
+            [t('order_number')]: index + 1,
+            [t('name')]: item.name,
+            [t('model')]: item.model || "-",
+            "ID": item.id,
+            [t('inn')]: item.inn || "-",
+            [t('status')]: item.status === 'working' ? t('status_working') :
+                item.status === 'repair' ? t('status_repair') :
+                    item.status === 'broken' ? t('status_broken') : item.status,
+            [t('checked_time')]: new Date(item.lastCheckedAt).toLocaleDateString("ru-RU"),
+            [t('department_checked')]: item.department || item.building || "-",
+            [t('image')]: item.image ? (window.location.origin + item.image) : "Rasm yo'q"
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -83,7 +85,6 @@ const InventoryReportPage = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Inventarizatsiya Hisoboti");
 
         // Auto-width columns
-        const max_width = dataToExport.reduce((w, r) => Math.max(w, r["Jihoz nomi"].length), 10);
         worksheet["!cols"] = [
             { wch: 5 }, // No
             { wch: 30 }, // Name
@@ -112,14 +113,14 @@ const InventoryReportPage = () => {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                         <RiCalendarCheckLine className="text-indigo-600" />
-                        Inventarizatsiya Hisoboti
+                        {t('report_title')}
                     </h1>
                     <p className="text-gray-500 mt-1">
-                        Jami tekshirilgan jihozlar: <span className="font-bold text-gray-900">{items.length} ta</span>
+                        {t('total_checked')}: <span className="font-bold text-gray-900">{items.length}</span>
                     </p>
                     {inventoryStartDate && (
                         <p className="text-xs text-indigo-500 mt-1 font-medium bg-indigo-50 inline-block px-2 py-1 rounded">
-                            {new Date(inventoryStartDate).toLocaleDateString("ru-RU")} dan keyingi tekshiruvlar
+                            {t('checked_after').replace('{date}', new Date(inventoryStartDate).toLocaleDateString("ru-RU"))}
                         </p>
                     )}
                 </div>
@@ -131,7 +132,7 @@ const InventoryReportPage = () => {
                         disabled={items.length === 0}
                     >
                         <RiFileExcel2Line size={20} />
-                        Excelga yuklash
+                        {t('export_excel')}
                     </button>
                 </div>
             </div>
@@ -142,7 +143,7 @@ const InventoryReportPage = () => {
                     <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input
                         type="text"
-                        placeholder="Qidirish (Nomi, ID, INN)..."
+                        placeholder={t('search_placeholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="form-input pl-10 w-full"
@@ -157,12 +158,12 @@ const InventoryReportPage = () => {
                         <thead>
                             <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold tracking-wider">
                                 <th className="p-4 w-16 text-center">#</th>
-                                <th className="p-4">Jihoz</th>
-                                <th className="p-4">ID / INN</th>
-                                <th className="p-4">Holati</th>
-                                <th className="p-4">Tekshirilgan vaqti</th>
-                                <th className="p-4">Inventar o'tkazgan bo'lim</th>
-                                <th className="p-4 text-center">Rasm</th>
+                                <th className="p-4">{t('name')}</th>
+                                <th className="p-4">ID / {t('inn')}</th>
+                                <th className="p-4">{t('status')}</th>
+                                <th className="p-4">{t('checked_time')}</th>
+                                <th className="p-4">{t('department_checked')}</th>
+                                <th className="p-4 text-center">{t('image')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -171,14 +172,14 @@ const InventoryReportPage = () => {
                                     <td colSpan="7" className="p-8 text-center text-gray-500">
                                         <div className="flex items-center justify-center gap-2">
                                             <RiLoader4Line className="animate-spin" size={24} />
-                                            Yuklanmoqda...
+                                            {t('loading')}
                                         </div>
                                     </td>
                                 </tr>
                             ) : filteredItems.length === 0 ? (
                                 <tr>
                                     <td colSpan="7" className="p-8 text-center text-gray-500">
-                                        {inventoryStartDate ? "Muvofiq jihozlar topilmadi" : "Ma'lumot yo'q"}
+                                        {inventoryStartDate ? t('no_matching_items') : t('no_data')}
                                     </td>
                                 </tr>
                             ) : (
@@ -200,8 +201,8 @@ const InventoryReportPage = () => {
                                                 item.status === 'repair' ? 'bg-orange-50 text-orange-700 border-orange-200' :
                                                     'bg-red-50 text-red-700 border-red-200'
                                                 }`}>
-                                                {item.status === 'working' ? 'Ishchi' :
-                                                    item.status === 'repair' ? 'Ta\'mir talab' : 'Yaroqsiz'}
+                                                {item.status === 'working' ? t('status_working') :
+                                                    item.status === 'repair' ? t('status_repair') : t('status_broken')}
                                             </span>
                                         </td>
                                         <td className="p-4">

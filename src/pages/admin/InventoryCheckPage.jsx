@@ -19,8 +19,8 @@ const InventoryCheckPage = () => {
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Inventarizatsiyadan o'tkazish</h1>
-                    <p className="text-gray-500 mt-1">Jihozlarni skaner qiling va tasdiqlang</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('scan_title')}</h1>
+                    <p className="text-gray-500 mt-1">{t('scan_subtitle')}</p>
                 </div>
             </div>
 
@@ -32,9 +32,9 @@ const InventoryCheckPage = () => {
                     <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <RiQrCodeLine size={64} />
                     </div>
-                    <h2 className="text-3xl font-bold mb-2">Skanerlash</h2>
+                    <h2 className="text-3xl font-bold mb-2">{t('scan_card_title')}</h2>
                     <p className="text-indigo-200 text-center max-w-xs">
-                        Kamerani ishga tushirish uchun bosing
+                        {t('scan_card_desc')}
                     </p>
                 </div>
 
@@ -43,24 +43,24 @@ const InventoryCheckPage = () => {
                     <div className="card bg-white border border-indigo-100 p-6">
                         <h3 className="flex items-center gap-2 font-bold text-gray-900 mb-4">
                             <RiCheckDoubleLine className="text-green-500" size={24} />
-                            Ko'rsatmalar
+                            {t('instructions_title')}
                         </h3>
                         <ul className="space-y-3 text-gray-600 text-sm">
                             <li className="flex gap-3">
                                 <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">1</span>
-                                Jihozning QR kodini kameraga to'g'rilang
+                                {t('instruction_1')}
                             </li>
                             <li className="flex gap-3">
                                 <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">2</span>
-                                Jihoz ma'lumotlari chiqqach, uning holatini tekshiring
+                                {t('instruction_2')}
                             </li>
                             <li className="flex gap-3">
                                 <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">3</span>
-                                "Yangi rasm yuklash" orqali jihozning hozirgi holatini rasmga oling
+                                {t('instruction_3')}
                             </li>
                             <li className="flex gap-3">
                                 <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">4</span>
-                                "Tasdiqlash" tugmasini bosing
+                                {t('instruction_4')}
                             </li>
                         </ul>
                     </div>
@@ -71,9 +71,9 @@ const InventoryCheckPage = () => {
                                 <RiFileList3Line size={24} />
                             </div>
                             <div>
-                                <h4 className="font-bold text-blue-900">Eslatma</h4>
+                                <h4 className="font-bold text-blue-900">{t('note_title')}</h4>
                                 <p className="text-sm text-blue-700 mt-1">
-                                    Inventarizatsiyadan o'tgan jihozlar avtomatik tarzda "O'tdi" statusini oladi va sanasi yangilanadi.
+                                    {t('note_desc')}
                                 </p>
                             </div>
                         </div>

@@ -25,17 +25,17 @@ const InventoryDatesPage = () => {
 
     const handleSave = async () => {
         if (!startDate || !endDate) {
-            toast.error("Boshlash va tugash sanasini kiriting");
+            toast.error(t('enter_dates_error'));
             return;
         }
 
         setLoading(true);
         try {
             await api.post('/settings/inventory-dates', { startDate, endDate });
-            toast.success("Sanalar saqlandi va barchaga yuborildi");
+            toast.success(t('dates_saved'));
         } catch (error) {
             console.error("Error saving dates", error);
-            toast.error("Saqlashda xatolik yuz berdi");
+            toast.error(t('error_saving')); // Make sure this key exists or use generic
         } finally {
             setLoading(false);
         }
@@ -55,14 +55,14 @@ const InventoryDatesPage = () => {
                         <RiCalendarLine size={24} />
                     </div>
                     <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Invertarizatsiya davri</h3>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">{t('inventory_dates_title')}</h3>
                         <p className="text-gray-500 text-sm mb-6">
-                            Belgilangan sanalar oralig'ida tizimda invertarizatsiya o'tkazilayotgani haqida barcha foydalanuvchilarga ogohlantirish ko'rsatiladi.
+                            {t('inventory_dates_desc')}
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Boshlash sanasi</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('start_date')}</label>
                                 <input
                                     type="date"
                                     className="input w-full"
@@ -71,7 +71,7 @@ const InventoryDatesPage = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Tugash sanasi</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('end_date')}</label>
                                 <input
                                     type="date"
                                     className="input w-full"
@@ -88,7 +88,7 @@ const InventoryDatesPage = () => {
                                 className="btn btn-primary gap-2"
                             >
                                 <RiSave3Line size={20} />
-                                {loading ? "Saqlanmoqda..." : "Saqlash va E'lon qilish"}
+                                {loading ? t('saving') : t('save_and_publish')}
                             </button>
                         </div>
                     </div>

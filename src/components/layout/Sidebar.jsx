@@ -14,13 +14,13 @@ const Sidebar = ({ isOpen, onClose }) => {
         { name: t('inventory'), path: "/admin/inventory", icon: <RiBox3Line size={20} /> },
         { name: t('warehouse'), path: "/admin/warehouse", icon: <RiArchiveLine size={20} /> },
         { name: t('inventory_dates'), path: "/admin/inventory-dates", icon: <RiCalendarLine size={20} /> },
-        { name: "Inventarizatsiyadan o'tkazish", path: "/admin/inventory-check", icon: <RiQrScan2Line size={20} /> },
-        { name: "Hisobot", path: "/admin/reports", icon: <RiFileChartLine size={20} /> },
+        { name: t('inventory_check'), path: "/admin/inventory-check", icon: <RiQrScan2Line size={20} /> },
+        { name: t('report'), path: "/admin/reports", icon: <RiFileChartLine size={20} /> },
         // Only show Users link to admin
         ...(user?.role === 'admin' ? [{ name: t('users'), path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
-        ...(['admin', 'accounter', 'warehouseman'].includes(user?.role) ? [{ name: "So'rovlar", path: "/admin/requests", icon: <RiFileList3Line size={20} /> }] : []),
-        ...(user?.role === 'admin' ? [{ name: "Loglar (Tarix)", path: "/admin/logs", icon: <RiHistoryLine size={20} /> }] : []),
-        ...(user?.role === 'guard' ? [{ name: "Qoravul Paneli", path: "/guard", icon: <RiShieldLine size={20} /> }] : []),
+        ...(['admin', 'accounter', 'warehouseman'].includes(user?.role) ? [{ name: t('requests'), path: "/admin/requests", icon: <RiFileList3Line size={20} /> }] : []),
+        ...(user?.role === 'admin' ? [{ name: t('logs'), path: "/admin/logs", icon: <RiHistoryLine size={20} /> }] : []),
+        ...(user?.role === 'guard' ? [{ name: t('guard_panel'), path: "/guard", icon: <RiShieldLine size={20} /> }] : []),
         { name: t('profile'), path: user?.role === 'employee' ? "/employee/profile" : (user?.role === 'guard' ? "/guard/profile" : "/admin/profile"), icon: <RiUserSettingsLine size={20} /> },
     ];
 
@@ -72,7 +72,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     className="flex items-center gap-3 w-full px-4 py-3 text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-xl transition-colors font-medium"
                 >
                     <RiLogoutBoxLine size={20} />
-                    <span>Chiqish</span>
+                    <span>{t('logout')}</span>
                 </button>
             </div>
         </div>

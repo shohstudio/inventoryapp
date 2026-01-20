@@ -7,6 +7,12 @@ export const translations = {
         users: "Foydalanuvchilar",
         inventory_dates: "Invertardan o'tkazish sanasi",
         profile: "Profil",
+        inventory_check: "Inventarizatsiyadan o'tkazish",
+        report: "Hisobot",
+        requests: "So'rovlar",
+        logs: "Loglar (Tarix)",
+        guard_panel: "Qoravul Paneli",
+        logout: "Chiqish",
 
         // General
         search: "Qidirish...",
@@ -74,6 +80,48 @@ export const translations = {
         select_from_warehouse: "Ombordan jihoz tanlash",
         available: "mavjud",
 
+        // Warehouse Page
+        warehouse_filter_all: "Barchasi",
+        warehouse_filter_unassigned: "Birikmaganlar",
+        warehouse_filter_pending: "Kutilayotganlar",
+        warehouse_delete_selected: "Tanlanganlarni o'chirish",
+        warehouse_no_items: "Omborda jihozlar yo'q",
+        warehouse_item_added: "Jihoz omborga qo'shildi",
+        warehouse_item_updated: "Jihoz yangilandi",
+        warehouse_items_deleted: "Jihozlar muvaffaqiyatli o'chirildi",
+        confirm_delete_many: "Tanlangan {count} ta jihozni o'chirib yuborishni tasdiqlaysizmi?",
+
+        // Inventory Dates Page
+        inventory_dates_title: "Invertarizatsiya davri",
+        inventory_dates_desc: "Belgilangan sanalar oralig'ida tizimda invertarizatsiya o'tkazilayotgani haqida barcha foydalanuvchilarga ogohlantirish ko'rsatiladi.",
+        start_date: "Boshlash sanasi",
+        end_date: "Tugash sanasi",
+        save_and_publish: "Saqlash va E'lon qilish",
+        saving: "Saqlanmoqda...",
+        dates_saved: "Sanalar saqlandi va barchaga yuborildi",
+        enter_dates_error: "Boshlash va tugash sanasini kiriting",
+
+        // Inventory Check Page
+        scan_title: "Inventarizatsiyadan o'tkazish",
+        scan_subtitle: "Jihozlarni skaner qiling va tasdiqlang",
+        scan_card_title: "Skanerlash",
+        scan_card_desc: "Kamerani ishga tushirish uchun bosing",
+        instructions_title: "Ko'rsatmalar",
+        instruction_1: "Jihozning QR kodini kameraga to'g'rilang",
+        instruction_2: "Jihoz ma'lumotlari chiqqach, uning holatini tekshiring",
+        instruction_3: "\"Yangi rasm yuklash\" orqali jihozning hozirgi holatini rasmga oling",
+        instruction_4: "\"Tasdiqlash\" tugmasini bosing",
+        note_title: "Eslatma",
+        note_desc: "Inventarizatsiyadan o'tgan jihozlar avtomatik tarzda \"O'tdi\" statusini oladi va sanasi yangilanadi.",
+
+        // Inventory Report Page
+        report_title: "Inventarizatsiya Hisoboti",
+        total_checked: "Jami tekshirilgan jihozlar",
+        checked_after: "{date} dan keyingi tekshiruvlar",
+        checked_time: "Tekshirilgan vaqti",
+        department_checked: "Inventar o'tkazgan bo'lim",
+        no_matching_items: "Muvofiq jihozlar topilmadi",
+
         // Dashboard
         total_items: "Jami jihozlar",
         total_value: "Umumiy qiymat",
@@ -118,6 +166,12 @@ export const translations = {
         users: "Фойдаланувчилар",
         inventory_dates: "Инвертардан ўтказиш санаси",
         profile: "Профиль",
+        inventory_check: "Инвентаризациядан ўтказиш",
+        report: "Ҳисобот",
+        requests: "Сўровлар",
+        logs: "Логлар (Тарих)",
+        guard_panel: "Қоровул панели",
+        logout: "Чиқиш",
 
         // General
         search: "Қидириш...",
@@ -185,6 +239,48 @@ export const translations = {
         select_from_warehouse: "Омбордан жиҳоз танлаш",
         available: "мавжуд",
 
+        // Warehouse Page
+        warehouse_filter_all: "Барчаси",
+        warehouse_filter_unassigned: "Бирикмаганлар",
+        warehouse_filter_pending: "Кутилаётганлар",
+        warehouse_delete_selected: "Танланганларни ўчириш",
+        warehouse_no_items: "Омборда жиҳозлар йўқ",
+        warehouse_item_added: "Жиҳоз омборга қўшилди",
+        warehouse_item_updated: "Жиҳоз янгиланди",
+        warehouse_items_deleted: "Жиҳозлар муваффақиятли ўчирилди",
+        confirm_delete_many: "Танланган {count} та жиҳозни ўчириб юборишни тасдиқлайсизми?",
+
+        // Inventory Dates Page
+        inventory_dates_title: "Инвертаризация даври",
+        inventory_dates_desc: "Белгиланган саналар оралиғида тизимда инвертаризация ўтказилаётгани ҳақида барча фойдаланувчиларга огоҳлантириш кўрсатилади.",
+        start_date: "Бошлаш санаси",
+        end_date: "Тугаш санаси",
+        save_and_publish: "Сақлаш ва Эълон қилиш",
+        saving: "Сақланмоқда...",
+        dates_saved: "Саналар сақланди ва барчага юборилди",
+        enter_dates_error: "Бошлаш ва тугаш санасини киритинг",
+
+        // Inventory Check Page
+        scan_title: "Инвентаризациядан ўтказиш",
+        scan_subtitle: "Жиҳозларни сканер қилинг ва тасдиқланг",
+        scan_card_title: "Сканерлаш",
+        scan_card_desc: "Камерани ишга тушириш учун босинг",
+        instructions_title: "Кўрсатмалар",
+        instruction_1: "Жиҳознинг QR кодини камерага тўғриланг",
+        instruction_2: "Жиҳоз маълумотлари чиққач, унинг ҳолатини текширинг",
+        instruction_3: "\"Янги расм юклаш\" орқали жиҳознинг ҳозирги ҳолатини расмга олинг",
+        instruction_4: "\"Тасдиқлаш\" тугмасини босинг",
+        note_title: "Эслатма",
+        note_desc: "Инвентаризациядан ўтган жиҳозлар автоматик тарзда \"Ўтди\" статусини олади ва санаси янгиланади.",
+
+        // Inventory Report Page
+        report_title: "Инвентаризация Ҳисоботи",
+        total_checked: "Жами текширилган жиҳозлар",
+        checked_after: "{date} дан кейинги текширувлар",
+        checked_time: "Текширилган вақти",
+        department_checked: "Инвентар ўтказган бўлим",
+        no_matching_items: "Мувофиқ жиҳозлар топилмади",
+
         // Dashboard
         total_items: "Жами жиҳозлар",
         total_value: "Умумий қиймат",
@@ -229,6 +325,12 @@ export const translations = {
         users: "Пользователи",
         inventory_dates: "Дата инвентаризации",
         profile: "Профиль",
+        inventory_check: "Проверка инвентаря",
+        report: "Отчет",
+        requests: "Запросы",
+        logs: "Логи (История)",
+        guard_panel: "Панель охраны",
+        logout: "Выйти",
 
         // General
         search: "Поиск...",
@@ -295,6 +397,48 @@ export const translations = {
         // Attach Modal
         select_from_warehouse: "Выбрать со склада",
         available: "доступно",
+
+        // Warehouse Page
+        warehouse_filter_all: "Все",
+        warehouse_filter_unassigned: "Нераспределенные",
+        warehouse_filter_pending: "Ожидающие",
+        warehouse_delete_selected: "Удалить выбранные",
+        warehouse_no_items: "На складе нет оборудования",
+        warehouse_item_added: "Оборудование добавлено на склад",
+        warehouse_item_updated: "Оборудование обновлено",
+        warehouse_items_deleted: "Оборудование успешно удалено",
+        confirm_delete_many: "Вы уверены, что хотите удалить выбранные {count} элементов?",
+
+        // Inventory Dates Page
+        inventory_dates_title: "Период инвентаризации",
+        inventory_dates_desc: "Уведомление о проведении инвентаризации в системе в указанные даты будет показано всем пользователям.",
+        start_date: "Дата начала",
+        end_date: "Дата окончания",
+        save_and_publish: "Сохранить и опубликовать",
+        saving: "Сохранение...",
+        dates_saved: "Даты сохранены и отправлены всем",
+        enter_dates_error: "Введите дату начала и окончания",
+
+        // Inventory Check Page
+        scan_title: "Проведение инвентаризации",
+        scan_subtitle: "Сканируйте оборудование и подтверждайте",
+        scan_card_title: "Сканировать",
+        scan_card_desc: "Нажмите, чтобы запустить камеру",
+        instructions_title: "Инструкции",
+        instruction_1: "Наведите камеру на QR-код оборудования",
+        instruction_2: "Когда появятся данные оборудования, проверьте его состояние",
+        instruction_3: "Сфотографируйте текущее состояние, нажав «Загрузить новое фото»",
+        instruction_4: "Нажмите кнопку «Подтвердить»",
+        note_title: "Примечание",
+        note_desc: "Оборудование, прошедшее инвентаризацию, автоматически получает статус «Прошел», и дата обновляется.",
+
+        // Inventory Report Page
+        report_title: "Отчет инвентаризации",
+        total_checked: "Всего проверено",
+        checked_after: "Проверки после {date}",
+        checked_time: "Время проверки",
+        department_checked: "Отдел, проводивший инвентаризацию",
+        no_matching_items: "Подходящее оборудование не найдено",
 
         // Dashboard
         total_items: "Всего оборудования",

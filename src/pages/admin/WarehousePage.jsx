@@ -113,13 +113,13 @@ const WarehousePage = () => {
                 await api.put(`/items/${selectedItem.id}`, formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                toast.success("Jihoz yangilandi");
+                toast.success(t('warehouse_item_updated'));
             } else {
                 // Create
                 await api.post('/items', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
-                toast.success("Jihoz omborga qo'shildi");
+                toast.success(t('warehouse_item_added'));
             }
             fetchItems();
             setIsModalOpen(false);
@@ -161,12 +161,12 @@ const WarehousePage = () => {
     };
 
     const handleBulkDelete = async () => {
-        if (!window.confirm(`Tanlangan ${selectedItems.size} ta jihozni o'chirib yuborishni tasdiqlaysizmi?`)) return;
+        if (!window.confirm(t('confirm_delete_many').replace('{count}', selectedItems.size))) return;
 
         setIsDeleting(true);
         try {
             await api.post('/items/delete-many', { ids: Array.from(selectedItems) });
-            toast.success("Jihozlar muvaffaqiyatli o'chirildi");
+            toast.success(t('warehouse_items_deleted'));
             setSelectedItems(new Set());
             fetchItems();
         } catch (error) {
@@ -222,7 +222,7 @@ const WarehousePage = () => {
                             disabled={isDeleting}
                         >
                             <RiDeleteBinLine size={20} />
-                            Tanlanganlarni o'chirish ({selectedItems.size})
+                            {t('warehouse_delete_selected')} ({selectedItems.size})
                         </button>
                     )}
                     <button
@@ -256,19 +256,19 @@ const WarehousePage = () => {
                                 onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'all' }))}
                                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'all' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
-                                Barchasi
+                                {t('warehouse_filter_all')}
                             </button>
                             <button
                                 onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'unassigned' }))}
                                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'unassigned' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
-                                Birikmaganlar
+                                {t('warehouse_filter_unassigned')}
                             </button>
                             <button
                                 onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'pending' }))}
                                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'pending' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                             >
-                                Kutilayotganlar
+                                {t('warehouse_filter_pending')}
                             </button>
                         </div>
                     </div>
@@ -330,12 +330,12 @@ const WarehousePage = () => {
                                     />
                                 </th>
                                 <th className="py-4 px-6 font-semibold text-sm">ID</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Nomi / Model</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Mas'ul (Holat)</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Kafolat</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Narxi</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Rasm</th>
-                                <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">Amallar</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('name')} / {t('model')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('assigned_to')} ({t('status')})</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('warranty')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('price')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('image')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -361,22 +361,22 @@ const WarehousePage = () => {
                                         ) : (item.requests && item.requests.length > 0) ? (
                                             <div className="flex flex-col">
                                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                    Jaroyonda: {item.requests[0].targetUser?.name}
+                                                    {t('warehouse_filter_pending')}: {item.requests[0].targetUser?.name}
                                                 </span>
                                             </div>
                                         ) : item.initialOwner ? (
                                             <div className="flex flex-col">
-                                                <span className="text-orange-500 text-sm font-medium">Biriktirilmagan</span>
+                                                <span className="text-orange-500 text-sm font-medium">{t('warehouse_filter_unassigned')}</span>
                                                 <span className="text-xs text-gray-400">({item.initialOwner})</span>
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400 italic">Omborda</span>
+                                            <span className="text-gray-400 italic">{t('in_warehouse')}</span>
                                         )}
                                     </td>
                                     <td className="py-4 px-6">
                                         {/* Warranty not always in API? Using arrivalDate/ManufactureYear as proxy if needed, or check schema if warranty field exists. Schema didn't show warranty field, only purchaseDate. Let's assume frontend handled this loosely. */}
                                         <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
-                                            {item.condition || 'Yangi'}
+                                            {item.condition || t('status_new')}
                                         </span>
                                     </td>
                                     <td className="py-4 px-6 text-gray-900 font-bold">{parseFloat(item.price).toLocaleString()} so'm</td>
@@ -420,7 +420,7 @@ const WarehousePage = () => {
                             {filteredItems.length === 0 && (
                                 <tr>
                                     <td colSpan="10" className="text-center py-8 text-gray-500">
-                                        Omborda jihozlar yo'q
+                                        {t('warehouse_no_items')}
                                     </td>
                                 </tr>
                             )}
