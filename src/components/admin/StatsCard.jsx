@@ -17,7 +17,7 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", on
             <div className="p-6 relative z-10">
                 <div className="flex justify-between items-start mb-4 gap-2">
                     <p className={clsx(
-                        "text-sm font-semibold tracking-wide flex-1 break-words",
+                        "text-sm font-semibold tracking-wide flex-1 break-words min-w-0",
                         isFeatured ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400"
                     )}>{title}</p>
                     {isFeatured && (
