@@ -39,6 +39,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         "4-bino Mash tex",
         "5-bino qurilish"
     ];
+    const roles = [
+        "Rektor",
+        "Prorektor",
+        "Dekan",
+        "Kafedra mudiri",
+        "Bo'lim boshlig'i",
+        "Markaz direktori",
+        "Bino komendanti",
+        "Hisobchi"
+    ];
 
     useEffect(() => {
         setErrors({}); // Reset errors on open
@@ -102,7 +112,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 price: initialData?.price ? initialData.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") : "",
                 status: "working",
                 assignedTo: "",
-                assignedRole: "",
+                assignedRole: roles[4], // Default to "Bo'lim boshlig'i" as it seems most common, or roles[0]
                 assignedPINFL: "",
                 images: [], // Start empty for new items, or parse initialData if needed
                 pdf: null
@@ -455,14 +465,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                             </div>
                             <div>
                                 <label className="label">Lavozimi <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
+                                <select
                                     name="assignedRole"
                                     className={`input bg-white ${errors.assignedRole ? 'border-red-500 ring-red-500' : ''}`}
-                                    value={formData.assignedRole}
+                                    value={roles.includes(formData.assignedRole) ? formData.assignedRole : roles[0]}
                                     onChange={handleChange}
-                                    placeholder="Hisobchi"
-                                />
+                                >
+                                    {roles.map(role => (
+                                        <option key={role} value={role}>{role}</option>
+                                    ))}
+                                </select>
                                 {errors.assignedRole && <span className="text-red-500 text-xs mt-1 block">{errors.assignedRole}</span>}
                             </div>
                             <div>
