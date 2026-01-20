@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
-import { RiCloseLine, RiCheckLine, RiCameraLine, RiLoader4Line, RiSearchLine, RiInformationLine, RiDeleteBinLine } from "react-icons/ri";
+import { RiCloseLine, RiCheckLine, RiCameraLine, RiLoader4Line, RiSearchLine, RiInformationLine } from "react-icons/ri";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
 
@@ -12,7 +12,6 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
     const [loading, setLoading] = useState(false);
     const [scannerId] = useState("reader-" + Math.random().toString(36).substr(2, 9));
     const [manualInput, setManualInput] = useState("");
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const html5QrCodeRef = useRef(null);
 
     // Verification Form State
@@ -29,7 +28,6 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
             setManualInput("");
             setVerificationStatus('working');
             setVerificationNotes("");
-            setShowDeleteConfirm(false);
         }
     }, [isOpen]);
 
@@ -180,22 +178,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
         }
     };
 
-    const handleDeleteItem = async () => {
-        if (!scannedItem) return;
-        setLoading(true);
-        try {
-            await api.delete(`/items/${scannedItem.id}`);
-            toast.success("Jihoz o'chirildi");
-            setStep('scan');
-            setScannedItem(null);
-            setShowDeleteConfirm(false);
-            onScanSuccess && onScanSuccess("deleted"); // Optional refresh logic
-        } catch (err) {
-            toast.error("Xatolik: " + (err.response?.data?.message || err.message));
-        } finally {
-            setLoading(false);
-        }
-    };
+
 
     if (!isOpen) return null;
 
@@ -285,113 +268,81 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                             )}
                         </div>
 
-                        {/* Delete Option */}
-                        <div className="flex justify-end mb-2">
-                            <button
-                                type="button"
-                                onClick={() => setShowDeleteConfirm(true)}
-                                className="text-red-500 text-sm hover:text-red-700 flex items-center gap-1 transition-colors"
-                            >
-                                <RiDeleteBinLine size={16} /> Jihozni o'chirish
-                            </button>
+
+                        {/* Status Selection */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Holati</label>
+                            <div className="grid grid-cols-3 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setVerificationStatus('working')}
+                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'working'
+                                        ? 'bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500'
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    🟢 Yaxshi
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setVerificationStatus('repair')}
+                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'repair'
+                                        ? 'bg-orange-50 border-orange-500 text-orange-700 ring-1 ring-orange-500'
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    🟠 Ta'mir
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setVerificationStatus('broken')}
+                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'broken'
+                                        ? 'bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500'
+                                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    🔴 Yomon
+                                </button>
+                            </div>
                         </div>
 
-                        {showDeleteConfirm ? (
-                            <div className="p-6 bg-red-50 rounded-xl border border-red-100 animate-in zoom-in-95 mb-6">
-                                <p className="text-red-800 font-medium text-center mb-4 text-lg">Haqiqatan ham bu jihozni o'chirmoqchimisiz?</p>
-                                <div className="flex gap-4">
-                                    <button
-                                        onClick={() => setShowDeleteConfirm(false)}
-                                        className="btn flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 py-3 rounded-xl"
-                                    >
-                                        Bekor qilish
-                                    </button>
-                                    <button
-                                        onClick={handleDeleteItem}
-                                        className="btn flex-1 bg-red-600 hover:bg-red-700 text-white py-3 rounded-xl shadow-lg shadow-red-200"
-                                        disabled={loading}
-                                    >
-                                        {loading ? "O'chirilmoqda..." : "Ha, o'chirish"}
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                {/* Status Selection */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Holati</label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setVerificationStatus('working')}
-                                            className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'working'
-                                                ? 'bg-green-50 border-green-500 text-green-700 ring-1 ring-green-500'
-                                                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                                                }`}
-                                        >
-                                            🟢 Yaxshi
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setVerificationStatus('repair')}
-                                            className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'repair'
-                                                ? 'bg-orange-50 border-orange-500 text-orange-700 ring-1 ring-orange-500'
-                                                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                                                }`}
-                                        >
-                                            🟠 Ta'mir
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setVerificationStatus('broken')}
-                                            className={`p-3 rounded-lg border text-sm font-medium transition-all ${verificationStatus === 'broken'
-                                                ? 'bg-red-50 border-red-500 text-red-700 ring-1 ring-red-500'
-                                                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
-                                                }`}
-                                        >
-                                            🔴 Yomon
-                                        </button>
-                                    </div>
-                                </div>
+                        {/* Notes */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Izoh {verificationStatus !== 'working' && <span className="text-red-500">*</span>}
+                            </label>
+                            <textarea
+                                value={verificationNotes}
+                                onChange={(e) => setVerificationNotes(e.target.value)}
+                                placeholder={verificationStatus === 'working' ? "Ixtiyoriy izoh..." : "Nima nosozligi bor? Batafsil yozing..."}
+                                className="form-input w-full min-h-[80px]"
+                            />
+                        </div>
 
-                                {/* Notes */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Izoh {verificationStatus !== 'working' && <span className="text-red-500">*</span>}
-                                    </label>
-                                    <textarea
-                                        value={verificationNotes}
-                                        onChange={(e) => setVerificationNotes(e.target.value)}
-                                        placeholder={verificationStatus === 'working' ? "Ixtiyoriy izoh..." : "Nima nosozligi bor? Batafsil yozing..."}
-                                        className="form-input w-full min-h-[80px]"
-                                    />
+                        {/* Image Upload */}
+                        <div className="bg-gray-50 rounded-xl p-4 border border-dashed border-gray-300">
+                            {imageFile ? (
+                                <div className="relative h-32 w-full rounded-lg overflow-hidden">
+                                    <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover" />
+                                    <button onClick={() => setImageFile(null)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"><RiCloseLine /></button>
                                 </div>
+                            ) : (
+                                <label className="flex flex-col items-center justify-center h-24 cursor-pointer hover:bg-gray-100 transition-colors rounded-lg">
+                                    <RiCameraLine size={32} className="text-gray-400 mb-1" />
+                                    <span className="text-xs text-gray-600 font-medium">Rasm yuklash</span>
+                                    <input type="file" accept="image/*" className="hidden" onChange={handleVerifyFilter} capture="environment" />
+                                </label>
+                            )}
+                        </div>
 
-                                {/* Image Upload */}
-                                <div className="bg-gray-50 rounded-xl p-4 border border-dashed border-gray-300">
-                                    {imageFile ? (
-                                        <div className="relative h-32 w-full rounded-lg overflow-hidden">
-                                            <img src={URL.createObjectURL(imageFile)} alt="Preview" className="w-full h-full object-cover" />
-                                            <button onClick={() => setImageFile(null)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"><RiCloseLine /></button>
-                                        </div>
-                                    ) : (
-                                        <label className="flex flex-col items-center justify-center h-24 cursor-pointer hover:bg-gray-100 transition-colors rounded-lg">
-                                            <RiCameraLine size={32} className="text-gray-400 mb-1" />
-                                            <span className="text-xs text-gray-600 font-medium">Rasm yuklash</span>
-                                            <input type="file" accept="image/*" className="hidden" onChange={handleVerifyFilter} capture="environment" />
-                                        </label>
-                                    )}
-                                </div>
+                        <button
+                            onClick={handleConfirm}
+                            disabled={loading || (verificationStatus !== 'working' && !verificationNotes.trim())}
+                            className={`btn w-full py-3 text-lg mt-2 ${loading ? 'opacity-75' : ''} btn-primary shadow-lg shadow-indigo-200`}
+                        >
+                            {loading ? <RiLoader4Line className="animate-spin mx-auto" /> : "Tasdiqlash va O'tkazish"}
+                        </button>
 
-                                <button
-                                    onClick={handleConfirm}
-                                    disabled={loading || (verificationStatus !== 'working' && !verificationNotes.trim())}
-                                    className={`btn w-full py-3 text-lg mt-2 ${loading ? 'opacity-75' : ''} btn-primary shadow-lg shadow-indigo-200`}
-                                >
-                                    {loading ? <RiLoader4Line className="animate-spin mx-auto" /> : "Tasdiqlash va O'tkazish"}
-                                </button>
-                            </>
-                        )}
                     </div>
                 )}
 
