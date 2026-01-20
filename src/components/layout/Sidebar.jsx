@@ -43,7 +43,7 @@ const Sidebar = ({ isOpen, onClose }) => {
 
             <nav className="flex-1 p-4 space-y-2 overflow-y-auto mt-2">
                 {links.map((link) => {
-                    const isActive = pathname === link.path || (link.path !== "/admin" && pathname.startsWith(link.path));
+                    const isActive = pathname === link.path || (link.path !== "/admin" && pathname.startsWith(link.path + '/'));
                     return (
                         <Link
                             key={link.path}
