@@ -9,7 +9,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         inn: "",
         orderNumber: "",
         category: "",
-        building: "Bosh Ofis",
+        building: "1-bino Asosiy",
         department: "RTTM",
         location: "",
         quantity: 1,
@@ -32,6 +32,13 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     // Options
     const categories = ["NOTEBOOK", "PRINTER", "TV", "KONDITSIONER", "IN PANEL", "MEBEL JIHOZLAR"];
     const departments = ["RTTM", "Bino komendanti"];
+    const buildings = [
+        "1-bino Asosiy",
+        "2-bino IB va KT",
+        "3-bino Avtomobilsozlik",
+        "4-bino Mash tex",
+        "5-bino qurilish"
+    ];
 
     useEffect(() => {
         setErrors({}); // Reset errors on open
@@ -55,7 +62,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 inn: item.inn || "",
                 orderNumber: item.orderNumber || "",
                 category: item.category || "",
-                building: item.building || "Bosh Ofis",
+                building: item.building || buildings[0],
                 department: item.department || "RTTM",
                 location: item.location || "",
                 quantity: item.quantity || 1,
@@ -87,7 +94,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 inn: "",
                 orderNumber: "",
                 category: initialData?.category || categories[0],
-                building: "Bosh Ofis",
+                building: buildings[0],
                 department: "RTTM",
                 location: "",
                 quantity: 1,
@@ -368,15 +375,16 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="label">Bino (Ofis) <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
+                            <select
                                 name="building"
                                 className={`input ${errors.building ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.building}
                                 onChange={handleChange}
-                                placeholder="Bosh Ofis"
-                            />
-                            {errors.building && <span className="text-red-500 text-xs mt-1 block">{errors.building}</span>}
+                            >
+                                {buildings.map(b => (
+                                    <option key={b} value={b}>{b}</option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label className="label">Mas'ul Bo'lim <span className="text-red-500">*</span></label>
