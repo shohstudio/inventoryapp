@@ -5,6 +5,7 @@ export const translations = {
         inventory: "Invertar",
         warehouse: "Ombor",
         users: "Foydalanuvchilar",
+        inventory_dates: "Invertardan o'tkazish sanasi",
         profile: "Profil",
 
         // General
@@ -92,6 +93,7 @@ export const translations = {
         inventory: "Инвентар",
         warehouse: "Омбор",
         users: "Фойдаланувчилар",
+        inventory_dates: "Инвертардан ўтказиш санаси",
         profile: "Профиль",
 
         // General
@@ -179,6 +181,7 @@ export const translations = {
         inventory: "Инвентарь",
         warehouse: "Склад",
         users: "Пользователи",
+        inventory_dates: "Дата инвентаризации",
         profile: "Профиль",
 
         // General
