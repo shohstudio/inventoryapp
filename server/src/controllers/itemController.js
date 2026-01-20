@@ -1,5 +1,5 @@
 const prisma = require('../utils/prisma');
-const cloudinary = require('../utils/cloudinary');
+// const cloudinary = require('../utils/cloudinary'); // Removed as we use local storage now
 
 // @desc    Get all items
 // @route   GET /api/items
