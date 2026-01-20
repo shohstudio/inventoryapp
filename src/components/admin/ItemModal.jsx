@@ -151,6 +151,12 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (!formData.assignedRole.trim()) newErrors.assignedRole = "Shu joyni to'ldirish majburiy";
         if (!formData.assignedPINFL.trim()) newErrors.assignedPINFL = "Shu joyni to'ldirish majburiy";
 
+        // Image Validation
+        if (formData.images.length < 4) {
+            newErrors.images = "Kamida 4 ta rasm yuklash majburiy";
+            toast.error("Kamida 4 ta rasm yuklashingiz kerak");
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -310,11 +316,11 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                         className={`input pr-12 ${errors.price ? 'border-red-500 ring-red-500' : ''}`}
                                         value={formData.price}
                                         onChange={(e) => {
-                                            // Allow numbers and spaces
-                                            let val = e.target.value.replace(/[^0-9\s]/g, '');
-                                            // Format with spaces
-                                            val = val.replace(/\s/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-                                            setFormData(prev => ({ ...prev, price: val }));
+                                            // 1. Remove non-digits
+                                            let raw = e.target.value.replace(/\D/g, '');
+                                            // 2. Format with spaces
+                                            let formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                                            setFormData(prev => ({ ...prev, price: formatted }));
                                             if (errors.price) setErrors(prev => ({ ...prev, price: "" }));
                                         }}
                                         placeholder="14 000 000"
@@ -501,14 +507,14 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     {/* Image Upload Section */}
                     <div>
                         <label className="label flex justify-between">
-                            Jihoz rasmlari
+                            Jihoz rasmlari <span className="text-red-500">*</span>
                             {formData.images.length < 4 && (
-                                <span className="text-red-500 text-xs font-semibold">
+                                <span className={`text-xs font-semibold ${errors.images ? 'text-red-600 font-bold' : 'text-red-500'}`}>
                                     Kamida 4 ta rasm yuklang ({formData.images.length}/4)
                                 </span>
                             )}
                         </label>
-                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-indigo-300 transition-colors">
+                        <div className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors ${errors.images ? 'border-red-500 bg-red-50' : 'border-gray-200 hover:border-indigo-300'}`}>
                             <input
                                 type="file"
                                 multiple
