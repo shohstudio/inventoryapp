@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine, RiArchiveLine, RiFileList3Line, RiHistoryLine, RiShieldLine, RiCalendarLine } from "react-icons/ri";
+import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine, RiArchiveLine, RiFileList3Line, RiHistoryLine, RiShieldLine, RiCalendarLine, RiQrScan2Line } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import clsx from "clsx";
@@ -14,6 +14,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         { name: t('inventory'), path: "/admin/inventory", icon: <RiBox3Line size={20} /> },
         { name: t('warehouse'), path: "/admin/warehouse", icon: <RiArchiveLine size={20} /> },
         { name: t('inventory_dates'), path: "/admin/inventory-dates", icon: <RiCalendarLine size={20} /> },
+        { name: "Inventarizatsiyadan o'tkazish", path: "/admin/inventory-check", icon: <RiQrScan2Line size={20} /> },
         // Only show Users link to admin
         ...(user?.role === 'admin' ? [{ name: t('users'), path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
         ...(['admin', 'accounter', 'warehouseman'].includes(user?.role) ? [{ name: "So'rovlar", path: "/admin/requests", icon: <RiFileList3Line size={20} /> }] : []),
