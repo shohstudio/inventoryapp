@@ -44,6 +44,20 @@ const getItems = async (req, res) => {
         if (building) where.building = building;
         if (location) where.location = { contains: location }; // Loose match for location
 
+        // Filter by Inventory Status (Passed / Not Passed)
+        if (inventoryStatus && inventoryStartDate) {
+            if (inventoryStatus === 'passed') {
+                where.lastCheckedAt = {
+                    gte: inventoryStartDate // Checked AFTER start date
+                };
+            } else if (inventoryStatus === 'not_passed') {
+                where.OR = [
+                    { lastCheckedAt: null },
+                    { lastCheckedAt: { lt: inventoryStartDate } } // Checked BEFORE start date
+                ];
+            }
+        }
+
         if (assignedUserId) {
             where.assignedUserId = parseInt(assignedUserId);
         }

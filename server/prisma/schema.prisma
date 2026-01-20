@@ -69,6 +69,7 @@ model Item {
   assignedUserId Int?
   
   assignedDate DateTime? // When it was assigned
+  lastCheckedAt DateTime? // When it was last verified during inventory
 
   logs         Log[]
   requests     Request[]
