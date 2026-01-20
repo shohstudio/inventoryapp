@@ -27,21 +27,25 @@ const InventoryReportPage = () => {
             // 2. Get All Items
             const itemsRes = await api.get('/items');
 
-            // 3. Filter for Verified Items (lastCheckedAt >= startDate)
-            // If no startDate is set, maybe show all checked items? 
-            // Better to show only if date is set, or all checked items if no date logic strictness.
-            // Let's rely on backend 'lastCheckedAt' existence + date logic if set.
+            // 3. Filter for Verified Items (lastCheckedAt exists)
+            // User reported items not showing. We will be permissive:
+            // If item has lastCheckedAt, we show it.
+            // If startDate is set, we TRY to filter, but if that results in 0 items, 
+            // maybe we should fallback or at least we know why.
+            // But usually "Inventory Report" implies current inventory.
+            // However, "O'tgan jihozlar ro'yxati kelmayapti" implies they EXPECT to see something they scanned.
+            // If they scanned BEFORE the start date (or start date was reset), they might vanish.
+            // Safest bet: Show ALL items with lastCheckedAt != null.
 
             let verifiedItems = itemsRes.data.items.filter(item => item.lastCheckedAt);
 
             if (startDate) {
-                // Strictly filter: Item MUST have lastCheckedAt >= startDate
+                // We will still filter by date if it exists, to be accurate to the "Current Inventory".
+                // But if the user scanned items and THEN set the date? No, date is usually set first.
+                // Issue might be timezone or just simply no items match.
+                // Let's relax it slightly or just ensure logic is correct.
+                // new Date(string) works.
                 verifiedItems = verifiedItems.filter(item => new Date(item.lastCheckedAt) >= startDate);
-            } else {
-                // If no inventory period is set, then logically nothing has "passed" the current inventory.
-                // To keep it clean and strict as per user request ("O'tgan"), we show nothing or valid ones.
-                // Better to show empty if no active round.
-                verifiedItems = [];
             }
 
             // Sort by check date (newest first)
@@ -71,9 +75,8 @@ const InventoryReportPage = () => {
             "Holati": item.status === 'working' ? 'Ishchi' :
                 item.status === 'repair' ? 'Ta\'mir talab' :
                     item.status === 'broken' ? 'Yaroqsiz' : item.status,
-            "Inventarizatsiya": `O'tgan (${new Date(item.lastCheckedAt).toLocaleDateString("ru-RU")})`,
+            "Tekshirilgan sana": new Date(item.lastCheckedAt).toLocaleDateString("ru-RU"),
             "Rasm (Link)": item.image ? (window.location.origin + item.image) : "Rasm yo'q"
-            // Note: Embedding actual images requires simpler libraries or paid ones, usually links are safer for web export
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -112,15 +115,11 @@ const InventoryReportPage = () => {
                         Inventarizatsiya Hisoboti
                     </h1>
                     <p className="text-gray-500 mt-1">
-                        Jami o'tgan jihozlar: <span className="font-bold text-gray-900">{items.length} ta</span>
+                        Jami tekshirilgan jihozlar: <span className="font-bold text-gray-900">{items.length} ta</span>
                     </p>
-                    {inventoryStartDate ? (
+                    {inventoryStartDate && (
                         <p className="text-xs text-indigo-500 mt-1 font-medium bg-indigo-50 inline-block px-2 py-1 rounded">
-                            {new Date(inventoryStartDate).toLocaleDateString("ru-RU")} dan boshlab
-                        </p>
-                    ) : (
-                        <p className="text-xs text-red-500 mt-1 font-medium bg-red-50 inline-block px-2 py-1 rounded">
-                            Inventarizatsiya sanasi belgilanmagan
+                            {new Date(inventoryStartDate).toLocaleDateString("ru-RU")} dan keyingi tekshiruvlar
                         </p>
                     )}
                 </div>
@@ -160,7 +159,7 @@ const InventoryReportPage = () => {
                                 <th className="p-4">Jihoz</th>
                                 <th className="p-4">ID / INN</th>
                                 <th className="p-4">Holati</th>
-                                <th className="p-4">Inventarizatsiya</th>
+                                <th className="p-4">Tekshirilgan vaqti</th>
                                 <th className="p-4 text-center">Rasm</th>
                             </tr>
                         </thead>
@@ -196,21 +195,19 @@ const InventoryReportPage = () => {
                                         </td>
                                         <td className="p-4">
                                             <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${item.status === 'working' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                item.status === 'repair' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                                    'bg-red-50 text-red-700 border-red-200'
+                                                    item.status === 'repair' ? 'bg-orange-50 text-orange-700 border-orange-200' :
+                                                        'bg-red-50 text-red-700 border-red-200'
                                                 }`}>
                                                 {item.status === 'working' ? 'Ishchi' :
                                                     item.status === 'repair' ? 'Ta\'mir talab' : 'Yaroqsiz'}
                                             </span>
                                         </td>
                                         <td className="p-4">
-                                            <div className="flex flex-col items-start gap-1">
-                                                <span className="px-2 py-1 rounded-md text-xs font-bold border bg-green-50 text-green-600 border-green-200">
-                                                    O'tgan ✅
-                                                </span>
-                                                <span className="text-[10px] text-gray-400 font-mono">
-                                                    {new Date(item.lastCheckedAt).toLocaleDateString("ru-RU")}
-                                                </span>
+                                            <div className="text-sm text-gray-900 font-medium">
+                                                {new Date(item.lastCheckedAt).toLocaleDateString("ru-RU")}
+                                            </div>
+                                            <div className="text-xs text-gray-400">
+                                                {new Date(item.lastCheckedAt).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </td>
                                         <td className="p-4 text-center">
