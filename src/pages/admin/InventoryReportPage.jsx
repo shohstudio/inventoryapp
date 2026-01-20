@@ -74,6 +74,7 @@ const InventoryReportPage = () => {
                 item.status === 'repair' ? 'Ta\'mir talab' :
                     item.status === 'broken' ? 'Yaroqsiz' : item.status,
             "Tekshirilgan sana": new Date(item.lastCheckedAt).toLocaleDateString("ru-RU"),
+            "Inventar o'tkazgan bo'lim": item.department || item.building || "-",
             "Rasm (Link)": item.image ? (window.location.origin + item.image) : "Rasm yo'q"
         }));
 
@@ -91,6 +92,7 @@ const InventoryReportPage = () => {
             { wch: 15 }, // INN
             { wch: 15 }, // Status
             { wch: 15 }, // Date
+            { wch: 25 }, // Department
             { wch: 50 }  // Image Link
         ];
 
@@ -159,13 +161,14 @@ const InventoryReportPage = () => {
                                 <th className="p-4">ID / INN</th>
                                 <th className="p-4">Holati</th>
                                 <th className="p-4">Tekshirilgan vaqti</th>
+                                <th className="p-4">Inventar o'tkazgan bo'lim</th>
                                 <th className="p-4 text-center">Rasm</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="6" className="p-8 text-center text-gray-500">
+                                    <td colSpan="7" className="p-8 text-center text-gray-500">
                                         <div className="flex items-center justify-center gap-2">
                                             <RiLoader4Line className="animate-spin" size={24} />
                                             Yuklanmoqda...
@@ -174,7 +177,7 @@ const InventoryReportPage = () => {
                                 </tr>
                             ) : filteredItems.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="p-8 text-center text-gray-500">
+                                    <td colSpan="7" className="p-8 text-center text-gray-500">
                                         {inventoryStartDate ? "Muvofiq jihozlar topilmadi" : "Ma'lumot yo'q"}
                                     </td>
                                 </tr>
@@ -194,8 +197,8 @@ const InventoryReportPage = () => {
                                         </td>
                                         <td className="p-4">
                                             <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${item.status === 'working' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                    item.status === 'repair' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                                        'bg-red-50 text-red-700 border-red-200'
+                                                item.status === 'repair' ? 'bg-orange-50 text-orange-700 border-orange-200' :
+                                                    'bg-red-50 text-red-700 border-red-200'
                                                 }`}>
                                                 {item.status === 'working' ? 'Ishchi' :
                                                     item.status === 'repair' ? 'Ta\'mir talab' : 'Yaroqsiz'}
@@ -208,6 +211,11 @@ const InventoryReportPage = () => {
                                             <div className="text-xs text-gray-400">
                                                 {new Date(item.lastCheckedAt).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}
                                             </div>
+                                        </td>
+                                        <td className="p-4">
+                                            <span className="text-sm text-gray-700 font-medium bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                                                {item.department || item.building || "-"}
+                                            </span>
                                         </td>
                                         <td className="p-4 text-center">
                                             {item.image ? (
