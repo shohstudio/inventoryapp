@@ -80,6 +80,29 @@ export const translations = {
         repair_items: "Ta'mirdagi jihozlar",
         written_off_items: "Ro'yxatdan chiqarilgan",
         category_stats: "Kategoriyalar statistikasi",
+        dashboard_subtitle: "Bugungi statistika va muhim o'zgarishlar",
+        recent_activity: "So'nggi Harakatlar",
+        no_data_yet: "Hozircha ma'lumot yo'q",
+
+        // Notifications
+        attention_new_requests: "Diqqat! Yangi So'rovlar",
+        pending_requests_text: "Sizda {count} ta tasdiqlanmagan chiqish so'rovi bor.",
+        later: "Keyinroq",
+        view: "Ko'rish",
+
+        // Activity Table
+        in_warehouse: "Omborda",
+        status_active: "Faol",
+        status_in_repair: "Ta'mirda",
+        status_written_off_short: "Hisobdan chiqarilgan",
+        status_new: "Yangi",
+
+        // Stats
+        trend_vs_last_month: "o'tgan oyga nisbatan",
+        trend_growth: "o'sish",
+        trend_decrease: "kamaydi",
+        trend_no_change: "o'zgarishsiz",
+        active_users: "Faol foydalanuvchilar",
 
         // User Roles
         role_admin: "Administrator",
@@ -168,6 +191,29 @@ export const translations = {
         repair_items: "Таъмирдаги жиҳозлар",
         written_off_items: "Рўйхатдан чиқарилган",
         category_stats: "Категориялар статистикаси",
+        dashboard_subtitle: "Бугунги статистика ва муҳим ўзгаришлар",
+        recent_activity: "Сўнгги Ҳаракатлар",
+        no_data_yet: "Ҳозирча маълумот йўқ",
+
+        // Notifications
+        attention_new_requests: "Диққат! Янги Сўровлар",
+        pending_requests_text: "Сизда {count} та тасдиқланмаган чиқиш сўрови бор.",
+        later: "Кейинроқ",
+        view: "Кўриш",
+
+        // Activity Table
+        in_warehouse: "Омборда",
+        status_active: "Фаол",
+        status_in_repair: "Таъмирда",
+        status_written_off_short: "Ҳисобдан чиқарилган",
+        status_new: "Янги",
+
+        // Stats
+        trend_vs_last_month: "ўтган ойга нисбатан",
+        trend_growth: "ўсиш",
+        trend_decrease: "камайди",
+        trend_no_change: "ўзгаришсиз",
+        active_users: "Фаол фойдаланувчилар",
 
         // User Roles
         role_admin: "Админ",
@@ -256,6 +302,29 @@ export const translations = {
         repair_items: "В ремонте",
         written_off_items: "Списано",
         category_stats: "Статистика по категориям",
+        dashboard_subtitle: "Статистика и важные изменения",
+        recent_activity: "Последние действия",
+        no_data_yet: "Пока нет данных",
+
+        // Notifications
+        attention_new_requests: "Внимание! Новые запросы",
+        pending_requests_text: "У вас есть {count} неподтвержденных запросов на вывод.",
+        later: "Позже",
+        view: "Просмотреть",
+
+        // Activity Table
+        in_warehouse: "На складе",
+        status_active: "Активен",
+        status_in_repair: "В ремонте",
+        status_written_off_short: "Списано",
+        status_new: "Новое",
+
+        // Stats
+        trend_vs_last_month: "по сравнению с прошлым месяцем",
+        trend_growth: "рост",
+        trend_decrease: "снижение",
+        trend_no_change: "без изменений",
+        active_users: "Активные пользователи",
 
         // User Roles
         role_admin: "Админ",

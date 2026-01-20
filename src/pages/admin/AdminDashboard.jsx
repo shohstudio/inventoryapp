@@ -95,7 +95,7 @@ const AdminDashboard = () => {
         <div>
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('dashboard')}</h1>
-                <p className="text-gray-500 dark:text-gray-400">Bugungi statistika va muhim o'zgarishlar</p>
+                <p className="text-gray-500 dark:text-gray-400">{t('dashboard_subtitle')}</p>
             </div>
 
             {/* Stats Grid */}
@@ -105,7 +105,7 @@ const AdminDashboard = () => {
                     value={inventoryStats.totalItems}
                     icon={<RiBox3Line size={24} />}
                     trend={12}
-                    trendLabel="o'tgan oyga nisbatan"
+                    trendLabel={t('trend_vs_last_month')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory")}
                 />
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
                     value={`${formatValue(inventoryStats.totalValue)} so'm`}
                     icon={<RiMoneyDollarCircleLine size={24} />}
                     trend={8.2}
-                    trendLabel="o'sish"
+                    trendLabel={t('trend_growth')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory")}
                 />
@@ -125,7 +125,7 @@ const AdminDashboard = () => {
                     value={userCount}
                     icon={<RiUserLine size={24} />}
                     trend={98}
-                    trendLabel="Faol foydalanuvchilar"
+                    trendLabel={t('active_users')}
                     variant="featured"
                     onClick={() => navigate("/admin/users")}
                 />
@@ -135,7 +135,7 @@ const AdminDashboard = () => {
                     value={inventoryStats.repairItems}
                     icon={<RiAlertLine size={24} />}
                     trend={-2}
-                    trendLabel="kamaydi"
+                    trendLabel={t('trend_decrease')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
@@ -145,7 +145,7 @@ const AdminDashboard = () => {
                     value={inventoryStats.writtenOffItems}
                     icon={<RiDeleteBinLine size={24} />}
                     trend={0}
-                    trendLabel="o'zgarishsiz"
+                    trendLabel={t('trend_no_change')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "written-off" } })}
                 />
@@ -154,17 +154,17 @@ const AdminDashboard = () => {
             {/* Recent Activity Table (Redesigned) */}
             <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-gray-800 dark:text-white">So'nggi Harakatlar</h3>
+                    <h3 className="text-lg font-bold text-gray-800 dark:text-white">{t('recent_activity')}</h3>
                 </div>
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-blue-600 text-white">
-                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Jihoz Nomi</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Seriya Raqami</th>
-                                <th className="py-4 px-6 font-semibold text-sm">Javobgar Shaxs</th>
-                                <th className="py-4 px-6 font-semibold text-sm rounded-tr-lg">Holati</th>
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('name')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('model')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm">{t('assigned_to')}</th>
+                                <th className="py-4 px-6 font-semibold text-sm rounded-tr-lg">{t('status')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -173,7 +173,7 @@ const AdminDashboard = () => {
                                     <tr key={item.id || index} className="hover:bg-gray-50/80 dark:hover:bg-slate-700/50 transition-colors">
                                         <td className="py-4 px-6 text-gray-800 dark:text-gray-200 font-medium">{item.name}</td>
                                         <td className="py-4 px-6 text-gray-500 dark:text-gray-400 font-mono text-sm">{item.model || "-"}</td>
-                                        <td className="py-4 px-6 text-gray-700 dark:text-gray-300">{item.assignedTo?.name || "Omborda"}</td>
+                                        <td className="py-4 px-6 text-gray-700 dark:text-gray-300">{item.assignedTo?.name || t('in_warehouse')}</td>
                                         <td className="py-4 px-6">
                                             <span className={clsx(
                                                 "px-3 py-1 rounded-full text-xs font-semibold",
@@ -182,10 +182,10 @@ const AdminDashboard = () => {
                                                         item.status === 'written-off' ? "bg-red-100 text-red-700" :
                                                             "bg-cyan-100 text-cyan-700"
                                             )}>
-                                                {item.status === 'working' ? "Faol" :
-                                                    item.status === 'repair' ? "Ta'mirda" :
-                                                        item.status === 'written-off' ? "Hisobdan chiqarilgan" :
-                                                            "Yangi"}
+                                                {item.status === 'working' ? t('status_active') :
+                                                    item.status === 'repair' ? t('status_in_repair') :
+                                                        item.status === 'written-off' ? t('status_written_off_short') :
+                                                            t('status_new')}
                                             </span>
                                         </td>
                                     </tr>
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="4" className="py-6 text-center text-gray-500">
-                                        Hozircha ma'lumot yo'q
+                                        {t('no_data_yet')}
                                     </td>
                                 </tr>
                             )}
@@ -217,11 +217,11 @@ const AdminDashboard = () => {
                             </div>
 
                             <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-                                Diqqat! Yangi So'rovlar
+                                {t('attention_new_requests')}
                             </h2>
 
                             <p className="text-lg text-gray-500 dark:text-gray-300 mb-8 max-w-xs">
-                                Sizda <span className="font-bold text-orange-600">{pendingCount} ta</span> tasdiqlanmagan chiqish so'rovi bor.
+                                {t('pending_requests_text').replace('{count}', pendingCount)}
                             </p>
 
                             <div className="grid grid-cols-2 gap-4 w-full">
@@ -229,13 +229,13 @@ const AdminDashboard = () => {
                                     onClick={() => setShowPendingModal(false)}
                                     className="py-3 px-6 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold transition-colors dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
                                 >
-                                    Keyinroq
+                                    {t('later')}
                                 </button>
                                 <button
                                     onClick={() => navigate('/admin/requests', { state: { activeTab: pendingTab } })}
                                     className="py-3 px-6 rounded-xl bg-orange-600 text-white hover:bg-orange-700 shadow-lg shadow-orange-200 font-semibold transition-transform active:scale-95"
                                 >
-                                    Ko'rish
+                                    {t('view')}
                                 </button>
                             </div>
                         </div>
