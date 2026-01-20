@@ -1,4 +1,5 @@
 const prisma = require('../utils/prisma');
+const cloudinary = require('../utils/cloudinary');
 
 // @desc    Get all items
 // @route   GET /api/items
@@ -638,4 +639,55 @@ const deleteManyItems = async (req, res) => {
     }
 };
 
-module.exports = { getItems, getItemById, createItem, updateItem, deleteItem, importItems, deleteManyItems };
+// @desc    Verify inventory item (scanned & checked)
+// @route   POST /api/items/:id/verify-inventory
+// @access  Private (Admin/Employee)
+const verifyInventoryItem = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const item = await prisma.item.findUnique({ where: { id: parseInt(id) } });
+
+        if (!item) {
+            return res.status(404).json({ message: "Jihoz topilmadi" });
+        }
+
+        let updateData = {
+            lastCheckedAt: new Date()
+        };
+
+        // If new image uploaded
+        if (req.files && req.files.length > 0) {
+            // Assuming single image upload for verification usually, or replace main image?
+            // User asked: "new photo upload". Let's assume it replaces the main image to keep it current.
+            // Or we could store it in a history? For now, updating main image seems most practical for "current state".
+            const result = await cloudinary.uploader.upload(req.files[0].path);
+            updateData.image = result.secure_url;
+
+            // Clean up local file
+            const fs = require('fs');
+            fs.unlinkSync(req.files[0].path);
+        }
+
+        const updatedItem = await prisma.item.update({
+            where: { id: parseInt(id) },
+            data: updateData
+        });
+
+        // Log
+        await prisma.log.create({
+            data: {
+                action: 'inventory_check',
+                details: `Inventarizatsiyadan o'tkazildi. Sana: ${new Date().toLocaleDateString()}`,
+                userId: req.user.id,
+                itemId: updatedItem.id
+            }
+        });
+
+        res.json(updatedItem);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Tasdiqlashda xatolik: " + error.message });
+    }
+};
+
+module.exports = { getItems, getItemById, createItem, updateItem, deleteItem, importItems, deleteManyItems, verifyInventoryItem };

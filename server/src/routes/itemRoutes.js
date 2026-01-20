@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getItems, getItemById, createItem, updateItem, deleteItem, importItems, deleteManyItems } = require('../controllers/itemController');
+const { getItems, getItemById, createItem, updateItem, deleteItem, importItems, deleteManyItems, verifyInventoryItem } = require('../controllers/itemController');
 const { protect, admin } = require('../middleware/authMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 
@@ -16,5 +16,6 @@ router.route('/:id')
     .delete(protect, admin, deleteItem);
 
 router.post('/delete-many', protect, admin, deleteManyItems);
+router.post('/:id/verify-inventory', protect, upload.array('images', 1), verifyInventoryItem);
 
 module.exports = router;
