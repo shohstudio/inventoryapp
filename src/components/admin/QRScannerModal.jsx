@@ -210,7 +210,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                 </button>
 
                 {step === 'scan' && (
-                    <div className="flex-1 flex flex-col">
+                    <div className="flex-1 flex flex-col h-full">
+                        {/* Scanner Area - Fixed Height */}
                         <div className="relative h-64 bg-black flex flex-col items-center justify-center shrink-0">
                             {error ? (
                                 <div className="text-white text-center p-6">
@@ -231,21 +232,23 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                             )}
                         </div>
 
-                        <div className="p-6 bg-white flex-1 flex flex-col justify-center">
+                        {/* Manual Input Area - Fixed Minimum Height */}
+                        <div className="p-6 bg-white flex-1 flex flex-col justify-center min-h-[200px] border-t border-gray-100">
                             <form onSubmit={handleManualSubmit} className="flex flex-col gap-4">
                                 <div className="text-center mb-2">
-                                    <p className="text-sm text-gray-500">Yoki ID / INN raqamini kiriting</p>
+                                    <p className="text-sm font-medium text-gray-700">QR kod ishlamayaptimi?</p>
+                                    <p className="text-xs text-gray-500">ID yoki INN raqamini qo'lda kiriting</p>
                                 </div>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
                                         value={manualInput}
                                         onChange={(e) => setManualInput(e.target.value)}
-                                        placeholder="ID yoki INN..."
-                                        className="form-input flex-1"
+                                        placeholder="Masalan: 0130600029"
+                                        className="form-input flex-1 border-gray-300 focus:border-indigo-500 py-2.5"
                                     />
-                                    <button type="submit" className="btn btn-primary px-4" disabled={loading}>
-                                        {loading ? <RiLoader4Line className="animate-spin" /> : <RiSearchLine />}
+                                    <button type="submit" className="btn btn-primary px-4 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all" disabled={loading}>
+                                        {loading ? <RiLoader4Line className="animate-spin" /> : <RiSearchLine size={20} />}
                                     </button>
                                 </div>
                             </form>
