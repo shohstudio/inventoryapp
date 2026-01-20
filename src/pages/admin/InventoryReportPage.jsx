@@ -18,33 +18,31 @@ const InventoryReportPage = () => {
         try {
             setLoading(true);
 
-            // 1. Get Inventory Start Date
-            const settingsRes = await api.get('/settings');
-            const startDateSetting = settingsRes.data.find(s => s.key === 'inventory_start_date');
-            const startDate = startDateSetting ? new Date(startDateSetting.value) : null;
+            // 1. Get Inventory Start Date safely
+            let startDate = null;
+            try {
+                const settingsRes = await api.get('/settings');
+                if (Array.isArray(settingsRes.data)) {
+                    const startDateSetting = settingsRes.data.find(s => s.key === 'inventory_start_date');
+                    startDate = startDateSetting ? new Date(startDateSetting.value) : null;
+                }
+            } catch (err) {
+                console.warn("Failed to fetch settings:", err);
+                // Continue without start date
+            }
             setInventoryStartDate(startDate);
 
-            // 2. Get All Items
-            const itemsRes = await api.get('/items');
+            // 2. Get All Items with high limit
+            // Using a large limit to ensure we get all records for the report
+            const itemsRes = await api.get('/items', { params: { limit: 10000 } });
+
+            const allItems = itemsRes.data?.items || [];
 
             // 3. Filter for Verified Items (lastCheckedAt exists)
-            // User reported items not showing. We will be permissive:
-            // If item has lastCheckedAt, we show it.
-            // If startDate is set, we TRY to filter, but if that results in 0 items, 
-            // maybe we should fallback or at least we know why.
-            // But usually "Inventory Report" implies current inventory.
-            // However, "O'tgan jihozlar ro'yxati kelmayapti" implies they EXPECT to see something they scanned.
-            // If they scanned BEFORE the start date (or start date was reset), they might vanish.
-            // Safest bet: Show ALL items with lastCheckedAt != null.
-
-            let verifiedItems = itemsRes.data.items.filter(item => item.lastCheckedAt);
+            let verifiedItems = allItems.filter(item => item.lastCheckedAt);
 
             if (startDate) {
-                // We will still filter by date if it exists, to be accurate to the "Current Inventory".
-                // But if the user scanned items and THEN set the date? No, date is usually set first.
-                // Issue might be timezone or just simply no items match.
-                // Let's relax it slightly or just ensure logic is correct.
-                // new Date(string) works.
+                // If start date exists, filter items checked on or after that date
                 verifiedItems = verifiedItems.filter(item => new Date(item.lastCheckedAt) >= startDate);
             }
 
@@ -53,8 +51,8 @@ const InventoryReportPage = () => {
 
             setItems(verifiedItems);
         } catch (error) {
-            console.error(error);
-            toast.error("Ma'lumotlarni yuklashda xatolik");
+            console.error("Error fetching report data:", error);
+            toast.error("Ma'lumotlarni yuklashda xatolik: " + (error.response?.data?.message || error.message));
         } finally {
             setLoading(false);
         }
@@ -128,6 +126,7 @@ const InventoryReportPage = () => {
                     <button
                         onClick={handleExportExcel}
                         className="btn bg-green-600 hover:bg-green-700 text-white flex items-center gap-2 shadow-sm"
+                        disabled={items.length === 0}
                     >
                         <RiFileExcel2Line size={20} />
                         Excelga yuklash
@@ -176,7 +175,7 @@ const InventoryReportPage = () => {
                             ) : filteredItems.length === 0 ? (
                                 <tr>
                                     <td colSpan="6" className="p-8 text-center text-gray-500">
-                                        Ma'lumot topilmadi
+                                        {inventoryStartDate ? "Muvofiq jihozlar topilmadi" : "Ma'lumot yo'q"}
                                     </td>
                                 </tr>
                             ) : (
