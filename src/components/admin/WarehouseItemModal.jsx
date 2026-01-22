@@ -26,7 +26,10 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
             setFormData({
                 ...item,
                 category: item.category || categories[0],
-                images: item.images || [],
+                // Parse images if it's a JSON string to avoid .map error
+                images: typeof item.images === 'string'
+                    ? JSON.parse(item.images || "[]")
+                    : (item.images || []),
                 pdf: item.contractPdf || null
             });
         } else {

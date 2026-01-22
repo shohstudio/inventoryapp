@@ -32,7 +32,10 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
             setFormData({
                 ...item,
                 category: item.category || "",
-                images: item.images || [],
+                // Parse images if it's a JSON string
+                images: typeof item.images === 'string'
+                    ? JSON.parse(item.images || "[]")
+                    : (item.images || []),
                 pdf: item.contractPdf || null
             });
         } else {
