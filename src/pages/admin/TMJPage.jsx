@@ -150,9 +150,11 @@ const TMJPage = () => {
             }
 
             // Append PDF
+            // Multer is configured for 'images' field only. 
+            // We must append PDF as 'images' field so it passes the middleware.
+            // Backend middleware filters by mimetype to distinguish PDF from actual images.
             if (itemData.pdf instanceof File) {
-                formData.append('pdf', itemData.pdf);
-                formData.append('images', itemData.pdf); // Fallback for multer logic if needed
+                formData.append('images', itemData.pdf);
             }
 
             // Append Inventory Type
