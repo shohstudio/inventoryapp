@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine, RiArchiveLine, RiFileList3Line, RiHistoryLine, RiShieldLine, RiCalendarLine, RiQrScan2Line, RiFileChartLine } from "react-icons/ri";
+import { RiDashboardLine, RiBox3Line, RiUserLine, RiSettings4Line, RiLogoutBoxLine, RiCloseLine, RiUserSettingsLine, RiArchiveLine, RiFileList3Line, RiHistoryLine, RiShieldLine, RiCalendarLine, RiQrScan2Line, RiFileChartLine, RiFilePaper2Line } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import clsx from "clsx";
