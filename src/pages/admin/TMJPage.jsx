@@ -106,59 +106,102 @@ const TMJPage = () => {
         fetchItems();
     }, [currentPage, searchQuery, activeTab]);
 
+    // Bulk Delete Logic
+    const toggleSelectAll = () => {
+        if (selectedItems.size === items.length) {
+            setSelectedItems(new Set());
+        } else {
+            const allIds = new Set(items.map(i => i.id));
+            setSelectedItems(allIds);
+        }
+    };
+
+    const toggleSelectItem = (id) => {
+        const newSelected = new Set(selectedItems);
+        if (newSelected.has(id)) {
+            newSelected.delete(id);
+        } else {
+            newSelected.add(id);
+        }
+        setSelectedItems(newSelected);
+    };
+
+    const handleBulkDelete = async () => {
+        if (!window.confirm(t('confirm_bulk_delete') || "Tanlanganlarni o'chirishni tasdiqlaysizmi?")) return;
+
+        setIsDeleting(true);
+        try {
+            await api.post('/items/delete-many', {
+                itemIds: Array.from(selectedItems)
+            });
+            toast.success("Muvaffaqiyatli o'chirildi");
+            setSelectedItems(new Set());
+            fetchItems();
+        } catch (error) {
+            console.error("Bulk delete error", error);
+            toast.error("O'chirishda xatolik");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     const handleAddItem = async (itemData) => {
         try {
             const formData = new FormData();
-            Object.keys(itemData).forEach(key => {
-                // Skip keys that we handle specifically or map from others
-                if (['images', 'imageFiles', 'pdf', 'purchaseDate', 'location', 'arrivalDate', 'supplier', 'price'].includes(key)) {
-                    return;
-                }
-                if (itemData[key] !== null && itemData[key] !== undefined) {
-                    formData.append(key, itemData[key]);
+
+            // 1. Manual Append of Standard Fields
+            const fields = [
+                'name', 'category', 'model', 'serialNumber', 'inn', 'orderNumber',
+                'quantity', 'status', 'condition', 'building', 'department',
+                'initialPinfl', 'initialOwner', 'initialRole'
+            ];
+
+            fields.forEach(field => {
+                if (itemData[field] !== undefined && itemData[field] !== null) {
+                    formData.append(field, itemData[field]);
                 }
             });
 
-            // Explicitly handle mapped/formatted fields
+            // 2. Specific Mapped Fields (Explicit handling)
+            // Price: Strip spaces
             if (itemData.price) {
                 formData.append('price', itemData.price.toString().replace(/\s/g, ''));
             }
 
-            // Map arrivalDate -> purchaseDate
-            const purchaseDate = itemData.arrivalDate || itemData.purchaseDate;
-            if (purchaseDate) {
-                formData.append('purchaseDate', purchaseDate);
+            // Arrival Date -> Purchase Date
+            const pDate = itemData.arrivalDate || itemData.purchaseDate;
+            if (pDate) {
+                formData.append('purchaseDate', pDate);
             }
 
-            // Map supplier -> location
-            const location = itemData.supplier || itemData.location;
-            if (location) {
-                formData.append('location', location);
+            // Supplier -> Location
+            const loc = itemData.supplier || itemData.location;
+            if (loc) {
+                formData.append('location', loc);
             }
 
-            // Append Images
+            // Inventory Type
+            formData.append('inventoryType', 'tmj');
+
+            // 3. File Handling
+
+            // New Image Files
             if (itemData.imageFiles && Array.isArray(itemData.imageFiles)) {
                 itemData.imageFiles.forEach(file => {
                     formData.append('images', file);
                 });
             }
 
-            // Handle existing images
+            // Existing Images (JSON of URLs)
             if (itemData.images && Array.isArray(itemData.images)) {
                 const existingUrls = itemData.images.filter(img => typeof img === 'string' && !img.startsWith('blob:'));
                 formData.append('existingImages', JSON.stringify(existingUrls));
             }
 
-            // Append PDF
-            // Multer is configured for 'images' field only. 
-            // We must append PDF as 'images' field so it passes the middleware.
-            // Backend middleware filters by mimetype to distinguish PDF from actual images.
+            // PDF Contract - Append as 'images' to satisfy Multer
             if (itemData.pdf instanceof File) {
                 formData.append('images', itemData.pdf);
             }
-
-            // Append Inventory Type
-            formData.append('inventoryType', 'tmj');
 
             if (selectedItem) {
                 await api.put(`/items/${selectedItem.id}`, formData);
@@ -171,17 +214,9 @@ const TMJPage = () => {
             setIsModalOpen(false);
         } catch (error) {
             console.error(error);
-            toast.error("Xatolik");
+            toast.error("Xatolik: " + (error.response?.data?.message || error.message));
         }
     };
-
-    // Helper to fix modal logic (since I can't edit it right here easily without another step):
-    // I will assume `handleAddItem` works or I'll iterate.
-    // Actually, I missed capturing Files in Modal. I'll need to fix `TMJItemModal` logic or `Warehouse` logic.
-    // Warehouse modal used `imageFile` (singular).
-    // My new component `TMJItemModal` uses `images` array of URLs.
-
-    // Let's implement basics first.
 
     return (
         <div>
@@ -189,9 +224,20 @@ const TMJPage = () => {
                 <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                     <RiFilePaper2Line className="text-blue-600" /> TMJ
                 </h1>
-                <button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="btn btn-primary bg-blue-600">
-                    <RiAddLine size={20} /> Qo'shish
-                </button>
+                <div className="flex gap-2">
+                    {selectedItems.size > 0 && (
+                        <button
+                            onClick={handleBulkDelete}
+                            disabled={isDeleting}
+                            className="btn bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                        >
+                            <RiDeleteBinLine size={20} /> {selectedItems.size} ta tanlanganni o'chirish
+                        </button>
+                    )}
+                    <button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="btn btn-primary bg-blue-600">
+                        <RiAddLine size={20} /> Qo'shish
+                    </button>
+                </div>
             </div>
 
             {/* Tabs */}
@@ -224,6 +270,14 @@ const TMJPage = () => {
                     <table className="w-full text-left">
                         <thead className="bg-gray-50">
                             <tr>
+                                <th className="p-4 w-10">
+                                    <input
+                                        type="checkbox"
+                                        className="checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        checked={selectedItems.size === items.length && items.length > 0}
+                                        onChange={toggleSelectAll}
+                                    />
+                                </th>
                                 <th className="p-4 font-semibold text-gray-600">Nomi / Tur</th>
                                 <th className="p-4 font-semibold text-gray-600">Holat / Biriktirilgan</th>
                                 <th className="p-4 font-semibold text-gray-600">Kelgan vaqti</th>
@@ -235,11 +289,19 @@ const TMJPage = () => {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {loading ? (
-                                <tr><td colSpan="6" className="p-8 text-center text-gray-500">Yuklanmoqda...</td></tr>
+                                <tr><td colSpan="8" className="p-8 text-center text-gray-500">Yuklanmoqda...</td></tr>
                             ) : items.length === 0 ? (
-                                <tr><td colSpan="6" className="p-8 text-center text-gray-500">Ma'lumot yo'q</td></tr>
+                                <tr><td colSpan="8" className="p-8 text-center text-gray-500">Ma'lumot yo'q</td></tr>
                             ) : items.map(item => (
-                                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${selectedItems.has(item.id) ? 'bg-blue-50' : ''}`}>
+                                    <td className="p-4">
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            checked={selectedItems.has(item.id)}
+                                            onChange={() => toggleSelectItem(item.id)}
+                                        />
+                                    </td>
                                     <td className="p-4">
                                         <div className="font-medium text-gray-900">{item.name}</div>
                                         <div className="text-xs text-gray-500">{item.category}</div>
