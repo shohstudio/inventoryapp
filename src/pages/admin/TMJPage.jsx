@@ -13,7 +13,7 @@ const TMJPage = () => {
     const [selectedItem, setSelectedItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewImage, setPreviewImage] = useState(null);
-    const [activeTab, setActiveTab] = useState('stock'); // 'stock' (Omborga kelgan), 'assigned' (Berilgan), 'all' (Barchasi)
+    const [activeTab, setActiveTab] = useState('all'); // 'all' (Barchasi), 'stock' (Omborga kelgan), 'assigned' (Berilgan)
 
     // Data State
     const [items, setItems] = useState([]);
@@ -186,6 +186,13 @@ const TMJPage = () => {
             {/* Tabs */}
             <div className="flex gap-4 mb-6 border-b border-gray-200">
                 <button
+                    onClick={() => setActiveTab('all')}
+                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'all' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                    Barchasi
+                    {activeTab === 'all' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
+                </button>
+                <button
                     onClick={() => setActiveTab('stock')}
                     className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'stock' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
@@ -198,13 +205,6 @@ const TMJPage = () => {
                 >
                     Berilgan maxsulotlar
                     {activeTab === 'assigned' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
-                </button>
-                <button
-                    onClick={() => setActiveTab('all')}
-                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'all' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                    Barchasi
-                    {activeTab === 'all' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
                 </button>
             </div>
 
