@@ -380,7 +380,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 value={formData.status}
                                 onChange={handleChange}
                             >
-                                <option value="working">Ishchi</option>
+                                <option value="working">Soz holatda</option>
                                 <option value="repair">Ta'mir talab</option>
                                 <option value="written-off">Ro'yxatdan chiqarilgan</option>
                                 <option value="broken">Buzilgan</option>
