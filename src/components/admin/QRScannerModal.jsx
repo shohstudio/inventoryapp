@@ -18,6 +18,8 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
     const [verificationStatus, setVerificationStatus] = useState('working'); // 'working', 'broken', 'repair'
     const [verificationNotes, setVerificationNotes] = useState("");
 
+    const [inventoryError, setInventoryError] = useState(null);
+
     // Reset state on open
     useEffect(() => {
         if (isOpen) {
@@ -25,14 +27,58 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
             setScannedItem(null);
             setImageFiles([]);
             setError(null);
+            setInventoryError(null);
             setManualInput("");
             setVerificationStatus('working');
             setVerificationNotes("");
+
+            checkInventoryPeriod();
         }
     }, [isOpen]);
 
+    const checkInventoryPeriod = async () => {
+        try {
+            const { data } = await api.get('/settings');
+            if (data.inventoryStartDate && data.inventoryEndDate) {
+                const now = new Date();
+
+                // Helper to parse DD/MM/YYYY or YYYY-MM-DD
+                const parseDate = (dateStr) => {
+                    if (!dateStr) return null;
+                    if (dateStr.includes('/')) {
+                        const [d, m, y] = dateStr.split('/');
+                        return new Date(`${y}-${m}-${d}`);
+                    }
+                    return new Date(dateStr);
+                };
+
+                const start = parseDate(data.inventoryStartDate);
+                const end = parseDate(data.inventoryEndDate);
+
+                // Set end date to end of day
+                if (end) end.setHours(23, 59, 59, 999);
+                if (start) start.setHours(0, 0, 0, 0);
+
+                if (now < start || now > end) {
+                    setInventoryError(`Inventarizatsiya davri: ${data.inventoryStartDate} - ${data.inventoryEndDate}`);
+                }
+            } else {
+                // If no dates set, maybe allow or block? 
+                // Suggest blocking if strict inventory mode, but explicit dates are usually safer.
+                // For now, if no dates are set, we might assume it's NOT active or always active.
+                // Given the request "shoe vaqtdagina", implies strictness.
+                setInventoryError("Inventarizatsiya davri belgilanmagan");
+            }
+        } catch (err) {
+            console.error("Settings fetch error", err);
+            // safe fail - maybe allow if backend fails? OR block?
+            // "only during period" implies block on failure/unknown
+            setInventoryError("Tizim sozlamalarini yuklashda xatolik");
+        }
+    };
+
     useEffect(() => {
-        if (isOpen && step === 'scan') {
+        if (isOpen && step === 'scan' && !inventoryError) {
             const startScanner = async () => {
                 await new Promise(r => setTimeout(r, 100)); // Wait for DOM
 
@@ -223,7 +269,16 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                     <div className="flex-1 flex flex-col h-full overflow-hidden">
                         {/* Scanner Area - Flexible Height but constrained */}
                         <div className="relative flex-1 bg-black flex flex-col items-center justify-center overflow-hidden min-h-[250px]">
-                            {error ? (
+                            {inventoryError ? (
+                                <div className="text-white text-center p-6 bg-red-900/80 absolute inset-0 flex flex-col items-center justify-center z-50">
+                                    <RiInformationLine size={48} className="mb-4 text-white/80" />
+                                    <h3 className="text-xl font-bold mb-2">Inventarizatsiya Vaqti Emas</h3>
+                                    <p className="text-white/90 text-lg mb-6">{inventoryError}</p>
+                                    <button onClick={onClose} className="btn bg-white text-black px-6">
+                                        Yopish
+                                    </button>
+                                </div>
+                            ) : error ? (
                                 <div className="text-white text-center p-6">
                                     <p className="text-red-400 mb-2 font-bold">Xatolik</p>
                                     <p>{error}</p>
@@ -243,7 +298,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                         </div>
 
                         {/* Manual Input Area - Fixed Height & On Top */}
-                        <div className="relative z-20 bg-white p-5 shrink-0 shadow-[0_-5px_20px_rgba(0,0,0,0.1)]">
+                        <div className={`relative z-20 bg-white p-5 shrink-0 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] transition-transform ${inventoryError ? 'translate-y-full' : ''}`}>
                             <form onSubmit={handleManualSubmit} className="flex flex-col gap-3">
                                 <div className="text-center">
                                     <p className="text-sm font-bold text-gray-800">QR kod ishlamayaptimi?</p>
@@ -255,8 +310,9 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
                                         onChange={(e) => setManualInput(e.target.value)}
                                         placeholder="ID yoki INN (masalan: 0130600029)"
                                         className="form-input flex-1 border-gray-300 focus:border-indigo-500 py-3"
+                                        disabled={!!inventoryError}
                                     />
-                                    <button type="submit" className="btn btn-primary px-5 py-3 rounded-lg shadow-md hover:shadow-lg transition-all" disabled={loading}>
+                                    <button type="submit" className="btn btn-primary px-5 py-3 rounded-lg shadow-md hover:shadow-lg transition-all" disabled={loading || !!inventoryError}>
                                         {loading ? <RiLoader4Line className="animate-spin" /> : <RiSearchLine size={22} />}
                                     </button>
                                 </div>
