@@ -56,7 +56,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
             console.log("ItemModal received item:", item);
 
             // Check if existing values are in our predefined lists
-            const isStandardCategory = categories.includes(item.category?.toUpperCase());
+            const isStandardCategory = categories.includes(item.category);
             const isStandardDepartment = departments.includes(item.department);
 
             setIsCustomCategory(!isStandardCategory && !!item.category);
@@ -342,7 +342,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 <select
                                     name="category"
                                     className={`input ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
-                                    value={categories.includes(formData.category.toUpperCase()) ? formData.category.toUpperCase() : "OTHER"}
+                                    value={categories.includes(formData.category) ? formData.category : "OTHER"}
                                     onChange={handleCategoryChange}
                                 >
                                     {categories.map(cat => (
