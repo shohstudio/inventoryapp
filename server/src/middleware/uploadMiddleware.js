@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 
 const checkFileType = (file, cb) => {
     // Allowed extensions
-    const filetypes = /jpg|jpeg|png|xlsx|xls/;
+    const filetypes = /jpg|jpeg|png|xlsx|xls|pdf/;
     // Check extension
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
@@ -29,7 +29,8 @@ const checkFileType = (file, cb) => {
         'image/png',
         'application/vnd.ms-excel',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/octet-stream' // Sometimes CSV/Excel comes as octet-stream
+        'application/octet-stream', // Sometimes CSV/Excel comes as octet-stream
+        'application/pdf'
     ];
 
     const mimetype = mimetypes.includes(file.mimetype) || filetypes.test(file.mimetype); // Fallback to regex if simple string check fails
@@ -41,7 +42,7 @@ const checkFileType = (file, cb) => {
     if (extname) {
         return cb(null, true);
     } else {
-        cb('Error: Only Images and Excel files are allowed!');
+        cb('Error: Only Images, Excel, and PDF files are allowed!');
     }
 };
 
