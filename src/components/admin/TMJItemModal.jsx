@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
+import { BASE_URL } from "../../api/axios";
 
 const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
     // TMJ Product Types (Categories)
@@ -22,7 +23,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
         price: "",
         quantity: "1",
         images: [],
-        imageFiles: [], // Store actual files here
+        imageFiles: [], // Store NEW files here
         pdf: null
     });
 
@@ -112,21 +113,45 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
     const handleImageChange = (e) => {
         if (e.target.files) {
             const files = Array.from(e.target.files);
-            const filesArray = files.map(file => URL.createObjectURL(file));
+            const newImageUrls = files.map(file => URL.createObjectURL(file));
+
             setFormData(prev => ({
                 ...prev,
-                images: [...prev.images, ...filesArray],
+                images: [...prev.images, ...newImageUrls],
                 imageFiles: [...prev.imageFiles, ...files]
             }));
+
             if (errors.images) setErrors(prev => ({ ...prev, images: null }));
         }
     };
 
     const removeImage = (index) => {
-        setFormData(prev => ({
-            ...prev,
-            images: prev.images.filter((_, i) => i !== index)
-        }));
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            const newImageFiles = [...prev.imageFiles];
+            const imageToRemove = newImages[index];
+
+            // If string starts with blob:, it's a new file.
+            // We need to remove it from imageFiles too.
+            if (typeof imageToRemove === 'string' && imageToRemove.startsWith('blob:')) {
+                // Determine which new file corresponds to this blob.
+                // Since we append, the order of blobs in 'images' matches 'imageFiles'.
+                // Count how many blobs precede this index in 'images'.
+                const blobIndex = newImages.slice(0, index).filter(img => img.startsWith('blob:')).length;
+                if (blobIndex < newImageFiles.length) {
+                    newImageFiles.splice(blobIndex, 1);
+                }
+            }
+
+            // Remove from images preview array
+            newImages.splice(index, 1);
+
+            return {
+                ...prev,
+                images: newImages,
+                imageFiles: newImageFiles
+            };
+        });
     };
 
     const handleSubmit = (e) => {
@@ -260,20 +285,24 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 />
                             </div>
                             {formData.pdf && (
-                                <div className="mt-2 p-2 bg-white rounded border border-blue-200 flex items-center justify-between">
-                                    <span className="text-sm text-gray-600 flex items-center gap-2">
-                                        <RiFilePdfLine className="text-red-500" />
-                                        {typeof formData.pdf === 'string' ? "Joriy shartnoma fayli" : formData.pdf.name}
+                                <div className="mt-2 p-3 bg-white rounded-lg border border-blue-200 flex items-center justify-between shadow-sm">
+                                    <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
+                                        <RiFilePdfLine className="text-red-500 text-lg" />
+                                        {typeof formData.pdf === 'string'
+                                            ? "Joriy shartnoma fayli"
+                                            : formData.pdf.name}
                                     </span>
-                                    {typeof formData.pdf === 'string' && (
+                                    {typeof formData.pdf === 'string' ? (
                                         <a
-                                            href={formData.pdf}
+                                            href={BASE_URL.replace('/api', '') + formData.pdf}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="text-xs text-blue-600 font-medium hover:underline"
+                                            className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors"
                                         >
                                             Ko'rish
                                         </a>
+                                    ) : (
+                                        <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">Yuklashga tayyor</span>
                                     )}
                                 </div>
                             )}
