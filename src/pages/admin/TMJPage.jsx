@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
+import { BASE_URL } from "../../api/axios";
 
 const TMJPage = () => {
     const { t } = useLanguage();
@@ -325,21 +326,40 @@ const TMJPage = () => {
                                     </td>
                                     <td className="p-4">
                                         {item.contractPdf ? (
-                                            <a href={item.contractPdf} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium text-sm">
-                                                <RiFilePdfLine size={16} /> PDF yuklab olish
+                                            <a
+                                                href={BASE_URL.replace('/api', '') + item.contractPdf}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium text-sm"
+                                            >
+                                                <RiFilePdfLine size={16} /> PDF
                                             </a>
                                         ) : (
                                             <span className="text-gray-300">-</span>
                                         )}
                                     </td>
                                     <td className="p-4">
-                                        {item.image ? (
-                                            <div className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100">
-                                                <img src={item.image} alt="Item" className="w-full h-full object-cover" />
-                                            </div>
-                                        ) : (
-                                            <span className="text-gray-300">-</span>
-                                        )}
+                                        {(() => {
+                                            let img = item.image;
+                                            if (!img && item.images) {
+                                                try {
+                                                    const imgs = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
+                                                    if (Array.isArray(imgs) && imgs.length > 0) img = imgs[0];
+                                                } catch (e) {
+                                                    console.error("Image parse error", e);
+                                                }
+                                            }
+
+                                            if (img) {
+                                                const imgSrc = img.startsWith('http') ? img : (BASE_URL.replace('/api', '') + img);
+                                                return (
+                                                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100 bg-white">
+                                                        <img src={imgSrc} alt="Item" className="w-full h-full object-cover" />
+                                                    </div>
+                                                );
+                                            }
+                                            return <span className="text-gray-300">-</span>;
+                                        })()}
                                     </td>
                                     <td className="p-4 text-right flex justify-end gap-2">
                                         <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
