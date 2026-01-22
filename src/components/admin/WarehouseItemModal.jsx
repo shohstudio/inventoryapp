@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 
 const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
     // Categories matching ItemModal
-    const categories = ["NOTEBOOK", "PRINTER", "TV", "KONDITSIONER", "Interaktiv panel", "MEBEL JIHOZLAR"];
+    const categories = ["Kompyuter", "PRINTER", "TV", "KONDITSIONER", "Interaktiv panel", "MEBEL JIHOZLAR"];
 
     const [formData, setFormData] = useState({
         name: "",
