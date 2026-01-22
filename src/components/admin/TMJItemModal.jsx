@@ -34,10 +34,22 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
             setFormData({
                 ...item,
                 category: item.category || "",
-                // Parse images if it's a JSON string
-                images: typeof item.images === 'string'
-                    ? JSON.parse(item.images || "[]")
-                    : (item.images || []),
+                // Parse images: Handle JSON string, single image fallback, or array
+                images: (() => {
+                    let imgs = [];
+                    if (item.images) {
+                        try {
+                            imgs = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
+                            if (!Array.isArray(imgs)) imgs = []; // content validation
+                        } catch (e) {
+                            console.error("Error parsing images JSON", e);
+                            imgs = [];
+                        }
+                    } else if (item.image) {
+                        imgs = [item.image];
+                    }
+                    return imgs;
+                })(),
                 imageFiles: [], // Clear files on edit load
                 pdf: item.contractPdf || null,
                 supplier: item.location || "", // Map Location -> Supplier
