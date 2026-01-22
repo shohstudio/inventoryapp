@@ -217,6 +217,7 @@ const TMJPage = () => {
                                 <th className="p-4 font-semibold text-gray-600">Kelgan vaqti</th>
                                 <th className="p-4 font-semibold text-gray-600">Narx</th>
                                 <th className="p-4 font-semibold text-gray-600">Hujjat</th>
+                                <th className="p-4 font-semibold text-gray-600">Rasm</th>
                                 <th className="p-4 font-semibold text-gray-600 text-right">Amallar</th>
                             </tr>
                         </thead>
@@ -249,6 +250,15 @@ const TMJPage = () => {
                                             <a href={item.contractPdf} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium text-sm">
                                                 <RiFilePdfLine size={16} /> PDF yuklab olish
                                             </a>
+                                        ) : (
+                                            <span className="text-gray-300">-</span>
+                                        )}
+                                    </td>
+                                    <td className="p-4">
+                                        {item.image ? (
+                                            <div className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100">
+                                                <img src={item.image} alt="Item" className="w-full h-full object-cover" />
+                                            </div>
                                         ) : (
                                             <span className="text-gray-300">-</span>
                                         )}
