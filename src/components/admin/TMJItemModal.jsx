@@ -8,11 +8,12 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
     // If specific types are needed, we can list them or allow free text.
     // Defaulting to same as Warehouse or generic.
     // User didn't specify exact types, so I'll keep common ones + generic.
-    const categories = ["Kompyuter", "Printer", "TV", "Konditsioner", "Interaktiv panel", "Mebel jihozlar", "Boshqa"];
+    // TMJ Product Types (Categories) - Converted to Manual Input
+    // const categories = ["Kompyuter", "Printer", "TV", "Konditsioner", "Interaktiv panel", "Mebel jihozlar", "Boshqa"];
 
     const [formData, setFormData] = useState({
         name: "",
-        category: categories[0],
+        category: "", // Manual input
         model: "",
         manufactureYear: "",
         arrivalDate: new Date().toISOString().split('T')[0],
@@ -30,14 +31,14 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
         if (item) {
             setFormData({
                 ...item,
-                category: item.category || categories[0],
+                category: item.category || "",
                 images: item.images || [],
                 pdf: item.contractPdf || null
             });
         } else {
             setFormData({
                 name: "",
-                category: categories[0],
+                category: "",
                 model: "",
                 manufactureYear: "",
                 arrivalDate: new Date().toISOString().split('T')[0],
@@ -57,6 +58,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
     const validateForm = () => {
         const newErrors = {};
         if (!formData.name.trim()) newErrors.name = "Nomi kiritilishi shart";
+        if (!formData.category.trim()) newErrors.category = "Maxsulot turi kiritilishi shart";
         // User requested: "Maxsulot nomi, turi, kelgan vaqti, manzili, soni, narxi"
         // Model/Year/Warranty might be optional? 
         // Keeping them standard for now but focusing on user requirements.
@@ -138,17 +140,15 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                             />
                         </div>
                         <div>
-                            <label className="label">Maxsulot Turi (Kategoriya)</label>
-                            <select
+                            <label className="label">Maxsulot Turi (Kategoriya) <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
                                 name="category"
-                                className="input"
+                                className={`input ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.category}
                                 onChange={handleChange}
-                            >
-                                {categories.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
+                                placeholder="Masalan: Kompyuter"
+                            />
                         </div>
                     </div>
 
