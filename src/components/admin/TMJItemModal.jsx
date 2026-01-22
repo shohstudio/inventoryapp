@@ -93,8 +93,13 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
 
     const handleImageChange = (e) => {
         if (e.target.files) {
-            const filesArray = Array.from(e.target.files).map(file => URL.createObjectURL(file));
-            setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
+            const files = Array.from(e.target.files);
+            const filesArray = files.map(file => URL.createObjectURL(file));
+            setFormData(prev => ({
+                ...prev,
+                images: [...prev.images, ...filesArray],
+                imageFiles: [...prev.imageFiles, ...files]
+            }));
             if (errors.images) setErrors(prev => ({ ...prev, images: null }));
         }
     };

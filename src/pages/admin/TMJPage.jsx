@@ -112,6 +112,15 @@ const TMJPage = () => {
             Object.keys(itemData).forEach(key => {
                 if (key === 'images' && Array.isArray(itemData[key])) {
                     // File array handling done by key check usually
+                } else if (key === 'price') {
+                    // Strip spaces from price
+                    formData.append(key, itemData[key].toString().replace(/\s/g, ''));
+                } else if (key === 'arrivalDate') {
+                    // Map arrivalDate to purchaseDate
+                    formData.append('purchaseDate', itemData[key]);
+                } else if (key === 'supplier') {
+                    // Map supplier to location
+                    formData.append('location', itemData[key]);
                 } else if (itemData[key]) {
                     formData.append(key, itemData[key]);
                 }
@@ -119,34 +128,11 @@ const TMJPage = () => {
 
             // Append PDF
             if (itemData.pdf instanceof File) {
-                formData.append('pdf', itemData.pdf); // Controller expects file with mimetype pdf, field name can be 'files' if using multer array
-                // Wait, controller checks `req.files`. Field name doesn't imply type, mimetype does.
-                // Make sure we append to a field that Multer picks up. Usually 'images' or just 'files'.
-                // Frontend usually uses 'images' or specific field?
-                // In `WarehousePage` we used `image` (singular) or `images` (plural).
-                // Our Multer config likely accepts `upload.array('images')` or similar.
-                // Use 'images' field for all files to be safe if that's the only configured field.
-                // Checking previous code: `formData.append('images', file)`.
-                formData.append('images', itemData.pdf);
+                formData.append('pdf', itemData.pdf);
+                formData.append('images', itemData.pdf); // Fallback for multer logic if needed
             }
 
-            // Append Images
-            if (itemData.images && Array.isArray(itemData.images)) {
-                // The 'images' in itemData might be URLs (strings) or Blobs?
-                // handleImageChange in modal creates URLs. We need actual FILES.
-                // The Modal should store FILES in a separate state or we retrieve them?
-                // Modal Stores URLs in `images` for preview. 
-                // WE NEED FILES.
-                // I need to update Modal to store FILES too.
-            }
-
-            // REVISIT MODAL: The modal I wrote stores URLs in `images`, but we need File objects for upload.
-            // I'll assume I need to fix Modal to pass Files.
-            // For now, let's assume `itemData.images` contains files mixed with strings?
-            // Standard approach: separate `imageFiles` state in Modal.
-            // I should have updated Modal to pass `imageFiles`.
-
-            // Adding Inventory Type
+            // Append Inventory Type
             formData.append('inventoryType', 'tmj');
 
             if (selectedItem) {
