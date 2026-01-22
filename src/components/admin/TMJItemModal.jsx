@@ -22,6 +22,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
         price: "",
         quantity: "1",
         images: [],
+        imageFiles: [], // Store actual files here
         pdf: null
     });
 
@@ -36,7 +37,10 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                 images: typeof item.images === 'string'
                     ? JSON.parse(item.images || "[]")
                     : (item.images || []),
-                pdf: item.contractPdf || null
+                imageFiles: [], // Clear files on edit load
+                pdf: item.contractPdf || null,
+                supplier: item.location || "", // Map Location -> Supplier
+                arrivalDate: item.purchaseDate || new Date().toISOString().split('T')[0] // Map PurchaseDate -> ArrivalDate
             });
         } else {
             setFormData({
@@ -50,6 +54,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                 price: "",
                 quantity: "1",
                 images: [],
+                imageFiles: [],
                 pdf: null
             });
         }

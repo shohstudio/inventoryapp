@@ -126,6 +126,19 @@ const TMJPage = () => {
                 }
             });
 
+            // Append Images
+            if (itemData.imageFiles && Array.isArray(itemData.imageFiles)) {
+                itemData.imageFiles.forEach(file => {
+                    formData.append('images', file);
+                });
+            }
+
+            // Handle existing images
+            if (itemData.images && Array.isArray(itemData.images)) {
+                const existingUrls = itemData.images.filter(img => typeof img === 'string' && !img.startsWith('blob:'));
+                formData.append('existingImages', JSON.stringify(existingUrls));
+            }
+
             // Append PDF
             if (itemData.pdf instanceof File) {
                 formData.append('pdf', itemData.pdf);
