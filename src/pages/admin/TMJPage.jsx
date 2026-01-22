@@ -135,7 +135,7 @@ const TMJPage = () => {
         setIsDeleting(true);
         try {
             await api.post('/items/delete-many', {
-                itemIds: Array.from(selectedItems)
+                ids: Array.from(selectedItems)
             });
             toast.success("Muvaffaqiyatli o'chirildi");
             setSelectedItems(new Set());
