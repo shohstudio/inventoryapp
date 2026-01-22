@@ -30,14 +30,14 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const [errors, setErrors] = useState({});
 
     // Options
-    const categories = ["Kompyuter", "PRINTER", "TV", "KONDITSIONER", "Interaktiv panel", "MEBEL JIHOZLAR"];
+    const categories = ["Kompyuter", "Printer", "TV", "Konditsioner", "Interaktiv panel", "Mebel jihozlar"];
     const departments = ["RTTM", "Bino komendanti"];
     const buildings = [
         "1-bino Asosiy",
         "2-bino IB va KT",
         "3-bino Avtomobilsozlik",
         "4-bino Mash tex",
-        "5-bino qurilish"
+        "5-bino Qurilish"
     ];
     const roles = [
         "Rektor",
