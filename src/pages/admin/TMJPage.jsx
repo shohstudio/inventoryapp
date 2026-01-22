@@ -246,8 +246,8 @@ const TMJPage = () => {
                                     </td>
                                     <td className="p-4">
                                         {item.contractPdf ? (
-                                            <a href={item.contractPdf} target="_blank" rel="noreferrer" className="text-red-600 hover:text-red-700 tooltip" data-tip="PDF Korish">
-                                                <RiFilePdfLine size={20} />
+                                            <a href={item.contractPdf} target="_blank" rel="noreferrer" className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium text-sm">
+                                                <RiFilePdfLine size={16} /> PDF yuklab olish
                                             </a>
                                         ) : (
                                             <span className="text-gray-300">-</span>
