@@ -17,7 +17,8 @@ const getItems = async (req, res) => {
             assignedUserId,
             isAssigned, // 'unassigned', 'pending', 'all'
             inventoryStatus,
-            inventoryStartDate
+            inventoryStartDate,
+            inventoryType // Add inventoryType filter
         } = req.query;
 
         const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -46,6 +47,7 @@ const getItems = async (req, res) => {
         if (category) where.category = category;
         if (building) where.building = building;
         if (location) where.location = { contains: location }; // Loose match for location
+        if (inventoryType) where.inventoryType = inventoryType;
 
         // Filter by Inventory Status (Passed / Not Passed)
         // Filter by Inventory Status (Passed / Not Passed)
@@ -178,19 +180,27 @@ const createItem = async (req, res) => {
             assignedPINFL, assignedTo, assignedRole // Extract new fields
         } = req.body;
 
-        // MULTI-IMAGE HANDLING
+        // MULTI-IMAGE & PDF HANDLING
         let image = null;
         let images = [];
+        let contractPdf = null;
+        let inventoryType = req.body.inventoryType || 'warehouse'; // Default to warehouse
 
         if (req.files && req.files.length > 0) {
-            // New multi-upload
-            images = req.files.map(file => `/uploads/${file.filename}`);
-            image = images[0]; // Set first image as Main Image
-        } else if (req.file) {
-            // Fallback for single file (legacy) if someone uses old endpoint
-            image = `/uploads/${req.file.filename}`;
-            images = [image];
+            // Filter images vs PDFs
+            const imageFiles = req.files.filter(f => f.mimetype.startsWith('image/'));
+            const pdfFiles = req.files.filter(f => f.mimetype === 'application/pdf');
+
+            if (imageFiles.length > 0) {
+                images = imageFiles.map(file => `/uploads/${file.filename}`);
+                image = images[0]; // Set first image as Main Image
+            }
+
+            if (pdfFiles.length > 0) {
+                contractPdf = `/uploads/${pdfFiles[0].filename}`;
+            }
         }
+        // Legacy single file fallback (removed mostly, but safe to keep check if needed, but Multer usually arrays now)
 
         // Check if User exists by PINFL or assignedUserId
         let targetUser = null;
@@ -218,6 +228,8 @@ const createItem = async (req, res) => {
             department,
             image, // Main image
             images: JSON.stringify(images), // All images as JSON
+            contractPdf,
+            inventoryType,
             // Do NOT assign directly yet
             assignedUserId: null,
             assignedDate: null,
@@ -287,7 +299,7 @@ const updateItem = async (req, res) => {
             building, location, department
         };
 
-        // IMAGE HANDLING
+        // IMAGE & PDF HANDLING
         // 1. Get existing images from request (frontend should send what is kept)
         let finalImages = [];
         if (existingImages) {
@@ -303,10 +315,15 @@ const updateItem = async (req, res) => {
 
         // 2. Add NEW files
         if (req.files && req.files.length > 0) {
-            const newImagePaths = req.files.map(file => `/uploads/${file.filename}`);
+            const imageFiles = req.files.filter(f => f.mimetype.startsWith('image/'));
+            const pdfFiles = req.files.filter(f => f.mimetype === 'application/pdf');
+
+            const newImagePaths = imageFiles.map(file => `/uploads/${file.filename}`);
             finalImages = [...finalImages, ...newImagePaths];
-        } else if (req.file) {
-            finalImages.push(`/uploads/${req.file.filename}`);
+
+            if (pdfFiles.length > 0) {
+                dataToUpdate.contractPdf = `/uploads/${pdfFiles[0].filename}`;
+            }
         }
 
         // 3. Update fields if we have a final list

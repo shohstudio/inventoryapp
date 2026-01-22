@@ -10,6 +10,7 @@ import EmployeeDashboard from "./pages/employee/EmployeeDashboard";
 import AdminLayout from "./components/layout/AdminLayout";
 import InventoryPage from "./pages/admin/InventoryPage";
 import WarehousePage from "./pages/admin/WarehousePage";
+import TMJPage from "./pages/admin/TMJPage";
 import UsersPage from "./pages/admin/UsersPage";
 import EmployeeLayout from "./components/layout/EmployeeLayout";
 import MyItemsPage from "./pages/employee/MyItemsPage";
@@ -41,6 +42,7 @@ function App() {
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="warehouse" element={<WarehousePage />} />
+                <Route path="tmj" element={<TMJPage />} />
                 <Route path="inventory-dates" element={<InventoryDatesPage />} />
                 <Route path="inventory-check" element={<InventoryCheckPage />} />
                 <Route path="reports" element={<InventoryReportPage />} />

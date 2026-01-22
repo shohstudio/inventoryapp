@@ -59,6 +59,9 @@ model Item {
   image        String?  // URL to MAIN image
   images       String?  // JSON array of all image URLs
 
+  contractPdf  String?  // URL to PDF contract
+  inventoryType String @default("warehouse") // warehouse, tmj
+
   // If imported from Excel and user not found, store name here
   initialOwner String?
   initialRole  String?  // Store role if user not found

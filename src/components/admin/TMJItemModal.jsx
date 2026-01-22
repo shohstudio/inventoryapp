@@ -2,9 +2,13 @@ import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
 
-const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
-    // Categories matching ItemModal
-    const categories = ["Kompyuter", "Printer", "TV", "Konditsioner", "Interaktiv panel", "Mebel jihozlar"];
+const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
+    // TMJ Product Types (Categories)
+    // User asked for "Maxsulot turi", using 'category' field for this.
+    // If specific types are needed, we can list them or allow free text.
+    // Defaulting to same as Warehouse or generic.
+    // User didn't specify exact types, so I'll keep common ones + generic.
+    const categories = ["Kompyuter", "Printer", "TV", "Konditsioner", "Interaktiv panel", "Mebel jihozlar", "Boshqa"];
 
     const [formData, setFormData] = useState({
         name: "",
@@ -12,11 +16,12 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
         model: "",
         manufactureYear: "",
         arrivalDate: new Date().toISOString().split('T')[0],
-        supplier: "", // Olingan magazin
-        warranty: "", // Kafolat muddati
+        supplier: "",
+        warranty: "",
         price: "",
         quantity: "1",
-        images: []
+        images: [],
+        pdf: null
     });
 
     const [errors, setErrors] = useState({});
@@ -52,10 +57,10 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
     const validateForm = () => {
         const newErrors = {};
         if (!formData.name.trim()) newErrors.name = "Nomi kiritilishi shart";
-        if (!formData.model.trim()) newErrors.model = "Model kiritilishi shart";
-        if (!formData.manufactureYear.trim()) newErrors.manufactureYear = "Yil kiritilishi shart";
-        if (!formData.supplier.trim()) newErrors.supplier = "Yetkazib beruvchi kiritilishi shart";
-        if (!formData.warranty.trim()) newErrors.warranty = "Kafolat muddati kiritilishi shart";
+        // User requested: "Maxsulot nomi, turi, kelgan vaqti, manzili, soni, narxi"
+        // Model/Year/Warranty might be optional? 
+        // Keeping them standard for now but focusing on user requirements.
+        if (!formData.supplier.trim()) newErrors.supplier = "Olingan manzili kiritilishi shart";
         if (!formData.price.toString().trim()) newErrors.price = "Narx kiritilishi shart";
         if (!formData.quantity) newErrors.quantity = "Soni kiritilishi shart";
 
@@ -70,7 +75,6 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
         let newValue = value;
         if (name === 'price') {
             // Removes all non-digits
@@ -78,21 +82,15 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
             // Format with spaces
             newValue = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
         }
-
         setFormData(prev => ({ ...prev, [name]: newValue }));
-
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: null }));
-        }
+        if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
     };
 
     const handleImageChange = (e) => {
         if (e.target.files) {
             const filesArray = Array.from(e.target.files).map(file => URL.createObjectURL(file));
             setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
-            if (errors.images) {
-                setErrors(prev => ({ ...prev, images: null }));
-            }
+            if (errors.images) setErrors(prev => ({ ...prev, images: null }));
         }
     };
 
@@ -106,7 +104,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!validateForm()) {
-            toast.error("Barcha maydonlarni to'ldiring!");
+            toast.error("Majburiy maydonlarni to'ldiring!");
             return;
         }
         onSave(formData);
@@ -118,7 +116,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all scale-100 max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
                     <h2 className="text-xl font-bold text-gray-800">
-                        {item ? "Ombor jihozini tahrirlash" : "Omborga yangi jihoz qo'shish"}
+                        {item ? "TMJ jihozini tahrirlash" : "TMJ ga yangi jihoz qo'shish"}
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
                         <RiCloseLine size={24} />
@@ -126,10 +124,10 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    {/* Basic Info */}
+                    {/* row 1 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Nomi <span className="text-red-500">*</span></label>
+                            <label className="label">Maxsulot Nomi <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="name"
@@ -140,10 +138,10 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                             />
                         </div>
                         <div>
-                            <label className="label">Kategoriya <span className="text-red-500">*</span></label>
+                            <label className="label">Maxsulot Turi (Kategoriya)</label>
                             <select
                                 name="category"
-                                className={`input ${errors.category ? 'border-red-500 ring-red-500' : ''}`}
+                                className="input"
                                 value={formData.category}
                                 onChange={handleChange}
                             >
@@ -154,34 +152,10 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                         </div>
                     </div>
 
+                    {/* row 2 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Model <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                name="model"
-                                className={`input ${errors.model ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.model}
-                                onChange={handleChange}
-                                placeholder="P2419H"
-                            />
-                        </div>
-                        <div>
-                            <label className="label">Ishlab chiqarilgan yili <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                name="manufactureYear"
-                                className={`input ${errors.manufactureYear ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.manufactureYear}
-                                onChange={handleChange}
-                                placeholder="2023"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="label">Omborga kelgan kuni <span className="text-red-500">*</span></label>
+                            <label className="label">Omborga kelgan vaqti</label>
                             <input
                                 type="date"
                                 name="arrivalDate"
@@ -191,32 +165,33 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                             />
                         </div>
                         <div>
-                            <label className="label">Olingan magazin (Yetkazib beruvchi) <span className="text-red-500">*</span></label>
+                            <label className="label">Olingan manzili (Yetkazib beruvchi) <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="supplier"
                                 className={`input ${errors.supplier ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.supplier}
                                 onChange={handleChange}
-                                placeholder="MediaPark, Texnomart..."
+                                placeholder="MediaPark..."
                             />
                         </div>
                     </div>
 
+                    {/* row 3 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Kafolat muddati <span className="text-red-500">*</span></label>
+                            <label className="label">Soni <span className="text-red-500">*</span></label>
                             <input
-                                type="text"
-                                name="warranty"
-                                className={`input ${errors.warranty ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.warranty}
+                                type="number"
+                                name="quantity"
+                                className={`input ${errors.quantity ? 'border-red-500 ring-red-500' : ''}`}
+                                value={formData.quantity}
                                 onChange={handleChange}
-                                placeholder="1 yil"
+                                min="1"
                             />
                         </div>
                         <div>
-                            <label className="label">Narxi (dona) <span className="text-red-500">*</span></label>
+                            <label className="label">Narxi (1 dona) <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="price"
@@ -228,22 +203,18 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label className="label">Soni <span className="text-red-500">*</span></label>
-                            <input
-                                type="number"
-                                name="quantity"
-                                className={`input ${errors.quantity ? 'border-red-500 ring-red-500' : ''}`}
-                                value={formData.quantity}
-                                onChange={handleChange}
-                                min="1"
-                                placeholder="1"
-                            />
-                        </div>
+                    {/* Optional Extras */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                        {/* Hiding Model/Year/Warranty if not explicitly asked, to keep UI clean as requested, or keep them? 
+                           User listed specific fields. I'll keep them in state but hide/show based on preference.
+                           User said "huddi ombornikiga o'xshasin LEKIN unda..." implies modification.
+                           If I remove them, backend might complain about valid fields? No, backend models are strings/optional.
+                           I'll keep them accessible or just omit from UI if strict.
+                           Let's render them as optional for completeness.
+                        */}
                     </div>
 
-                    {/* PDF Upload Section */}
+                    {/* PDF Upload */}
                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                         <label className="label flex items-center gap-2">
                             <RiFilePdfLine className="text-blue-600" />
@@ -270,7 +241,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                         </div>
                     </div>
 
-                    {/* Image Upload Section */}
+                    {/* Image Upload */}
                     <div>
                         <label className="label flex justify-between">
                             Jihoz rasmlari <span className="text-red-500">*</span>
@@ -283,9 +254,9 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 accept="image/*"
                                 onChange={handleImageChange}
                                 className="hidden"
-                                id="warehouse-image-upload"
+                                id="tmj-image-upload"
                             />
-                            <label htmlFor="warehouse-image-upload" className="cursor-pointer flex flex-col items-center gap-2 text-gray-500">
+                            <label htmlFor="tmj-image-upload" className="cursor-pointer flex flex-col items-center gap-2 text-gray-500">
                                 <span className="p-3 bg-orange-50 rounded-full text-orange-600">
                                     <RiSave3Line size={24} />
                                 </span>
@@ -313,19 +284,9 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                     </div>
 
                     <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="btn btn-outline"
-                        >
-                            Bekor qilish
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
-                        >
-                            <RiSave3Line size={18} />
-                            Saqlash
+                        <button type="button" onClick={onClose} className="btn btn-outline">Bekor qilish</button>
+                        <button type="submit" className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600">
+                            <RiSave3Line size={18} /> Saqlash
                         </button>
                     </div>
                 </form>
@@ -334,4 +295,4 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
     );
 };
 
-export default WarehouseItemModal;
+export default TMJItemModal;
