@@ -110,21 +110,31 @@ const TMJPage = () => {
         try {
             const formData = new FormData();
             Object.keys(itemData).forEach(key => {
-                if (key === 'images' && Array.isArray(itemData[key])) {
-                    // File array handling done by key check usually
-                } else if (key === 'price') {
-                    // Strip spaces from price
-                    formData.append(key, itemData[key].toString().replace(/\s/g, ''));
-                } else if (key === 'arrivalDate') {
-                    // Map arrivalDate to purchaseDate
-                    formData.append('purchaseDate', itemData[key]);
-                } else if (key === 'supplier') {
-                    // Map supplier to location
-                    formData.append('location', itemData[key]);
-                } else if (itemData[key]) {
+                // Skip keys that we handle specifically or map from others
+                if (['images', 'imageFiles', 'pdf', 'purchaseDate', 'location', 'arrivalDate', 'supplier', 'price'].includes(key)) {
+                    return;
+                }
+                if (itemData[key] !== null && itemData[key] !== undefined) {
                     formData.append(key, itemData[key]);
                 }
             });
+
+            // Explicitly handle mapped/formatted fields
+            if (itemData.price) {
+                formData.append('price', itemData.price.toString().replace(/\s/g, ''));
+            }
+
+            // Map arrivalDate -> purchaseDate
+            const purchaseDate = itemData.arrivalDate || itemData.purchaseDate;
+            if (purchaseDate) {
+                formData.append('purchaseDate', purchaseDate);
+            }
+
+            // Map supplier -> location
+            const location = itemData.supplier || itemData.location;
+            if (location) {
+                formData.append('location', location);
+            }
 
             // Append Images
             if (itemData.imageFiles && Array.isArray(itemData.imageFiles)) {
