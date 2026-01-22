@@ -383,7 +383,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 <option value="working">Soz holatda</option>
                                 <option value="repair">Ta'mir talab</option>
                                 <option value="written-off">Ro'yxatdan chiqarilgan</option>
-                                <option value="broken">Buzilgan</option>
+                                <option value="broken">Yaroqsiz holatda</option>
                             </select>
                         </div>
                     </div>
