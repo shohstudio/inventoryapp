@@ -27,6 +27,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
     });
 
     const [errors, setErrors] = useState({});
+    const [lightboxImage, setLightboxImage] = useState(null);
 
     useEffect(() => {
         if (item) {
@@ -233,24 +234,37 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                             <RiFilePdfLine className="text-blue-600" />
                             Shartnoma (PDF)
                         </label>
-                        <div className="flex items-center gap-3">
-                            <input
-                                type="file"
-                                accept="application/pdf"
-                                onChange={(e) => {
-                                    if (e.target.files[0]) {
-                                        setFormData(prev => ({ ...prev, pdf: e.target.files[0] }));
-                                    }
-                                }}
-                                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 text-sm text-gray-500"
-                            />
-                            {formData.pdf && (typeof formData.pdf === 'string' ? (
-                                <a href={formData.pdf} target="_blank" rel="noreferrer" className="text-xs text-blue-600 underline">
-                                    Joriy fayl
-                                </a>
-                            ) : (
-                                <span className="text-xs text-green-600 font-medium">Tanlandi</span>
-                            ))}
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => {
+                                        if (e.target.files[0]) {
+                                            setFormData(prev => ({ ...prev, pdf: e.target.files[0] }));
+                                        }
+                                    }}
+                                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 text-sm text-gray-500"
+                                />
+                            </div>
+                            {formData.pdf && (
+                                <div className="mt-2 p-2 bg-white rounded border border-blue-200 flex items-center justify-between">
+                                    <span className="text-sm text-gray-600 flex items-center gap-2">
+                                        <RiFilePdfLine className="text-red-500" />
+                                        {typeof formData.pdf === 'string' ? "Joriy shartnoma fayli" : formData.pdf.name}
+                                    </span>
+                                    {typeof formData.pdf === 'string' && (
+                                        <a
+                                            href={formData.pdf}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="text-xs text-blue-600 font-medium hover:underline"
+                                        >
+                                            Ko'rish
+                                        </a>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -281,11 +295,16 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                         {formData.images.length > 0 && (
                             <div className="grid grid-cols-4 gap-2 mt-4">
                                 {formData.images.map((img, index) => (
-                                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100">
-                                        <img src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
+                                        <img
+                                            src={img}
+                                            alt={`Preview ${index}`}
+                                            className="w-full h-full object-cover"
+                                            onClick={() => setLightboxImage(img)}
+                                        />
                                         <button
                                             type="button"
-                                            onClick={() => removeImage(index)}
+                                            onClick={(e) => { e.stopPropagation(); removeImage(index); }}
                                             className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
                                             <RiCloseLine size={16} />
@@ -304,6 +323,29 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                     </div>
                 </form>
             </div>
+
+            {/* Lightbox Overlay */}
+            {lightboxImage && (
+                <div
+                    className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center p-4"
+                    onClick={() => setLightboxImage(null)}
+                >
+                    <div className="relative max-w-4xl max-h-[90vh] w-full flex items-center justify-center">
+                        <img
+                            src={lightboxImage}
+                            alt="Full View"
+                            className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                            onClick={(e) => e.stopPropagation()} // Prevent close on image click
+                        />
+                        <button
+                            className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
+                            onClick={() => setLightboxImage(null)}
+                        >
+                            <RiCloseLine size={32} />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
