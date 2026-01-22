@@ -27,6 +27,7 @@ const TMJPage = () => {
     // Bulk Actions
     const [selectedItems, setSelectedItems] = useState(new Set());
     const [isDeleting, setIsDeleting] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const fetchItems = async () => {
         setLoading(true);
@@ -126,9 +127,11 @@ const TMJPage = () => {
         setSelectedItems(newSelected);
     };
 
-    const handleBulkDelete = async () => {
-        if (!window.confirm(t('confirm_bulk_delete') || "Tanlanganlarni o'chirishni tasdiqlaysizmi?")) return;
+    const handleBulkDelete = () => {
+        setShowDeleteConfirm(true);
+    };
 
+    const confirmDelete = async () => {
         setIsDeleting(true);
         try {
             await api.post('/items/delete-many', {
@@ -137,6 +140,7 @@ const TMJPage = () => {
             toast.success("Muvaffaqiyatli o'chirildi");
             setSelectedItems(new Set());
             fetchItems();
+            setShowDeleteConfirm(false);
         } catch (error) {
             console.error("Bulk delete error", error);
             toast.error("O'chirishda xatolik");
@@ -364,6 +368,38 @@ const TMJPage = () => {
                     onClose={() => setIsModalOpen(false)}
                     onSave={handleAddItem}
                 />
+            )}
+
+            {/* Custom Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+                        <div className="text-center">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <RiDeleteBinLine className="text-red-600 text-3xl" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Tasdiqlash</h3>
+                            <p className="text-gray-500 mb-6">
+                                Haqiqatan ham belgilangan {selectedItems.size} ta elementni o'chirib yubormoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.
+                            </p>
+                            <div className="flex gap-3 justify-center">
+                                <button
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="px-5 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                                >
+                                    Bekor qilish
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    disabled={isDeleting}
+                                    className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 shadow-lg shadow-red-200 transition-all transform active:scale-95"
+                                >
+                                    {isDeleting ? "O'chirilmoqda..." : "Ha, o'chirish"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
