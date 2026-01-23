@@ -44,54 +44,9 @@ const TMJPage = () => {
             };
 
             // Mapping tabs to API filters
-            if (activeTab === 'stock') {
-                params.isAssigned = 'unassigned';
-            } else if (activeTab === 'assigned') {
-                // For 'assigned', we want items that HAVE an assigned user OR a request pending?
-                // Usually 'assigned' implies current ownership.
-                // Let's allow 'all' assigned status (pending + completed) or just completed?
-                // Given standard logic, we might need a custom filter or just check for assignedUserId NOT NULL.
-                // Our API isAssigned helper handles 'unassigned', 'pending', 'all'.
-                // There isn't a direct 'only_assigned' helper in the controller snippets I saw, 
-                // but checking `assignedUserId` usually works.
-                // Let's try passing custom logic or handle via general logic.
-                // Wait, `isAssigned` logic in controller:
-                // if 'unassigned' -> assignedUserId = null
-                // if 'pending' -> requests...
-                // if 'all' -> no filter.
-                // We need 'assigned'. 
-                // Let's rely on specific filter if backend supports it, or just fetch all and filter client side if needed (bad for pagination).
-                // Actually, I can pass `assignedUserId` if I want specific user.
-                // For "Berilgan" (Given out), we want `assignedUserId != null`.
-                // Controller check: `if (assignedUserId)`.
-                // It seems I might need to update controller to support `isAssigned=assigned` explicitly if missing.
-                // checking controller code... 
-                // Ah, controller has: `if (isAssigned === 'unassigned') ... else if (isAssigned === 'pending') ...`
-                // It does NOT have `else if (isAssigned === 'assigned')`.
-                // FILTER HACK: I won't filter by `isAssigned` param for 'assigned' tab here yet, 
-                // I might rely on `status` or just fetch ALL and let user see? No, tabs imply filtering.
-                // Let's use `status` maybe? No.
-                // Simplest fix: Just use `all` for now for 'Barchasi'.
-                // For 'Omborga kelgan', use `unassigned`.
-                // For 'Berilgan', we strictly need assigned items.
-                // I will update controller later if needed, but 'All' shows everything.
-                // Let's assume 'assigned' isn't easily filterable via simple param without edit.
-                // I will add `isAssigned='assigned'` support to controller later or now?
-                // Better to just show `all` for now if I can't filter 'assigned' specifically.
-                // WAIT! `isAssigned` logic in controller doesn't cover "isAssigned".
-                // Let's just use 'all' for assigned tab but client filter? No, pagination breaks.
-                // Let's assume 'Berilgan' items have a specific status? No.
-
-                // Temporary strategy: 
-                // Tab 1: Stock -> isAssigned='unassigned'
-                // Tab 3: All -> isAssigned='all' (default)
-                // Tab 2: Assigned -> Currently tricky. Maybe I update controller to handle `isAssigned == 'assigned'`? 
-                // Yes, I should update controller. But for now I'll list "All" strategies.
-                // Let's use `assignedUserId` filter hack? No.
-                // I'll stick to 'all' for 'assigned' tab visually but maybe sort?
-                // Or I can add a quick fix to controller if I can.
-                // Let's just leave it as 'all' for now and fix controller next step if crucial.
-            }
+            if (activeTab === 'stock') params.isAssigned = 'unassigned';
+            if (activeTab === 'assigned') params.isAssigned = 'assigned';
+            // 'all' sends no 'isAssigned' param, meaning fetch everything
 
             const { data } = await api.get('/items', { params });
 

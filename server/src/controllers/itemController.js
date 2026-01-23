@@ -78,12 +78,22 @@ const getItems = async (req, res) => {
         // Warehouse Specific Filters
         if (isAssigned === 'unassigned') {
             where.assignedUserId = null;
+            // Also ensure no manual handover
+            where.initialOwner = null;
+
             // Also ensure no active requests if strict "Available in Warehouse"
             where.requests = {
                 none: {
                     status: { in: ['pending_accountant', 'pending_employee'] }
                 }
             };
+        } else if (isAssigned === 'assigned') {
+            // New filter for "Berilgan" tab
+            where.OR = [
+                { assignedUserId: { not: null } },
+                { initialOwner: { not: null } }
+            ];
+        } else if (isAssigned === 'pending') {
         } else if (isAssigned === 'pending') {
             where.requests = {
                 some: {
