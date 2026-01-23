@@ -194,6 +194,7 @@ const TMJPage = () => {
             formData.append('initialRole', data.handoverPosition);
             formData.append('building', data.handoverBuilding); // Update building location
             formData.append('assignedDate', data.handoverDate);
+            formData.append('handoverQuantity', data.handoverQuantity);
 
             if (data.handoverImage instanceof File) {
                 formData.append('handoverImage', data.handoverImage);

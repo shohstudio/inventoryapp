@@ -8,6 +8,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
         handoverName: "",
         handoverPosition: "",
         handoverBuilding: "1-bino Asosiy", // Default
+        handoverQuantity: "1",
         handoverDate: new Date().toISOString().split('T')[0],
         handoverImage: null, // File object or URL string
         handoverImagePreview: null
@@ -20,6 +21,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                 handoverName: item.initialOwner || "",
                 handoverPosition: item.initialRole || "",
                 handoverBuilding: item.building || "1-bino Asosiy", // Use item's current building as default
+                handoverQuantity: "1", // Default to 1
                 handoverDate: item.assignedDate ? item.assignedDate.split('T')[0] : new Date().toISOString().split('T')[0],
                 handoverImage: item.handoverImage || null,
                 handoverImagePreview: item.handoverImage ? (item.handoverImage.startsWith('http') ? item.handoverImage : BASE_URL.replace('/api', '') + item.handoverImage) : null
@@ -29,6 +31,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                 handoverName: "",
                 handoverPosition: "",
                 handoverBuilding: "1-bino Asosiy",
+                handoverQuantity: "1",
                 handoverDate: new Date().toISOString().split('T')[0],
                 handoverImage: null,
                 handoverImagePreview: null
@@ -70,6 +73,14 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
         if (!formData.handoverName.trim()) newErrors.handoverName = "Ism/Familya kiritilishi shart";
         if (!formData.handoverPosition.trim()) newErrors.handoverPosition = "Lavozim kiritilishi shart";
         if (!formData.handoverBuilding.trim()) newErrors.handoverBuilding = "Bino tanlanishi shart";
+
+        const qty = parseInt(formData.handoverQuantity);
+        if (!formData.handoverQuantity || isNaN(qty) || qty < 1) {
+            newErrors.handoverQuantity = "Soni noto'g'ri";
+        } else if (item && qty > item.quantity) {
+            newErrors.handoverQuantity = `Mavjud sonidan ko'p (Maks: ${item.quantity})`;
+        }
+
         if (!formData.handoverDate) newErrors.handoverDate = "Sana kiritilishi shart";
         // Image is mandatory
         if (!formData.handoverImage) newErrors.handoverImage = "Rasm yuklash majburiy";
@@ -142,6 +153,21 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                             ))}
                         </select>
                         {errors.handoverBuilding && <p className="text-red-500 text-xs mt-1">{errors.handoverBuilding}</p>}
+                    </div>
+
+                    <div>
+                        <label className="label">Topshirilayotgan soni (Mavjud: {item?.quantity || 0}) <span className="text-red-500">*</span></label>
+                        <input
+                            type="number"
+                            name="handoverQuantity"
+                            className={`input ${errors.handoverQuantity ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                            value={formData.handoverQuantity}
+                            onChange={handleChange}
+                            min="1"
+                            max={item?.quantity || 1}
+                            disabled={readOnly}
+                        />
+                        {errors.handoverQuantity && <p className="text-red-500 text-xs mt-1">{errors.handoverQuantity}</p>}
                     </div>
 
                     <div>

@@ -299,7 +299,7 @@ const updateItem = async (req, res) => {
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo,
             existingImages, // JSON string or array of strings of OLD images to keep
-            initialOwner, initialRole, assignedDate // Extract Handover fields directly
+            initialOwner, initialRole, assignedDate, handoverQuantity // Extract Handover fields directly
         } = req.body;
 
         const dataToUpdate = {
@@ -419,7 +419,60 @@ const updateItem = async (req, res) => {
             if (assignedDate !== undefined) dataToUpdate.assignedDate = assignedDate ? new Date(assignedDate) : null;
         }
 
-        const item = await prisma.item.update({
+        // --- PARTIAL HANDOVER SPLIT LOGIC ---
+        // If handoverQuantity is provided and it is LESS than current item quantity, we must SPLIT the item.
+        if (initialOwner && handoverQuantity && parseInt(handoverQuantity) < item.quantity) {
+            const splitQty = parseInt(handoverQuantity);
+            const remainingQty = item.quantity - splitQty;
+
+            // 1. Update ORIGINAL item: just reduce quantity, KEEP it in stock (unassigned)
+            // We do NOT apply dataToUpdate (which has assignment info) to the original item.
+            await prisma.item.update({
+                where: { id: parseInt(id) },
+                data: { quantity: remainingQty }
+            });
+
+            // 2. Create NEW item: Copy strict fields from original, set quantity to splitQty, apply assignment
+            // We need to parse images properly to copy them
+            let newImages = item.images;
+
+            // Prepare creation data based on original item
+            const newItemData = {
+                name: item.name,
+                model: item.model,
+                serialNumber: item.serialNumber, // Note: Serial number duplicate? Maybe append -1? But usually serials are unique. Assuming they split batch.
+                inn: item.inn,
+                orderNumber: item.orderNumber,
+                category: item.category,
+                subCategory: item.subCategory,
+                price: item.price,
+                quantity: splitQty, // The handed over amount
+                purchaseDate: item.purchaseDate,
+                status: item.status,
+                condition: item.condition,
+                department: item.department, // Maybe updates?
+                location: item.location,    // Maybe updates?
+
+                // Apply Handover Data
+                building: dataToUpdate.building || item.building, // Updated building
+                initialOwner: dataToUpdate.initialOwner,
+                initialRole: dataToUpdate.initialRole,
+                assignedDate: dataToUpdate.assignedDate,
+
+                // Images
+                images: newImages,
+                handoverImage: dataToUpdate.handoverImage // The proof image
+            };
+
+            const newItem = await prisma.item.create({
+                data: newItemData
+            });
+
+            return res.json(newItem);
+        }
+        // --- END PARTIAL LOGIC ---
+
+        const updatedItem = await prisma.item.update({
             where: { id: parseInt(req.params.id) },
             data: dataToUpdate
         });
