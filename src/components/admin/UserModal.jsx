@@ -228,6 +228,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                                 <option value="accounter">Hisobchi</option>
                                 <option value="warehouseman">Omborchi</option>
                                 <option value="guard">Qoravul</option>
+                                <option value="stat">Kuzatuvchi (Stat)</option>
                             </select>
                         </div>
                         <div>

@@ -156,7 +156,8 @@ export const translations = {
         role_admin: "Administrator",
         role_employee: "Xodim",
         role_accounter: "Hisobchi",
-        role_warehouseman: "Omborchi"
+        role_warehouseman: "Omborchi",
+        role_stat: "Kuzatuvchi"
     },
     oz: {
         // Sidebar
@@ -474,6 +475,7 @@ export const translations = {
         role_admin: "Админ",
         role_employee: "Сотрудник",
         role_accounter: "Бухгалтер",
-        role_warehouseman: "Кладовщик"
+        role_warehouseman: "Кладовщик",
+        role_stat: "Наблюдатель"
     }
 };
