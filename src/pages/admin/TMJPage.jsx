@@ -325,12 +325,14 @@ const TMJPage = () => {
                                         {parseFloat(item.price).toLocaleString()} so'm
                                     </td>
                                     <td className="p-4">
+
                                         {item.contractPdf ? (
                                             <a
-                                                href={BASE_URL.replace('/api', '') + item.contractPdf}
+                                                href={(item.contractPdf.startsWith('http') ? "" : BASE_URL.replace('/api', '')) + item.contractPdf}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium text-sm"
+                                                className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium text-sm bg-red-50 px-2 py-1 rounded border border-red-100 hover:bg-red-100 transition-colors w-fit"
+                                                onClick={(e) => e.stopPropagation()}
                                             >
                                                 <RiFilePdfLine size={16} /> PDF
                                             </a>
@@ -353,7 +355,13 @@ const TMJPage = () => {
                                             if (img) {
                                                 const imgSrc = img.startsWith('http') ? img : (BASE_URL.replace('/api', '') + img);
                                                 return (
-                                                    <div className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100 bg-white">
+                                                    <div
+                                                        className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100 bg-white cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all shadow-sm"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setPreviewImage(imgSrc);
+                                                        }}
+                                                    >
                                                         <img src={imgSrc} alt="Item" className="w-full h-full object-cover" />
                                                     </div>
                                                 );
@@ -421,6 +429,30 @@ const TMJPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Image Preview Modal */}
+            {previewImage && (
+                <div
+                    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <div className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center">
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md"
+                        >
+                            <RiCloseLine size={24} />
+                        </button>
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
