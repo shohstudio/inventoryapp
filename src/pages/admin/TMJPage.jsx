@@ -46,7 +46,7 @@ const TMJPage = () => {
             // Mapping tabs to API filters
             if (activeTab === 'stock') params.isAssigned = 'unassigned';
             if (activeTab === 'assigned') params.isAssigned = 'assigned';
-            // 'all' sends no 'isAssigned' param, meaning fetch everything
+            // 'all' sends no 'isAssigned' param, hammasi fetch bo'ladi
 
             const { data } = await api.get('/items', { params });
 
@@ -66,7 +66,7 @@ const TMJPage = () => {
         fetchItems();
     }, [currentPage, searchQuery, activeTab]);
 
-    // Bulk Delete Logic
+    // Bbirdan o'chirish
     const toggleSelectAll = () => {
         if (selectedItems.size === items.length) {
             setSelectedItems(new Set());
@@ -161,7 +161,7 @@ const TMJPage = () => {
                 formData.append('existingImages', JSON.stringify(existingUrls));
             }
 
-            // PDF Contract - Append as 'images' to satisfy Multer
+            // PDF ko'rishga
             if (itemData.pdf instanceof File) {
                 formData.append('images', itemData.pdf);
             }
@@ -192,6 +192,7 @@ const TMJPage = () => {
             const formData = new FormData();
             formData.append('initialOwner', data.handoverName);
             formData.append('initialRole', data.handoverPosition);
+            formData.append('building', data.handoverBuilding); // Update building location
             formData.append('assignedDate', data.handoverDate);
 
             if (data.handoverImage instanceof File) {

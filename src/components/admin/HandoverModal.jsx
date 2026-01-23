@@ -7,6 +7,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
     const [formData, setFormData] = useState({
         handoverName: "",
         handoverPosition: "",
+        handoverBuilding: "1-bino Asosiy", // Default
         handoverDate: new Date().toISOString().split('T')[0],
         handoverImage: null, // File object or URL string
         handoverImagePreview: null
@@ -18,6 +19,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
             setFormData({
                 handoverName: item.initialOwner || "",
                 handoverPosition: item.initialRole || "",
+                handoverBuilding: item.building || "1-bino Asosiy", // Use item's current building as default
                 handoverDate: item.assignedDate ? item.assignedDate.split('T')[0] : new Date().toISOString().split('T')[0],
                 handoverImage: item.handoverImage || null,
                 handoverImagePreview: item.handoverImage ? (item.handoverImage.startsWith('http') ? item.handoverImage : BASE_URL.replace('/api', '') + item.handoverImage) : null
@@ -26,6 +28,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
             setFormData({
                 handoverName: "",
                 handoverPosition: "",
+                handoverBuilding: "1-bino Asosiy",
                 handoverDate: new Date().toISOString().split('T')[0],
                 handoverImage: null,
                 handoverImagePreview: null
@@ -54,10 +57,19 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
         }
     };
 
+    const buildings = [
+        "1-bino Asosiy",
+        "2-bino IB va KT",
+        "3-bino Avtomobilsozlik",
+        "4-bino Mash tex",
+        "5-bino Qurilish"
+    ];
+
     const validateForm = () => {
         const newErrors = {};
         if (!formData.handoverName.trim()) newErrors.handoverName = "Ism/Familya kiritilishi shart";
         if (!formData.handoverPosition.trim()) newErrors.handoverPosition = "Lavozim kiritilishi shart";
+        if (!formData.handoverBuilding.trim()) newErrors.handoverBuilding = "Bino tanlanishi shart";
         if (!formData.handoverDate) newErrors.handoverDate = "Sana kiritilishi shart";
         // Image is mandatory
         if (!formData.handoverImage) newErrors.handoverImage = "Rasm yuklash majburiy";
@@ -80,7 +92,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
                 <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
                     <h2 className="text-xl font-bold text-gray-800">
-                        {readOnly ? "Topshirish Ma'lumotlari" : "Topshirish (Handover)"}
+                        {readOnly ? "Topshirish Ma'lumotlari" : "Topshirish"}
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
                         <RiCloseLine size={24} />
@@ -114,6 +126,22 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                             disabled={readOnly}
                         />
                         {errors.handoverPosition && <p className="text-red-500 text-xs mt-1">{errors.handoverPosition}</p>}
+                    </div>
+
+                    <div>
+                        <label className="label">Bino <span className="text-red-500">*</span></label>
+                        <select
+                            name="handoverBuilding"
+                            className={`input ${errors.handoverBuilding ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                            value={formData.handoverBuilding}
+                            onChange={handleChange}
+                            disabled={readOnly}
+                        >
+                            {buildings.map(b => (
+                                <option key={b} value={b}>{b}</option>
+                            ))}
+                        </select>
+                        {errors.handoverBuilding && <p className="text-red-500 text-xs mt-1">{errors.handoverBuilding}</p>}
                     </div>
 
                     <div>
