@@ -11,6 +11,7 @@ import { BASE_URL } from "../../api/axios";
 
 const TMJPage = () => {
     const { t } = useLanguage();
+    const { user } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const [isHandoverModalOpen, setIsHandoverModalOpen] = useState(false);
