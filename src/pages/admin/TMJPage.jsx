@@ -209,10 +209,14 @@ const TMJPage = () => {
             }
 
             if (selectedItem) {
-                await api.put(`/items/${selectedItem.id}`, formData);
+                await api.put(`/items/${selectedItem.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
                 toast.success("Yangilandi");
             } else {
-                await api.post('/items', formData);
+                await api.post('/items', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
                 toast.success("Qo'shildi");
             }
             fetchItems();
