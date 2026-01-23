@@ -407,11 +407,13 @@ const TMJPage = () => {
                                     <td className="p-4 text-right flex justify-end gap-2">
                                         <button
                                             onClick={() => { setSelectedHandoverItem(item); setIsHandoverModalOpen(true); }}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg flex items-center gap-1 border border-blue-100"
+                                            className={`p-2 rounded-lg flex items-center gap-1 border transition-colors ${item.initialOwner
+                                                ? 'text-green-600 hover:bg-green-50 border-green-100 bg-green-50/50'
+                                                : 'text-blue-600 hover:bg-blue-50 border-blue-100'}`}
                                             title="Topshirish"
                                         >
                                             <RiUserReceived2Line size={18} />
-                                            <span className="text-xs font-medium">Topshirish</span>
+                                            <span className="text-xs font-medium">{item.initialOwner ? "Topshirilgan" : "Topshirish"}</span>
                                         </button>
                                         <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
                                             <RiMore2Fill size={18} />
@@ -445,6 +447,7 @@ const TMJPage = () => {
                 <HandoverModal
                     isOpen={isHandoverModalOpen}
                     item={selectedHandoverItem}
+                    readOnly={!!selectedHandoverItem?.initialOwner}
                     onClose={() => setIsHandoverModalOpen(false)}
                     onSave={handleHandoverSave}
                 />

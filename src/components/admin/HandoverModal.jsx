@@ -3,7 +3,7 @@ import { RiCloseLine, RiSave3Line, RiImageAddLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
 import { BASE_URL } from "../../api/axios";
 
-const HandoverModal = ({ isOpen, onClose, onSave, item }) => {
+const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
     const [formData, setFormData] = useState({
         handoverName: "",
         handoverPosition: "",
@@ -80,7 +80,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item }) => {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
                 <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
                     <h2 className="text-xl font-bold text-gray-800">
-                        Topshirish (Handover)
+                        {readOnly ? "Topshirish Ma'lumotlari" : "Topshirish (Handover)"}
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
                         <RiCloseLine size={24} />
@@ -93,10 +93,11 @@ const HandoverModal = ({ isOpen, onClose, onSave, item }) => {
                         <input
                             type="text"
                             name="handoverName"
-                            className={`input ${errors.handoverName ? 'border-red-500 ring-red-500' : ''}`}
+                            className={`input ${errors.handoverName ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             value={formData.handoverName}
                             onChange={handleChange}
                             placeholder="F.I.SH"
+                            disabled={readOnly}
                         />
                         {errors.handoverName && <p className="text-red-500 text-xs mt-1">{errors.handoverName}</p>}
                     </div>
@@ -106,10 +107,11 @@ const HandoverModal = ({ isOpen, onClose, onSave, item }) => {
                         <input
                             type="text"
                             name="handoverPosition"
-                            className={`input ${errors.handoverPosition ? 'border-red-500 ring-red-500' : ''}`}
+                            className={`input ${errors.handoverPosition ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             value={formData.handoverPosition}
                             onChange={handleChange}
                             placeholder="Masalan: Bosh hisobchi"
+                            disabled={readOnly}
                         />
                         {errors.handoverPosition && <p className="text-red-500 text-xs mt-1">{errors.handoverPosition}</p>}
                     </div>
@@ -119,9 +121,10 @@ const HandoverModal = ({ isOpen, onClose, onSave, item }) => {
                         <input
                             type="date"
                             name="handoverDate"
-                            className={`input ${errors.handoverDate ? 'border-red-500 ring-red-500' : ''}`}
+                            className={`input ${errors.handoverDate ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             value={formData.handoverDate}
                             onChange={handleChange}
+                            disabled={readOnly}
                         />
                         {errors.handoverDate && <p className="text-red-500 text-xs mt-1">{errors.handoverDate}</p>}
                     </div>
@@ -137,14 +140,14 @@ const HandoverModal = ({ isOpen, onClose, onSave, item }) => {
                                         alt="Handover Preview"
                                         className="w-full h-full object-contain rounded-lg"
                                     />
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg cursor-pointer text-white font-medium" onClick={() => document.getElementById('handoverInfoImage').click()}>
-                                        O'zgartirish
+                                    <div className={`absolute inset-0 bg-black/40 ${readOnly ? 'opacity-0' : 'opacity-0 hover:opacity-100 cursor-pointer'} transition-opacity flex items-center justify-center rounded-lg text-white font-medium`} onClick={() => !readOnly && document.getElementById('handoverInfoImage').click()}>
+                                        {readOnly ? "" : "O'zgartirish"}
                                     </div>
                                 </div>
                             ) : (
-                                <label htmlFor="handoverInfoImage" className="cursor-pointer flex flex-col items-center gap-2 text-gray-400 hover:text-blue-500 w-full h-full justify-center">
+                                <label htmlFor="handoverInfoImage" className={`flex flex-col items-center gap-2 text-gray-400 w-full h-full justify-center ${readOnly ? 'cursor-not-allowed' : 'cursor-pointer hover:text-blue-500'}`}>
                                     <RiImageAddLine size={32} />
-                                    <span className="text-sm">Rasm yuklash</span>
+                                    <span className="text-sm">{readOnly ? "Rasm yo'q" : "Rasm yuklash"}</span>
                                 </label>
                             )}
 
@@ -154,16 +157,19 @@ const HandoverModal = ({ isOpen, onClose, onSave, item }) => {
                                 accept="image/*"
                                 onChange={handleImageChange}
                                 className="hidden"
+                                disabled={readOnly}
                             />
                         </div>
                         {errors.handoverImage && <p className="text-red-500 text-xs mt-1 text-center">{errors.handoverImage}</p>}
                     </div>
 
                     <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
-                        <button type="button" onClick={onClose} className="btn btn-outline">Bekor qilish</button>
-                        <button type="submit" className="btn btn-primary bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200">
-                            <RiSave3Line size={18} /> Saqlash
-                        </button>
+                        <button type="button" onClick={onClose} className="btn btn-outline">{readOnly ? "Yopish" : "Bekor qilish"}</button>
+                        {!readOnly && (
+                            <button type="submit" className="btn btn-primary bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200">
+                                <RiSave3Line size={18} /> Saqlash
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>
