@@ -122,7 +122,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                             className={`input ${errors.handoverPosition ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             value={formData.handoverPosition}
                             onChange={handleChange}
-                            placeholder="Masalan: Bosh hisobchi"
+                            placeholder="Masalan: Bog'bon"
                             disabled={readOnly}
                         />
                         {errors.handoverPosition && <p className="text-red-500 text-xs mt-1">{errors.handoverPosition}</p>}
