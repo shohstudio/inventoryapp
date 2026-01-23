@@ -195,7 +195,7 @@ const RequestsPage = () => {
                                         </td>
                                         <td className="py-4 px-6 text-right">
                                             {/* Logic for Accountant Approval */}
-                                            {user.role === 'accounter' && req.status === 'pending_accountant' && (
+                                            {user.role === 'accounter' && req.status === 'pending_accountant' && user.role !== 'stat' && (
                                                 <div className="flex justify-end gap-2">
                                                     <button
                                                         onClick={() => handleUpdateStatus(req.id, 'rejected')}

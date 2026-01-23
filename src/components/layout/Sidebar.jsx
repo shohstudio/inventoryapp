@@ -19,8 +19,8 @@ const Sidebar = ({ isOpen, onClose }) => {
         { name: t('report'), path: "/admin/reports", icon: <RiFileChartLine size={20} /> },
         // Only show Users link to admin
         ...(user?.role === 'admin' ? [{ name: t('users'), path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
-        ...(['admin', 'accounter', 'warehouseman'].includes(user?.role) ? [{ name: t('requests'), path: "/admin/requests", icon: <RiFileList3Line size={20} /> }] : []),
-        ...(user?.role === 'admin' ? [{ name: t('logs'), path: "/admin/logs", icon: <RiHistoryLine size={20} /> }] : []),
+        ...(['admin', 'accounter', 'warehouseman', 'stat'].includes(user?.role) ? [{ name: t('requests'), path: "/admin/requests", icon: <RiFileList3Line size={20} /> }] : []),
+        ...(['admin', 'stat'].includes(user?.role) ? [{ name: t('logs'), path: "/admin/logs", icon: <RiHistoryLine size={20} /> }] : []),
         ...(user?.role === 'guard' ? [{ name: t('guard_panel'), path: "/guard", icon: <RiShieldLine size={20} /> }] : []),
         { name: t('profile'), path: user?.role === 'employee' ? "/employee/profile" : (user?.role === 'guard' ? "/guard/profile" : "/admin/profile"), icon: <RiUserSettingsLine size={20} /> },
     ];

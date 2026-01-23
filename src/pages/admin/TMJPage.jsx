@@ -222,7 +222,7 @@ const TMJPage = () => {
                     <RiFilePaper2Line className="text-blue-600" /> TMJ
                 </h1>
                 <div className="flex gap-2">
-                    {selectedItems.size > 0 && (
+                    {selectedItems.size > 0 && user?.role !== 'stat' && (
                         <button
                             onClick={handleBulkDelete}
                             disabled={isDeleting}
@@ -231,9 +231,11 @@ const TMJPage = () => {
                             <RiDeleteBinLine size={20} /> {selectedItems.size} ta tanlanganni o'chirish
                         </button>
                     )}
-                    <button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="btn btn-primary bg-blue-600">
-                        <RiAddLine size={20} /> Qo'shish
-                    </button>
+                    {user?.role !== 'stat' && (
+                        <button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="btn btn-primary bg-blue-600">
+                            <RiAddLine size={20} /> Qo'shish
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -362,19 +364,23 @@ const TMJPage = () => {
                                         })()}
                                     </td>
                                     <td className="p-4 text-right flex justify-end gap-2">
-                                        <button
-                                            onClick={() => { setSelectedHandoverItem(item); setIsHandoverModalOpen(true); }}
-                                            className={`p-2 rounded-lg flex items-center gap-1 border transition-colors ${item.initialOwner
-                                                ? 'text-green-600 hover:bg-green-50 border-green-100 bg-green-50/50'
-                                                : 'text-blue-600 hover:bg-blue-50 border-blue-100'}`}
-                                            title="Topshirish"
-                                        >
-                                            <RiUserReceived2Line size={18} />
-                                            <span className="text-xs font-medium">{item.initialOwner ? "Topshirilgan" : "Topshirish"}</span>
-                                        </button>
-                                        <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
-                                            <RiMore2Fill size={18} />
-                                        </button>
+                                        {user?.role !== 'stat' && (
+                                            <>
+                                                <button
+                                                    onClick={() => { setSelectedHandoverItem(item); setIsHandoverModalOpen(true); }}
+                                                    className={`p-2 rounded-lg flex items-center gap-1 border transition-colors ${item.initialOwner
+                                                        ? 'text-green-600 hover:bg-green-50 border-green-100 bg-green-50/50'
+                                                        : 'text-blue-600 hover:bg-blue-50 border-blue-100'}`}
+                                                    title="Topshirish"
+                                                >
+                                                    <RiUserReceived2Line size={18} />
+                                                    <span className="text-xs font-medium">{item.initialOwner ? "Topshirilgan" : "Topshirish"}</span>
+                                                </button>
+                                                <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                                                    <RiMore2Fill size={18} />
+                                                </button>
+                                            </>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
