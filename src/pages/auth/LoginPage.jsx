@@ -73,7 +73,7 @@ const LoginPage = () => {
         setIsLoading(true);
         try {
             const user = await login(username, password);
-            if (["admin", "warehouseman", "accounter"].includes(user.role)) {
+            if (["admin", "warehouseman", "accounter", "stat"].includes(user.role)) {
                 navigate("/admin");
             } else if (user.role === "guard") {
                 navigate("/guard");
