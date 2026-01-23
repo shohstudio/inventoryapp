@@ -358,13 +358,15 @@ const InventoryPage = () => {
                         <RiStackLine size={20} className="mr-2" />
                         {t('attach_warehouse')}
                     </button>
-                    <button
-                        onClick={() => openModal()}
-                        className="btn btn-primary shadow-lg shadow-indigo-200"
-                    >
-                        <RiAddLine size={20} />
-                        {t('add_new')}
-                    </button>
+                    {user?.role !== 'stat' && (
+                        <button
+                            onClick={() => openModal()}
+                            className="btn btn-primary shadow-lg shadow-indigo-200"
+                        >
+                            <RiAddLine size={20} />
+                            {t('add_new')}
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -592,13 +594,15 @@ const InventoryPage = () => {
                                     </td>
                                     <td className="py-3 px-3 text-right whitespace-nowrap">
 
-                                        <button
-                                            onClick={() => openModal(item)}
-                                            className="p-1.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all"
-                                            title={t('edit_item')}
-                                        >
-                                            <RiEditLine size={16} />
-                                        </button>
+                                        {user?.role !== 'stat' && (
+                                            <button
+                                                onClick={() => openModal(item)}
+                                                className="p-1.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all"
+                                                title={t('edit_item')}
+                                            >
+                                                <RiEditLine size={16} />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

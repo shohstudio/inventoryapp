@@ -215,7 +215,7 @@ const WarehousePage = () => {
                     </p>
                 </div>
                 <div className="flex gap-2">
-                    {selectedItems.size > 0 && (
+                    {selectedItems.size > 0 && user?.role !== 'stat' && (
                         <button
                             onClick={handleBulkDelete}
                             className="btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200 border-red-600 animate-in fade-in zoom-in"
@@ -225,13 +225,15 @@ const WarehousePage = () => {
                             {t('warehouse_delete_selected')} ({selectedItems.size})
                         </button>
                     )}
-                    <button
-                        onClick={() => openModal()}
-                        className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
-                    >
-                        <RiAddLine size={20} />
-                        {t('warehouse_add')}
-                    </button>
+                    {user?.role !== 'stat' && (
+                        <button
+                            onClick={() => openModal()}
+                            className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
+                        >
+                            <RiAddLine size={20} />
+                            {t('warehouse_add')}
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -408,12 +410,14 @@ const WarehousePage = () => {
                                         </div>
                                     </td>
                                     <td className="py-4 px-6 text-right">
-                                        <button
-                                            onClick={() => openModal(item)}
-                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
-                                        >
-                                            <RiMore2Fill size={20} />
-                                        </button>
+                                        {user?.role !== 'stat' && (
+                                            <button
+                                                onClick={() => openModal(item)}
+                                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                            >
+                                                <RiMore2Fill size={20} />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
