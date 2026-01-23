@@ -326,19 +326,35 @@ const updateItem = async (req, res) => {
             }
         }
 
+
+
         // 3. Update fields if we have a final list
         if (finalImages.length > 0) {
             dataToUpdate.images = JSON.stringify(finalImages);
             dataToUpdate.image = finalImages[0]; // Main image is first one
         } else {
-            // If existingImages was empty AND no new files, does it mean "Delete All"?
-            // Or does it mean "No Change"?
-            // Usually if existingImages is explicit (even empty), we update. 
-            // If undefined, we might skip.
-            // Let's assume if 'existingImages' field is present in body (even empty), we treat it as the new state.
+            // Keep existing images logic or clear
             if (existingImages !== undefined) {
+                // If it was explicitly sent as something other than undefined (e.g. empty array string), clear it
+                // BUT current logic: if existingImages sent as "[]", finalImages becomes [], so we enter here? No, length 0.
                 dataToUpdate.images = "[]";
                 dataToUpdate.image = null;
+            }
+        }
+
+        // HANDOVER IMAGE HANDLING
+        if (req.files && req.files.length > 0) {
+            // Identify handover image by fieldname if possible, OR if Multer puts it in req.files array?
+            // Multer `upload.array('images', 10)` puts everything in one array if field name matches 'images'.
+            // BUT frontend sends: formData.append('handoverImage', file).
+            // Middleware `upload.array('images', 10)` ONLY accepts field 'images'.
+            // PROBLEM: We need to handle 'handoverImage' field.
+            // SOLUTION: We should use `upload.any()` or `upload.fields([{ name: 'images', maxCount: 10 }, { name: 'handoverImage', maxCount: 1 }])` in route.
+            // ACTION: I must check route first. If route is hardcoded to `upload.array('images')`, `handoverImage` will be rejected or ignored.
+            // Let's assume I fix route in next step. Here I handle the file assuming it arrives.
+            const handoverFile = req.files.find(f => f.fieldname === 'handoverImage');
+            if (handoverFile) {
+                dataToUpdate.handoverImage = `/uploads/${handoverFile.filename}`;
             }
         }
 

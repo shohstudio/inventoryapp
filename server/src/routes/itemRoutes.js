@@ -12,7 +12,7 @@ router.route('/')
 
 router.route('/:id')
     .get(protect, getItemById)
-    .put(protect, upload.array('images', 10), updateItem)
+    .put(protect, upload.any(), updateItem)
     .delete(protect, admin, deleteItem);
 
 router.post('/delete-many', protect, admin, deleteManyItems);

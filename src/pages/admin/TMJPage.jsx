@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiFilePaper2Line, RiDeleteBinLine, RiCloseLine, RiFilePdfLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiFilePaper2Line, RiDeleteBinLine, RiCloseLine, RiFilePdfLine, RiUserReceived2Line } from "react-icons/ri";
 import TMJItemModal from "../../components/admin/TMJItemModal";
+import HandoverModal from "../../components/admin/HandoverModal";
 import Pagination from "../../components/common/Pagination";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -12,6 +13,8 @@ const TMJPage = () => {
     const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [isHandoverModalOpen, setIsHandoverModalOpen] = useState(false);
+    const [selectedHandoverItem, setSelectedHandoverItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [previewImage, setPreviewImage] = useState(null);
     const [activeTab, setActiveTab] = useState('all'); // 'all' (Barchasi), 'stock' (Omborga kelgan), 'assigned' (Berilgan)
@@ -221,8 +224,36 @@ const TMJPage = () => {
             }
             fetchItems();
             setIsModalOpen(false);
+            fetchItems();
+            setIsModalOpen(false);
         } catch (error) {
             console.error(error);
+            toast.error("Xatolik: " + (error.response?.data?.message || error.message));
+        }
+    };
+
+    const handleHandoverSave = async (data) => {
+        try {
+            const formData = new FormData();
+            formData.append('initialOwner', data.handoverName);
+            formData.append('initialRole', data.handoverPosition);
+            formData.append('assignedDate', data.handoverDate);
+
+            if (data.handoverImage instanceof File) {
+                formData.append('handoverImage', data.handoverImage);
+            }
+
+            // We use updateItem endpoint as we are just updating fields
+            await api.put(`/items/${selectedHandoverItem.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            toast.success("Topshirish muvaffaqiyatli saqlandi");
+            fetchItems();
+            setIsHandoverModalOpen(false);
+            setSelectedHandoverItem(null);
+        } catch (error) {
+            console.error("Handover error", error);
             toast.error("Xatolik: " + (error.response?.data?.message || error.message));
         }
     };
@@ -374,6 +405,14 @@ const TMJPage = () => {
                                         })()}
                                     </td>
                                     <td className="p-4 text-right flex justify-end gap-2">
+                                        <button
+                                            onClick={() => { setSelectedHandoverItem(item); setIsHandoverModalOpen(true); }}
+                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg flex items-center gap-1 border border-blue-100"
+                                            title="Topshirish"
+                                        >
+                                            <RiUserReceived2Line size={18} />
+                                            <span className="text-xs font-medium">Topshirish</span>
+                                        </button>
                                         <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
                                             <RiMore2Fill size={18} />
                                         </button>
@@ -399,6 +438,15 @@ const TMJPage = () => {
                     item={selectedItem}
                     onClose={() => setIsModalOpen(false)}
                     onSave={handleAddItem}
+                />
+            )}
+
+            {isHandoverModalOpen && (
+                <HandoverModal
+                    isOpen={isHandoverModalOpen}
+                    item={selectedHandoverItem}
+                    onClose={() => setIsHandoverModalOpen(false)}
+                    onSave={handleHandoverSave}
                 />
             )}
 
