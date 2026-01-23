@@ -288,7 +288,8 @@ const updateItem = async (req, res) => {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo,
-            existingImages // JSON string or array of strings of OLD images to keep
+            existingImages, // JSON string or array of strings of OLD images to keep
+            initialOwner, initialRole, assignedDate // Extract Handover fields directly
         } = req.body;
 
         const dataToUpdate = {
@@ -401,6 +402,11 @@ const updateItem = async (req, res) => {
             // Check for undefined to allow clearing values if sent as empty string (though validation requires them, this is safer)
             if (assignedTo !== undefined) dataToUpdate.initialOwner = assignedTo;
             if (assignedRole !== undefined) dataToUpdate.initialRole = assignedRole;
+
+            // Direct Handover Data Update (if sent explicitly)
+            if (initialOwner !== undefined) dataToUpdate.initialOwner = initialOwner;
+            if (initialRole !== undefined) dataToUpdate.initialRole = initialRole;
+            if (assignedDate !== undefined) dataToUpdate.assignedDate = assignedDate ? new Date(assignedDate) : null;
         }
 
         const item = await prisma.item.update({
