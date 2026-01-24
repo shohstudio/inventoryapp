@@ -175,7 +175,9 @@ export const translations = {
         tmj_stock: "Omborga kelgan maxsulotlar",
         tmj_assigned: "Berilgan maxsulotlar",
         tmj_handover: "Topshirish",
+        tmj_handover: "Topshirish",
         tmj_handed_over: "Topshirilgan",
+        tmj_sidebar: "TMJ",
 
         // User Roles
         role_admin: "Administrator",
@@ -359,7 +361,9 @@ export const translations = {
         tmj_stock: "Омборга келган маҳсулотлар",
         tmj_assigned: "Берилган маҳсулотлар",
         tmj_handover: "Топшириш",
+        tmj_handover: "Топшириш",
         tmj_handed_over: "Топширилган",
+        tmj_sidebar: "ТМЖ", // Cirillic TMJ
 
         // User Roles
         role_admin: "Админ",
@@ -542,7 +546,9 @@ export const translations = {
         tmj_stock: "Поступившие на склад",
         tmj_assigned: "Выданные товары",
         tmj_handover: "Вручить",
+        tmj_handover: "Вручить",
         tmj_handed_over: "Вручено",
+        tmj_sidebar: "МБП", // Malotsennie i Bistroiznashivayushchiesya Predmeti (Traditional RU for TMJ)
 
         // User Roles
         role_admin: "Админ",
