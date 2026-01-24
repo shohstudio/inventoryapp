@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTheme } from "../../context/ThemeContext";
-import { RiNotification3Line, RiSearchLine, RiMenuLine, RiLogoutBoxLine, RiUserLine, RiArrowDownSLine, RiSunLine, RiMoonLine } from "react-icons/ri";
+import { RiSearchLine, RiMenuLine, RiLogoutBoxLine, RiUserLine, RiArrowDownSLine, RiSunLine, RiMoonLine } from "react-icons/ri";
 
 const Header = ({ onMenuClick }) => {
     const { user, logout } = useAuth();
@@ -68,10 +68,7 @@ const Header = ({ onMenuClick }) => {
                     </button>
                 </div>
 
-                <button className="relative p-2 text-gray-500 hover:text-indigo-600 transition-colors">
-                    <RiNotification3Line size={20} />
-                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
+
 
                 <div className="relative pl-4 border-l border-gray-200">
                     <button
