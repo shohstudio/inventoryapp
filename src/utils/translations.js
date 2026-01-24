@@ -166,6 +166,10 @@ export const translations = {
         verified_coverage: "O'tganlar", // Verification coverage % label
         item_is_not_defined: "Xatolik: Jihoz topilmadi (Item not defined)",
 
+        // Statuses Extra
+        passed: "O'tgan",
+        not_passed: "O'tmagan",
+
         // User Roles
         role_admin: "Administrator",
         role_employee: "Xodim",
@@ -340,6 +344,10 @@ export const translations = {
         verified_coverage: "Ўтганлар",
         item_is_not_defined: "Хатолик: Жиҳоз топилмади",
 
+        // Statuses Extra
+        passed: "Ўтган",
+        not_passed: "Ўтмаган",
+
         // User Roles
         role_admin: "Админ",
         role_employee: "Ходим",
@@ -512,6 +520,10 @@ export const translations = {
         trend_growth: "Рост",
         verified_coverage: "Проверено",
         item_is_not_defined: "Ошибка: Оборудование не найдено",
+
+        // Statuses Extra
+        passed: "Прошел",
+        not_passed: "Не прошел",
 
         // User Roles
         role_admin: "Админ",

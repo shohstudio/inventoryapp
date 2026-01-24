@@ -414,26 +414,26 @@ const InventoryPage = () => {
                 {showFilters && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Kategoriya</label>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('category')}</label>
                             <select
                                 className="input w-full"
                                 value={filters.category}
                                 onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
                             >
-                                <option value="">Barchasi</option>
+                                <option value="">{t('all')}</option>
                                 {uniqueCategories.map(cat => (
                                     <option key={cat} value={cat}>{cat}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Bino</label>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('building')}</label>
                             <select
                                 className="input w-full"
                                 value={filters.building}
                                 onChange={(e) => setFilters(prev => ({ ...prev, building: e.target.value }))}
                             >
-                                <option value="">Barchasi</option>
+                                <option value="">{t('all')}</option>
                                 {uniqueBuildings.map(build => (
                                     <option key={build} value={build}>{build}</option>
                                 ))}
@@ -464,15 +464,15 @@ const InventoryPage = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">Inventarizatsiya</label>
+                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('inventory_check')}</label>
                             <select
                                 className="input w-full"
                                 value={filters.inventoryStatus}
                                 onChange={(e) => setFilters(prev => ({ ...prev, inventoryStatus: e.target.value }))}
                             >
-                                <option value="all">Barchasi</option>
-                                <option value="passed">O'tgan ✅</option>
-                                <option value="not_passed">O'tmagan ❌</option>
+                                <option value="all">{t('all')}</option>
+                                <option value="passed">{t('passed')} ✅</option>
+                                <option value="not_passed">{t('not_passed')} ❌</option>
                             </select>
                         </div>
                     </div>
@@ -500,7 +500,7 @@ const InventoryPage = () => {
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('purchase_date')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('current_value')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('building')}</th>
-                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">Inventarizatsiya</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('inventory_check')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('status')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm text-center">{t('image')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
@@ -547,7 +547,7 @@ const InventoryPage = () => {
                                                         ? 'bg-green-50 text-green-600 border-green-200'
                                                         : 'bg-gray-50 text-gray-500 border-gray-200'
                                                         }`}>
-                                                        {isPassed ? 'O\'tgan ✅' : 'O\'tmagan ❌'}
+                                                        {isPassed ? `${t('passed')} ✅` : `${t('not_passed')} ❌`}
                                                     </span>
                                                     {item.lastCheckedAt && (
                                                         <span className="text-[10px] text-gray-400 font-mono whitespace-nowrap">
@@ -564,10 +564,10 @@ const InventoryPage = () => {
                                                 item.status === 'written-off' ? 'bg-gray-100 text-gray-500 line-through' :
                                                     'bg-red-100 text-red-700'
                                             }`}>
-                                            {item.status === 'working' ? 'Ishchi' :
-                                                item.status === 'repair' ? 'Ta\'mir talab' :
-                                                    item.status === 'written-off' ? 'Ro\'y. chiqdigan' :
-                                                        'Buzilgan'}
+                                            {item.status === 'working' ? t('status_working') :
+                                                item.status === 'repair' ? t('status_repair') :
+                                                    item.status === 'written-off' ? t('status_written_off') :
+                                                        t('status_broken')}
                                         </span>
                                     </td>
                                     <td className="py-3 px-3">
