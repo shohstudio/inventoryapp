@@ -170,6 +170,13 @@ export const translations = {
         passed: "O'tgan",
         not_passed: "O'tmagan",
 
+        // TMJ Page
+        tmj_stock: "Omborda", // Short for "Omborga kelgan maxsulotlar" -> Keep it concise "Omborda" or "Omborga kelgan"
+        tmj_stock: "Omborga kelgan maxsulotlar",
+        tmj_assigned: "Berilgan maxsulotlar",
+        tmj_handover: "Topshirish",
+        tmj_handed_over: "Topshirilgan",
+
         // User Roles
         role_admin: "Administrator",
         role_employee: "Xodim",
@@ -348,6 +355,12 @@ export const translations = {
         passed: "Ўтган",
         not_passed: "Ўтмаган",
 
+        // TMJ Page
+        tmj_stock: "Омборга келган маҳсулотлар",
+        tmj_assigned: "Берилган маҳсулотлар",
+        tmj_handover: "Топшириш",
+        tmj_handed_over: "Топширилган",
+
         // User Roles
         role_admin: "Админ",
         role_employee: "Ходим",
@@ -524,6 +537,12 @@ export const translations = {
         // Statuses Extra
         passed: "Прошел",
         not_passed: "Не прошел",
+
+        // TMJ Page
+        tmj_stock: "Поступившие на склад",
+        tmj_assigned: "Выданные товары",
+        tmj_handover: "Вручить",
+        tmj_handed_over: "Вручено",
 
         // User Roles
         role_admin: "Админ",

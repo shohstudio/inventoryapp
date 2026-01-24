@@ -229,12 +229,12 @@ const TMJPage = () => {
                             disabled={isDeleting}
                             className="btn bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
                         >
-                            <RiDeleteBinLine size={20} /> {selectedItems.size} ta tanlanganni o'chirish
+                            <RiDeleteBinLine size={20} /> {selectedItems.size} {t('warehouse_delete_selected')}
                         </button>
                     )}
                     {user?.role !== 'stat' && (
                         <button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="btn btn-primary bg-blue-600">
-                            <RiAddLine size={20} /> Qo'shish
+                            <RiAddLine size={20} /> {t('add_new')}
                         </button>
                     )}
                 </div>
@@ -246,21 +246,21 @@ const TMJPage = () => {
                     onClick={() => setActiveTab('all')}
                     className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'all' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                    Barchasi
+                    {t('all')}
                     {activeTab === 'all' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
                 </button>
                 <button
                     onClick={() => setActiveTab('stock')}
                     className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'stock' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                    Omborga kelgan maxsulotlar
+                    {t('tmj_stock')}
                     {activeTab === 'stock' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
                 </button>
                 <button
                     onClick={() => setActiveTab('assigned')}
                     className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'assigned' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                    Berilgan maxsulotlar
+                    {t('tmj_assigned')}
                     {activeTab === 'assigned' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
                 </button>
             </div>
@@ -278,13 +278,13 @@ const TMJPage = () => {
                                         onChange={toggleSelectAll}
                                     />
                                 </th>
-                                <th className="p-4 font-semibold text-gray-600">Nomi / Tur</th>
-                                <th className="p-4 font-semibold text-gray-600">Holat / Biriktirilgan</th>
-                                <th className="p-4 font-semibold text-gray-600">Kelgan vaqti</th>
-                                <th className="p-4 font-semibold text-gray-600">Narx</th>
+                                <th className="p-4 font-semibold text-gray-600">{t('name')} / {t('category')}</th>
+                                <th className="p-4 font-semibold text-gray-600">{t('status')} / {t('assigned_to')}</th>
+                                <th className="p-4 font-semibold text-gray-600">{t('arrival_date')}</th>
+                                <th className="p-4 font-semibold text-gray-600">{t('price')}</th>
                                 <th className="p-4 font-semibold text-gray-600">Hujjat</th>
-                                <th className="p-4 font-semibold text-gray-600">Rasm</th>
-                                <th className="p-4 font-semibold text-gray-600 text-right">Amallar</th>
+                                <th className="p-4 font-semibold text-gray-600">{t('image')}</th>
+                                <th className="p-4 font-semibold text-gray-600 text-right">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -375,7 +375,7 @@ const TMJPage = () => {
                                                     title="Topshirish"
                                                 >
                                                     <RiUserReceived2Line size={18} />
-                                                    <span className="text-xs font-medium">{item.initialOwner ? "Topshirilgan" : "Topshirish"}</span>
+                                                    <span className="text-xs font-medium">{item.initialOwner ? t('tmj_handed_over') : t('tmj_handover')}</span>
                                                 </button>
                                                 <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
                                                     <RiMore2Fill size={18} />
@@ -425,23 +425,23 @@ const TMJPage = () => {
                             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <RiDeleteBinLine className="text-red-600 text-3xl" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Tasdiqlash</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">{t('confirm_delete_title_many')}</h3>
                             <p className="text-gray-500 mb-6">
-                                Haqiqatan ham belgilangan {selectedItems.size} ta elementni o'chirib yubormoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi.
+                                {t('confirm_delete_message_many').replace('{count}', selectedItems.size)}
                             </p>
                             <div className="flex gap-3 justify-center">
                                 <button
                                     onClick={() => setShowDeleteConfirm(false)}
                                     className="px-5 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors"
                                 >
-                                    Bekor qilish
+                                    {t('cancel')}
                                 </button>
                                 <button
                                     onClick={confirmDelete}
                                     disabled={isDeleting}
                                     className="px-5 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 shadow-lg shadow-red-200 transition-all transform active:scale-95"
                                 >
-                                    {isDeleting ? "O'chirilmoqda..." : "Ha, o'chirish"}
+                                    {isDeleting ? t('loading') : t('yes_delete')}
                                 </button>
                             </div>
                         </div>
