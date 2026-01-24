@@ -5,6 +5,7 @@ import UserModal from "../../components/admin/UserModal"; // Restored
 import { useLanguage } from "../../context/LanguageContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
+import ConfirmationModal from "../../components/common/ConfirmationModal";
 
 const UsersPage = () => {
     const { t } = useLanguage();
@@ -12,6 +13,7 @@ const UsersPage = () => {
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: null, isDanger: false });
 
     // Pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -77,15 +79,24 @@ const UsersPage = () => {
     };
 
     const handleDeleteUser = async (id) => {
-        if (window.confirm("Rostdan ham bu foydalanuvchini o'chirmoqchimisiz?")) {
-            try {
-                await api.delete(`/users/${id}`);
-                setUsers(users.filter(u => u.id !== id));
-                toast.success("Foydalanuvchi o'chirildi");
-            } catch (error) {
-                console.error("Delete user error:", error);
-                toast.error("O'chirishda xatolik");
-            }
+        setConfirmModal({
+            isOpen: true,
+            title: "Foydalanuvchini o'chirish",
+            message: "Rostdan ham bu foydalanuvchini o'chirmoqchimisiz?",
+            confirmText: "Ha, o'chirish",
+            isDanger: true,
+            onConfirm: () => confirmDeleteUser(id)
+        });
+    };
+
+    const confirmDeleteUser = async (id) => {
+        try {
+            await api.delete(`/users/${id}`);
+            setUsers(users.filter(u => u.id !== id));
+            toast.success("Foydalanuvchi o'chirildi");
+        } catch (error) {
+            console.error("Delete user error:", error);
+            toast.error("O'chirishda xatolik");
         }
     };
 
@@ -217,6 +228,16 @@ const UsersPage = () => {
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveUser}
                 user={selectedUser}
+            />
+
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText={confirmModal.confirmText}
+                isDanger={confirmModal.isDanger}
             />
         </div>
     );

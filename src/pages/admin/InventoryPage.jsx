@@ -11,6 +11,7 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios"; // Import API
 import { toast } from "react-hot-toast";
+import ConfirmationModal from "../../components/common/ConfirmationModal";
 
 const InventoryPage = () => {
     const location = useLocation();
@@ -57,6 +58,7 @@ const InventoryPage = () => {
     const [qrItem, setQrItem] = useState(null);
     const [showQRScanner, setShowQRScanner] = useState(false);
     const [previewInfo, setPreviewInfo] = useState({ open: false, images: [], index: 0 });
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: null, isDanger: false });
 
     const openModal = (item = null) => {
         setSelectedItem(item);
@@ -289,12 +291,21 @@ const InventoryPage = () => {
         );
     };
 
-    const handleBulkDelete = async () => {
+    const handleBulkDeleteClickHandler = () => {
         if (selectedIds.length === 0) return;
 
-        if (!window.confirm(`${selectedIds.length} ta jihozni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi!`)) {
-            return;
-        }
+        setConfirmModal({
+            isOpen: true,
+            title: "O'chirishni tasdiqlang",
+            message: `${selectedIds.length} ta jihozni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi!`,
+            confirmText: "Ha, o'chirish",
+            isDanger: true,
+            onConfirm: handleBulkDelete
+        });
+    };
+
+    const handleBulkDelete = async () => {
+        // Validation moved to handler above or checked again here if needed, but modal handles flow.
 
         try {
             await api.post('/items/delete-many', { ids: selectedIds });
@@ -323,7 +334,7 @@ const InventoryPage = () => {
                         <>
                             {selectedIds.length > 0 && (
                                 <button
-                                    onClick={handleBulkDelete}
+                                    onClick={handleBulkDeleteClickHandler}
                                     className="btn bg-red-500 hover:bg-red-600 text-white shadow-sm border-0 animate-in fade-in"
                                 >
                                     <RiDeleteBinLine size={20} className="mr-2" />
@@ -737,6 +748,16 @@ const InventoryPage = () => {
                     setShowQRScanner(false);
                 }}
                 verificationMode={true} // Enable inventory verification mode
+            />
+
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText={confirmModal.confirmText}
+                isDanger={confirmModal.isDanger}
             />
 
 

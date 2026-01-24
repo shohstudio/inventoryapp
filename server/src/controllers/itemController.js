@@ -302,6 +302,13 @@ const updateItem = async (req, res) => {
             initialOwner, initialRole, assignedDate, handoverQuantity // Extract Handover fields directly
         } = req.body;
 
+        const id = parseInt(req.params.id);
+        const item = await prisma.item.findUnique({ where: { id } });
+
+        if (!item) {
+            return res.status(404).json({ message: "Jihoz topilmadi" });
+        }
+
         const dataToUpdate = {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price: price ? parseFloat(price) : undefined,
@@ -483,11 +490,11 @@ const updateItem = async (req, res) => {
                 action: 'update',
                 details: `Item updated: ${name}`,
                 userId: req.user.id,
-                itemId: item.id
+                itemId: updatedItem.id
             }
         });
 
-        res.json(item);
+        res.json(updatedItem);
     } catch (error) {
         console.error(error);
         res.status(400).json({ message: error.message });
