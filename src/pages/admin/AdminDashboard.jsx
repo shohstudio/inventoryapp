@@ -12,13 +12,19 @@ const AdminDashboard = () => {
     const { user } = useAuth();
     const { t } = useLanguage();
     const [userCount, setUserCount] = useState(0);
+    const [userTrend, setUserTrend] = useState(0); // New state
     const [loading, setLoading] = useState(true);
     const [inventoryStats, setInventoryStats] = useState({
         totalItems: 0,
+        itemTrend: 0, // New field default
         repairItems: 0,
+        repairTrend: 0, // New field default
         writtenOffItems: 0,
+        writtenOffTrend: 0, // New field default
         totalValue: 0,
+        valueTrend: 0, // New field default
         totalVerifiedItems: 0,
+        verifiedTrend: 0, // New field default
         recentItems: []
     });
     const [logs, setLogs] = useState([]);
@@ -56,6 +62,7 @@ const AdminDashboard = () => {
 
                 // Set Data from Stats API
                 setUserCount(stats.userCount);
+                setUserTrend(stats.userTrend || 0);
                 setInventoryStats(stats.inventory);
 
                 // Logs (future)
@@ -105,8 +112,8 @@ const AdminDashboard = () => {
                     title={t('total_items')}
                     value={inventoryStats.totalItems}
                     icon={<RiBox3Line size={24} />}
-                    trend={12}
-                    trendLabel={t('trend_vs_last_month')}
+                    trend={inventoryStats.itemTrend}
+                    trendLabel="O'tgan oyga nisbatan"
                     variant="featured"
                     onClick={() => navigate("/admin/inventory")}
                 />
@@ -115,7 +122,7 @@ const AdminDashboard = () => {
                     title="Inventarizatsiyadan o'tgan jihozlar"
                     value={inventoryStats.totalVerifiedItems}
                     icon={<RiCheckboxCircleLine size={24} />}
-                    trend={0} // Can be calculated if needed
+                    trend={inventoryStats.verifiedTrend || 0}
                     trendLabel="O'tganlar"
                     variant="featured"
                     color="bg-green-50 text-green-600"
@@ -126,8 +133,8 @@ const AdminDashboard = () => {
                     title={t('total_value')}
                     value={`${formatValue(inventoryStats.totalValue)} so'm`}
                     icon={<RiMoneyDollarCircleLine size={24} />}
-                    trend={8.2}
-                    trendLabel={t('trend_growth')}
+                    trend={inventoryStats.valueTrend}
+                    trendLabel="O'sish"
                     variant="featured"
                     onClick={() => navigate("/admin/inventory")}
                 />
@@ -136,8 +143,8 @@ const AdminDashboard = () => {
                     title={t('users')}
                     value={userCount}
                     icon={<RiUserLine size={24} />}
-                    trend={98}
-                    trendLabel={t('active_users')}
+                    trend={userTrend}
+                    trendLabel="Faol foydalanuvchilar"
                     variant="featured"
                     onClick={() => navigate("/admin/users")}
                 />
@@ -146,8 +153,8 @@ const AdminDashboard = () => {
                     title={t('repair_items')}
                     value={inventoryStats.repairItems}
                     icon={<RiAlertLine size={24} />}
-                    trend={-2}
-                    trendLabel={t('trend_decrease')}
+                    trend={inventoryStats.repairTrend}
+                    trendLabel="O'zgarish"
                     variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
@@ -156,8 +163,8 @@ const AdminDashboard = () => {
                     title={t('written_off_items')}
                     value={inventoryStats.writtenOffItems}
                     icon={<RiDeleteBinLine size={24} />}
-                    trend={0}
-                    trendLabel={t('trend_no_change')}
+                    trend={inventoryStats.writtenOffTrend}
+                    trendLabel="O'zgarishsiz"
                     variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "written-off" } })}
                 />
