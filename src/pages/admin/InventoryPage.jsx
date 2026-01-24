@@ -146,7 +146,9 @@ const InventoryPage = () => {
                 building: filters.building,
                 location: filters.location,
                 inventoryStatus: filters.inventoryStatus !== 'all' ? filters.inventoryStatus : undefined,
-                inventoryStartDate: filters.inventoryStatus !== 'all' ? inventoryStartDate : undefined // Only pass if filtering
+                inventoryStatus: filters.inventoryStatus !== 'all' ? filters.inventoryStatus : undefined,
+                inventoryStartDate: filters.inventoryStatus !== 'all' ? inventoryStartDate : undefined, // Only pass if filtering
+                inventoryType: 'warehouse' // Exclude TMJ items
             };
 
             const { data } = await api.get('/items', { params });
