@@ -84,6 +84,9 @@ const getDashboardStats = async (req, res) => {
             totalVerifiedItems = await prisma.item.count({ where: { lastCheckedAt: { not: null } } });
         }
 
+        // Verified Trend = Percentage of total items verified
+        const verifiedTrend = totalItemsAll > 0 ? Number(((totalVerifiedItems / totalItemsAll) * 100).toFixed(1)) : 0;
+
         // 5. Recent Items
         const recentItems = await prisma.item.findMany({
             take: 5,
@@ -104,7 +107,7 @@ const getDashboardStats = async (req, res) => {
                 totalValue,
                 valueTrend,
                 totalVerifiedItems,
-                verifiedTrend: 0, // Placeholder
+                verifiedTrend, // Now it is percentage coverage
                 recentItems
             }
         });
