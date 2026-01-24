@@ -298,9 +298,10 @@ const InventoryPage = () => {
 
         setConfirmModal({
             isOpen: true,
-            title: "O'chirishni tasdiqlang",
-            message: `${selectedIds.length} ta jihozni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi!`,
-            confirmText: "Ha, o'chirish",
+            title: t('confirm_delete_title_many'),
+            message: t('confirm_delete_message_many').replace('{count}', selectedIds.length),
+            confirmText: t('yes_delete'),
+            cancelText: t('cancel'),
             isDanger: true,
             onConfirm: handleBulkDelete
         });
@@ -340,7 +341,7 @@ const InventoryPage = () => {
                                     className="btn bg-red-500 hover:bg-red-600 text-white shadow-sm border-0 animate-in fade-in"
                                 >
                                     <RiDeleteBinLine size={20} className="mr-2" />
-                                    Tanlanganlarni o'chirish ({selectedIds.length})
+                                    {t('warehouse_delete_selected')} ({selectedIds.length})
                                 </button>
                             )}
 

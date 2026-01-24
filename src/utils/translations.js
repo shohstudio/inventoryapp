@@ -152,6 +152,20 @@ export const translations = {
         trend_no_change: "o'zgarishsiz",
         active_users: "Faol foydalanuvchilar",
 
+        // Modal Keys (Confirmation)
+        confirm_delete_title_many: "O'chirishni tasdiqlang",
+        confirm_delete_message_many: "{count} ta jihozni o'chirmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi!",
+        confirm_delete_title_single: "Foydalanuvchini o'chirish",
+        confirm_delete_message_single: "Rostdan ham bu foydalanuvchini o'chirmoqchimisiz?",
+        yes_delete: "Ha, o'chirish",
+
+        // Dashboard Trends
+        trend_change: "O'zgarish",
+        trend_no_change: "O'zgarishsiz",
+        trend_growth: "O'sish",
+        verified_coverage: "O'tganlar", // Verification coverage % label
+        item_is_not_defined: "Xatolik: Jihoz topilmadi (Item not defined)",
+
         // User Roles
         role_admin: "Administrator",
         role_employee: "Xodim",
@@ -312,6 +326,20 @@ export const translations = {
         trend_no_change: "ўзгаришсиз",
         active_users: "Фаол фойдаланувчилар",
 
+        // Modal Keys (Confirmation)
+        confirm_delete_title_many: "Ўчиришни тасдиқланг",
+        confirm_delete_message_many: "{count} та жиҳозни ўчирмоқчимисиз? Бу амални ортга қайтариб бўлмайди!",
+        confirm_delete_title_single: "Фойдаланувчини ўчириш",
+        confirm_delete_message_single: "Ростдан ҳам бу фойдаланувчини ўчирмоқчимисиз?",
+        yes_delete: "Ҳа, ўчириш",
+
+        // Dashboard Trends
+        trend_change: "Ўзгариш",
+        trend_no_change: "Ўзгаришсиз",
+        trend_growth: "Ўсиш",
+        verified_coverage: "Ўтганлар",
+        item_is_not_defined: "Хатолик: Жиҳоз топилмади",
+
         // User Roles
         role_admin: "Админ",
         role_employee: "Ходим",
@@ -470,6 +498,20 @@ export const translations = {
         trend_decrease: "снижение",
         trend_no_change: "без изменений",
         active_users: "Активные пользователи",
+
+        // Modal Keys (Confirmation)
+        confirm_delete_title_many: "Подтвердите удаление",
+        confirm_delete_message_many: "Вы уверены, что хотите удалить {count} элементов? Это действие нельзя отменить!",
+        confirm_delete_title_single: "Удаление пользователя",
+        confirm_delete_message_single: "Вы действительно хотите удалить этого пользователя?",
+        yes_delete: "Да, удалить",
+
+        // Dashboard Trends
+        trend_change: "Изменение",
+        trend_no_change: "Без изменений",
+        trend_growth: "Рост",
+        verified_coverage: "Проверено",
+        item_is_not_defined: "Ошибка: Оборудование не найдено",
 
         // User Roles
         role_admin: "Админ",

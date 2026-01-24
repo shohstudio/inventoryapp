@@ -113,17 +113,17 @@ const AdminDashboard = () => {
                     value={inventoryStats.totalItems}
                     icon={<RiBox3Line size={24} />}
                     trend={inventoryStats.itemTrend}
-                    trendLabel="O'tgan oyga nisbatan"
+                    trendLabel={t('trend_vs_last_month')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory")}
                 />
 
                 <StatsCard
-                    title="Inventarizatsiyadan o'tgan jihozlar"
+                    title={t('total_checked')} // Use existing key or specific one for verified
                     value={inventoryStats.totalVerifiedItems}
                     icon={<RiCheckboxCircleLine size={24} />}
                     trend={inventoryStats.verifiedTrend || 0}
-                    trendLabel="O'tganlar"
+                    trendLabel={t('verified_coverage')}
                     variant="featured"
                     color="bg-green-50 text-green-600"
                     onClick={() => navigate("/admin/reports")}
@@ -134,7 +134,7 @@ const AdminDashboard = () => {
                     value={`${formatValue(inventoryStats.totalValue)} so'm`}
                     icon={<RiMoneyDollarCircleLine size={24} />}
                     trend={inventoryStats.valueTrend}
-                    trendLabel="O'sish"
+                    trendLabel={t('trend_growth')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory")}
                 />
@@ -144,7 +144,7 @@ const AdminDashboard = () => {
                     value={userCount}
                     icon={<RiUserLine size={24} />}
                     trend={userTrend}
-                    trendLabel="Faol foydalanuvchilar"
+                    trendLabel={t('active_users')}
                     variant="featured"
                     onClick={() => navigate("/admin/users")}
                 />
@@ -154,7 +154,7 @@ const AdminDashboard = () => {
                     value={inventoryStats.repairItems}
                     icon={<RiAlertLine size={24} />}
                     trend={inventoryStats.repairTrend}
-                    trendLabel="O'zgarish"
+                    trendLabel={t('trend_change')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "repair" } })}
                 />
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
                     value={inventoryStats.writtenOffItems}
                     icon={<RiDeleteBinLine size={24} />}
                     trend={inventoryStats.writtenOffTrend}
-                    trendLabel="O'zgarishsiz"
+                    trendLabel={t('trend_no_change')}
                     variant="featured"
                     onClick={() => navigate("/admin/inventory", { state: { filter: "written-off" } })}
                 />

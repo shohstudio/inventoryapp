@@ -81,9 +81,10 @@ const UsersPage = () => {
     const handleDeleteUser = async (id) => {
         setConfirmModal({
             isOpen: true,
-            title: "Foydalanuvchini o'chirish",
-            message: "Rostdan ham bu foydalanuvchini o'chirmoqchimisiz?",
-            confirmText: "Ha, o'chirish",
+            title: t('confirm_delete_title_single'),
+            message: t('confirm_delete_message_single'),
+            confirmText: t('yes_delete'),
+            cancelText: t('cancel'),
             isDanger: true,
             onConfirm: () => confirmDeleteUser(id)
         });
