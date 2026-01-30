@@ -239,7 +239,7 @@ const TMJPage = () => {
             }
 
             // Format data for Excel
-            const exportData = data.items.map(item => {
+            const exportData = data.items.map((item, index) => {
                 const qty = item.quantity || 1;
                 const initQty = item.initialQuantity || qty;
                 let quantityStr = qty.toString();
@@ -253,6 +253,7 @@ const TMJPage = () => {
                 }
 
                 return {
+                    "№": index + 1,
                     "Nomi": item.name,
                     "Kategoriya": item.category,
                     "Model": item.model || "",
@@ -355,6 +356,7 @@ const TMJPage = () => {
                                         onChange={toggleSelectAll}
                                     />
                                 </th>
+                                <th className="p-4 font-semibold text-gray-600">№</th>
                                 <th className="p-4 font-semibold text-gray-600">{t('name')} / {t('category')}</th>
                                 <th className="p-4 font-semibold text-gray-600">{t('status')} / {t('assigned_to')}</th>
                                 <th className="p-4 font-semibold text-gray-600">{t('arrival_date')}</th>
@@ -379,6 +381,9 @@ const TMJPage = () => {
                                             checked={selectedItems.has(item.id)}
                                             onChange={() => toggleSelectItem(item.id)}
                                         />
+                                    </td>
+                                    <td className="p-4 text-gray-500 font-medium">
+                                        {(currentPage - 1) * 20 + index + 1}
                                     </td>
                                     <td className="p-4">
                                         <div className="font-medium text-gray-900">{item.name}</div>
