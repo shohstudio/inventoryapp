@@ -20,7 +20,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         assignedRole: "",
         assignedPINFL: "",
         images: [],
-        pdf: null
+        pdf: null,
+        inventoryType: 'warehouse'
     });
 
     // Custom Input States
@@ -93,7 +94,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                     }
                     return imgs.map((url, i) => ({ id: `existing-${i}`, url, file: null }));
                 })(),
-                pdf: item.pdf || null
+                pdf: item.pdf || null,
+                inventoryType: item.inventoryType || 'warehouse'
             });
         } else {
             // New Item or Initial Data
@@ -115,7 +117,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 assignedRole: roles[4], // Default to "Bo'lim boshlig'i" as it seems most common, or roles[0]
                 assignedPINFL: "",
                 images: [], // Start empty for new items, or parse initialData if needed
-                pdf: null
+                pdf: null,
+                inventoryType: initialData?.inventoryType || 'warehouse'
             });
             setIsCustomCategory(false);
             setIsCustomDepartment(false);
@@ -384,6 +387,18 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 <option value="repair">Ta'mir talab</option>
                                 <option value="written-off">Ro'yxatdan chiqarilgan</option>
                                 <option value="broken">Yaroqsiz holatda</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="label">Turi (Bo'lim)</label>
+                            <select
+                                name="inventoryType"
+                                className="input"
+                                value={formData.inventoryType}
+                                onChange={handleChange}
+                            >
+                                <option value="warehouse">Ombor (Asosiy)</option>
+                                <option value="tmj">TMJ (Tovar Material Jihozlar)</option>
                             </select>
                         </div>
                     </div>

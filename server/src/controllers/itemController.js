@@ -300,7 +300,8 @@ const updateItem = async (req, res) => {
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo,
             existingImages, // JSON string or array of strings of OLD images to keep
-            initialOwner, initialRole, assignedDate, handoverQuantity // Extract Handover fields directly
+            initialOwner, initialRole, assignedDate, handoverQuantity, // Extract Handover fields directly
+            inventoryType // Allow updating inventory type
         } = req.body;
 
         const id = parseInt(req.params.id);
@@ -315,7 +316,8 @@ const updateItem = async (req, res) => {
             price: price ? parseFloat(price) : undefined,
             quantity: quantity ? parseInt(quantity) : undefined,
             purchaseDate, status, condition,
-            building, location, department
+            building, location, department,
+            ...(inventoryType && { inventoryType }) // Only update if provided
         };
 
         // IMAGE & PDF HANDLING
