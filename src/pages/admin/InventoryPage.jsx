@@ -499,6 +499,7 @@ const InventoryPage = () => {
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('inn')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('purchase_date')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('current_value')}</th>
+                                <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('quantity')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('building')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('inventory_check')}</th>
                                 <th className="py-3 px-3 font-semibold text-sm whitespace-nowrap">{t('status')}</th>
@@ -532,6 +533,9 @@ const InventoryPage = () => {
                                             const total = price * quantity;
                                             return total.toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
                                         })()} so'm
+                                    </td>
+                                    <td className="py-3 px-3 text-gray-900 font-medium whitespace-nowrap text-center">
+                                        {item.quantity || 1}
                                     </td>
                                     <td className="py-3 px-3">
                                         <div className="text-gray-900 whitespace-nowrap">{item.building}</div>
