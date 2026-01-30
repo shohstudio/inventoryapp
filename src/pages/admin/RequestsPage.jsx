@@ -318,18 +318,18 @@ const RequestsPage = () => {
                                             {user.role === 'accounter' && req.status === 'pending_accountant' && user.role !== 'stat' && (
                                                 <div className="flex justify-end gap-2">
                                                     <button
-                                                        onClick={() => handleUpdateStatus(req.id, 'rejected')}
-                                                        className="btn btn-sm bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
-                                                        disabled={isProcessing}
+                                                        onClick={() => openDetailModal(req)}
+                                                        className="btn btn-sm bg-red-50 text-red-600 hover:bg-red-100 border-red-200 opacity-60 cursor-pointer"
+                                                        title="Batafsil ko'rish uchun bosing"
                                                     >
                                                         Rad etish
                                                     </button>
                                                     <button
-                                                        onClick={() => handleUpdateStatus(req.id, req.type === 'exit' ? 'approved' : 'pending_employee', 'mock_signature_XYZ')}
-                                                        className="btn btn-sm bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200"
-                                                        disabled={isProcessing}
+                                                        onClick={() => openDetailModal(req)}
+                                                        className="btn btn-sm bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-200 opacity-80"
+                                                        title="Batafsil ko'rish uchun bosing"
                                                     >
-                                                        {isProcessing ? "..." : <><RiShieldCheckLine className="mr-1" /> Tasdiqlash</>}
+                                                        <RiShieldCheckLine className="mr-1" /> Tasdiqlash
                                                     </button>
                                                 </div>
                                             )}

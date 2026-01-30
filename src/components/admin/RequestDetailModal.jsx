@@ -1,9 +1,18 @@
 import React from 'react';
 import { RiCloseLine, RiTimeLine, RiUserLine, RiMapPinLine, RiFileList3Line, RiShieldCheckLine, RiBox3Line } from 'react-icons/ri';
 import { useLanguage } from '../../context/LanguageContext';
+import { toast } from 'react-hot-toast';
 
 const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isProcessing, userRole }) => {
     const { t } = useLanguage();
+    const [file, setFile] = React.useState(null);
+
+    // Reset file when modal opens
+    React.useEffect(() => {
+        if (isOpen) {
+            setFile(null);
+        }
+    }, [isOpen]);
 
     if (!isOpen || !request) return null;
 
@@ -114,21 +123,46 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
 
                 {/* Footer Actions - Only for Accounter if pending */}
                 {userRole === 'accounter' && status === 'pending_accountant' && (
-                    <div className="p-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-                        <button
-                            onClick={() => onReject(request.id)}
-                            disabled={isProcessing}
-                            className="px-4 py-2 bg-white text-red-600 border border-red-200 rounded-xl hover:bg-red-50 font-medium transition-colors shadow-sm"
-                        >
-                            Rad etish
-                        </button>
-                        <button
-                            onClick={() => onApprove(request.id, type === 'exit' ? 'approved' : 'pending_employee')}
-                            disabled={isProcessing}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium transition-colors shadow-lg shadow-blue-200 flex items-center gap-2"
-                        >
-                            {isProcessing ? "..." : "Tasdiqlash"}
-                        </button>
+                    <div className="p-5 border-t border-gray-100 bg-gray-50 flex flex-col gap-3">
+                        {/* File Upload Input */}
+                        <div className="w-full">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Tasdiqlash hujjati (Nakladnoy PDF)
+                            </label>
+                            <input
+                                type="file"
+                                accept=".pdf, .jpg, .jpeg, .png"
+                                onChange={(e) => setFile(e.target.files[0])}
+                                className="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-full file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-blue-50 file:text-blue-700
+                                hover:file:bg-blue-100 transition-colors"
+                            />
+                        </div>
+                        <div className="flex justify-end gap-3 mt-2">
+                            <button
+                                onClick={() => onReject(request.id)}
+                                disabled={isProcessing}
+                                className="px-4 py-2 bg-white text-red-600 border border-red-200 rounded-xl hover:bg-red-50 font-medium transition-colors shadow-sm"
+                            >
+                                Rad etish
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (!file) {
+                                        toast.error("Iltimos, nakladnoy (PDF) hujjatni yuklang!");
+                                        return;
+                                    }
+                                    onApprove(request.id, type === 'exit' ? 'approved' : 'pending_employee', file);
+                                }}
+                                disabled={isProcessing}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium transition-colors shadow-lg shadow-blue-200 flex items-center gap-2"
+                            >
+                                {isProcessing ? "..." : "Tasdiqlash"}
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
