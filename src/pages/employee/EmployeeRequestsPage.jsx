@@ -4,11 +4,27 @@ import api from "../../api/axios";
 import { toast } from "react-hot-toast";
 import { RiFileList3Line, RiCheckDoubleLine, RiCloseCircleLine, RiTimeLine } from "react-icons/ri";
 
+import ConfirmationModal from "../../components/common/ConfirmationModal";
+
 const EmployeeRequestsPage = () => {
     const { user } = useAuth();
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isProcessing, setIsProcessing] = useState(false);
+
+    // Confirmation Modal State
+    const [confirmModal, setConfirmModal] = useState({
+        isOpen: false,
+        title: "",
+        message: null,
+        onConfirm: () => { },
+        confirmText: "Tasdiqlash",
+        isDanger: false
+    });
+
+    const closeConfirmModal = () => {
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+    };
 
     const fetchRequests = async () => {
         setLoading(true);
@@ -62,9 +78,42 @@ const EmployeeRequestsPage = () => {
             return;
         }
 
-        if (!window.confirm("Jihozni qabul qilasizmi?")) return;
+        // Find request
+        const req = requests.find(r => r.id === id);
 
-        processAction(id, 'completed');
+        setConfirmModal({
+            isOpen: true,
+            title: "Qabul qilasizmi?",
+            message: (
+                <div className="space-y-3">
+                    <p className="text-gray-600">Siz ushbu jihozni o'z nomingizga qabul qilmoqchisiz:</p>
+                    {req && (
+                        <div className="bg-blue-50 p-3 rounded-lg text-sm border border-blue-100">
+                            <div className="flex justify-between mb-1">
+                                <span className="text-gray-500">Jihoz:</span>
+                                <span className="font-medium text-gray-900">{req.item?.name}</span>
+                            </div>
+                            <div className="flex justify-between mb-1">
+                                <span className="text-gray-500">Model:</span>
+                                <span className="font-medium text-gray-900">{req.item?.model || '-'}</span>
+                            </div>
+                            <div className="flex justify-between mb-1">
+                                <span className="text-gray-500">Seriya:</span>
+                                <span className="font-mono text-gray-900">{req.item?.serialNumber || '-'}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500">Kimdan:</span>
+                                <span className="font-medium text-gray-900">{req.requester?.name || "Admin"}</span>
+                            </div>
+                        </div>
+                    )}
+                    <p className="text-xs text-gray-400">Tasdiqlash orqali siz jihoz uchun javobgarlikni o'z zimmangizga olasiz.</p>
+                </div>
+            ),
+            onConfirm: () => processAction(id, 'completed'),
+            confirmText: "Ha, bo'ynimga olaman",
+            isDanger: false
+        });
     };
 
     const processAction = async (id, status, description = null) => {
@@ -218,6 +267,17 @@ const EmployeeRequestsPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmModal.isOpen}
+                onClose={closeConfirmModal}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmText={confirmModal.confirmText}
+                isDanger={confirmModal.isDanger}
+            />
         </div>
     );
 };
