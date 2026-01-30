@@ -433,6 +433,14 @@ const updateItem = async (req, res) => {
             const splitQty = parseInt(handoverQuantity);
             const remainingQty = item.quantity - splitQty;
 
+            // Fix for Legacy Data:
+            // corrupted/default initialQuantity (e.g., 1) might be less than current item.quantity (e.g., 10).
+            // If so, assume item.quantity IS the initial quantity of this batch.
+            let validInitialQty = item.initialQuantity || item.quantity;
+            if (validInitialQty < item.quantity) {
+                validInitialQty = item.quantity;
+            }
+
             // 1. Update ORIGINAL item: just reduce quantity, KEEP it in stock (unassigned)
             // We do NOT apply dataToUpdate (which has assignment info) to the original item.
             // Ensure initialQuantity remains as is (e.g., 10). If null, set it to pre-split quantity.
@@ -440,7 +448,7 @@ const updateItem = async (req, res) => {
                 where: { id: parseInt(id) },
                 data: {
                     quantity: remainingQty,
-                    initialQuantity: item.initialQuantity || item.quantity
+                    initialQuantity: validInitialQty
                 }
             });
 
@@ -459,7 +467,7 @@ const updateItem = async (req, res) => {
                 subCategory: item.subCategory,
                 price: item.price,
                 quantity: splitQty, // The handed over amount
-                initialQuantity: item.initialQuantity || item.quantity, // Preserve the original batch size (e.g., 10)
+                initialQuantity: validInitialQty, // Preserve the valid original batch size
                 purchaseDate: item.purchaseDate,
                 status: item.status,
                 condition: item.condition,
