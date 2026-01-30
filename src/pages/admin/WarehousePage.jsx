@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiArchiveLine, RiDeleteBinLine, RiQrCodeLine, RiCloseLine } from "react-icons/ri";
 import WarehouseItemModal from "../../components/admin/WarehouseItemModal";
 import QRGeneratorModal from "../../components/admin/QRGeneratorModal";
+import ConfirmationModal from "../../components/common/ConfirmationModal";
 import Pagination from "../../components/common/Pagination"; // Import Pagination
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -11,6 +12,7 @@ import { toast } from "react-hot-toast";
 const WarehousePage = () => {
     const { t } = useLanguage();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false); // Confirmation Modal State
     // QR State
     const [isQRGenOpen, setIsQRGenOpen] = useState(false);
     const [qrItem, setQrItem] = useState(null);
@@ -183,9 +185,13 @@ const WarehousePage = () => {
         setSelectedItems(newSet);
     };
 
-    const handleBulkDelete = async () => {
-        if (!window.confirm(t('confirm_delete_many').replace('{count}', selectedItems.size))) return;
+    // Bulk Delete Logic - Trigger Modal
+    const handleBulkDelete = () => {
+        setIsConfirmModalOpen(true);
+    };
 
+    // Actual API Call (passed to modal)
+    const executeBulkDelete = async () => {
         setIsDeleting(true);
         try {
             await api.post('/items/delete-many', { ids: Array.from(selectedItems) });
@@ -505,6 +511,17 @@ const WarehousePage = () => {
                 isOpen={isQRGenOpen}
                 onClose={() => setIsQRGenOpen(false)}
                 item={qrItem}
+            />
+
+            <ConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={executeBulkDelete}
+                title="O'chirishni tasdiqlang"
+                message={t('confirm_delete_many').replace('{count}', selectedItems.size)}
+                confirmText={isDeleting ? "O'chirilmoqda..." : "Ha, o'chirish"}
+                cancelText="Bekor qilish"
+                isDanger={true}
             />
         </div>
     );
