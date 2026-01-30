@@ -6,7 +6,7 @@ import clsx from "clsx";
 
 const EmployeeLayout = () => {
     const { pathname } = useLocation();
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
 
     const links = [
         { name: "Asosiy", path: "/employee", icon: <RiHomeLine size={24} /> },
