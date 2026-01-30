@@ -309,10 +309,10 @@ const TMJPage = () => {
                     )}
                     <button
                         onClick={() => setIsExportModalOpen(true)}
-                        className="btn bg-green-50 text-green-600 hover:bg-green-100 border-green-200 ml-2"
+                        className="btn bg-green-500 hover:bg-green-600 text-white border-none ml-2 shadow-lg shadow-green-200"
                         title="Excelga yuklash"
                     >
-                        <RiFileExcel2Line size={20} /> Export
+                        <RiFileExcel2Line size={20} /> Excelga yuklash
                     </button>
                 </div>
             </div>
