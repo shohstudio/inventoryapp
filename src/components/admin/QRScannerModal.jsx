@@ -260,7 +260,7 @@ const QRScannerModal = ({ isOpen, onClose, onScanSuccess, verificationMode = fal
             <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in relative min-h-[400px] flex flex-col max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 z-10 p-2 bg-black/10 hover:bg-black/20 text-gray-800 rounded-full transition-colors"
+                    className="absolute top-4 right-4 z-[60] p-3 bg-white text-gray-800 rounded-full hover:bg-gray-100 shadow-xl border border-gray-100 transition-all transform hover:scale-105"
                 >
                     <RiCloseLine size={24} />
                 </button>
