@@ -372,7 +372,7 @@ const TMJPage = () => {
                                 <tr><td colSpan="8" className="p-8 text-center text-gray-500">Yuklanmoqda...</td></tr>
                             ) : items.length === 0 ? (
                                 <tr><td colSpan="8" className="p-8 text-center text-gray-500">Ma'lumot yo'q</td></tr>
-                            ) : items.map(item => (
+                            ) : items.map((item, index) => (
                                 <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${selectedItems.has(item.id) ? 'bg-blue-50' : ''}`}>
                                     <td className="p-4">
                                         <input
