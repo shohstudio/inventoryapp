@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiFilePaper2Line, RiDeleteBinLine, RiCloseLine, RiFilePdfLine, RiUserReceived2Line, RiFileExcel2Line, RiDownloadLine } from "react-icons/ri";
-import { utils, writeFile } from 'xlsx';
+import * as XLSX from 'xlsx';
 import TMJItemModal from "../../components/admin/TMJItemModal";
 import HandoverModal from "../../components/admin/HandoverModal";
 import Pagination from "../../components/common/Pagination";
@@ -269,12 +269,12 @@ const TMJPage = () => {
                 };
             });
 
-            const ws = utils.json_to_sheet(exportData);
-            const wb = utils.book_new();
-            utils.book_append_sheet(wb, ws, "TMJ Maxsulotlari");
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "TMJ Maxsulotlari");
 
             const fileName = `TMJ_Export_${type}_${new Date().toISOString().split('T')[0]}.xlsx`;
-            writeFile(wb, fileName);
+            XLSX.writeFile(wb, fileName);
 
             toast.success("Excel fayl yuklandi");
             setIsExportModalOpen(false);
