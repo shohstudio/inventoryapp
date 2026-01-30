@@ -435,10 +435,13 @@ const updateItem = async (req, res) => {
 
             // 1. Update ORIGINAL item: just reduce quantity, KEEP it in stock (unassigned)
             // We do NOT apply dataToUpdate (which has assignment info) to the original item.
-            // Ensure initialQuantity remains as is (e.g., 10)
+            // Ensure initialQuantity remains as is (e.g., 10). If null, set it to pre-split quantity.
             await prisma.item.update({
                 where: { id: parseInt(id) },
-                data: { quantity: remainingQty }
+                data: {
+                    quantity: remainingQty,
+                    initialQuantity: item.initialQuantity || item.quantity
+                }
             });
 
             // 2. Create NEW item: Copy strict fields from original, set quantity to splitQty, apply assignment
@@ -460,6 +463,7 @@ const updateItem = async (req, res) => {
                 purchaseDate: item.purchaseDate,
                 status: item.status,
                 condition: item.condition,
+                inventoryType: item.inventoryType, // Fix: Copy inventoryType (e.g. 'tmj') matching original
                 department: item.department, // Maybe updates?
                 location: item.location,    // Maybe updates?
 
