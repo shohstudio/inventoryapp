@@ -304,7 +304,10 @@ const TMJPage = () => {
                         </button>
                     )}
                     {user?.role !== 'stat' && (
-                        <button onClick={() => setIsModalOpen(true)} className="btn btn-primary bg-blue-600">
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="btn bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-200"
+                        >
                             <RiAddLine size={20} /> {t('add_new')}
                         </button>
                     )}
