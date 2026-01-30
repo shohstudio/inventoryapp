@@ -44,9 +44,9 @@ const ConfirmationModal = ({
                             <h3 className="text-xl font-bold text-gray-900 mb-2">
                                 {title}
                             </h3>
-                            <p className="text-gray-500 leading-relaxed">
+                            <div className="text-gray-500 leading-relaxed text-sm">
                                 {message}
-                            </p>
+                            </div>
                         </div>
                     </div>
 
@@ -64,8 +64,8 @@ const ConfirmationModal = ({
                                 onClose();
                             }}
                             className={`btn text-white shadow-md w-full sm:w-auto justify-center ${isDanger
-                                    ? 'bg-red-500 hover:bg-red-600 shadow-red-200'
-                                    : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'
+                                ? 'bg-red-500 hover:bg-red-600 shadow-red-200'
+                                : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'
                                 }`}
                         >
                             {confirmText}
