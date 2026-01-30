@@ -105,9 +105,12 @@ const WarehousePage = () => {
                 }
 
                 if (key !== 'imageFile') {
-                    // If ID is present (update), don't append it to body, it's in URL usually. 
-                    // But create needs fields.
-                    formData.append(key, itemData[key]);
+                    // Fix: Remove spaces from price (e.g. "10 000" -> "10000")
+                    if (key === 'price') {
+                        formData.append(key, String(itemData[key]).replace(/\s/g, ''));
+                    } else {
+                        formData.append(key, itemData[key]);
+                    }
                 }
             });
 
