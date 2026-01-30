@@ -316,6 +316,22 @@ const TMJPage = () => {
                         <RiFileExcel2Line size={20} /> Excelga yuklash
                     </button>
                 </div>
+
+                {/* Search Bar */}
+                <div className="mb-6">
+                    <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                            <RiSearchLine size={20} />
+                        </span>
+                        <input
+                            type="text"
+                            placeholder="Qidirish... (Nomi, Kategoriya, Seriya raqami, INN)"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-gray-700 bg-white shadow-sm"
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* Tabs */}
