@@ -23,6 +23,7 @@ model User {
   status    String   @default("active") // active, inactive
   pinfl     String?  @unique // JSHSHIR (14 digits)
   image     String?  // Profile picture URL
+  phone     String?  // Phone number
 
   items     Item[]   @relation("AssignedItems")
   logs      Log[]

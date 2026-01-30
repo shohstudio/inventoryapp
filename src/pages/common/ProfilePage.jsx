@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { RiUserSmileLine, RiShieldKeyholeLine, RiSave3Line, RiSmartphoneLine, RiMailLine, RiUserStarLine } from "react-icons/ri";
-import api from "../../api/axios";
+import { RiUserSmileLine, RiShieldKeyholeLine, RiSave3Line, RiSmartphoneLine, RiMailLine, RiUserStarLine, RiCameraSwitchLine } from "react-icons/ri";
+import api, { BASE_URL } from "../../api/axios";
 import { toast } from "react-hot-toast";
 
 const ProfilePage = () => {
     const { user, updateUser } = useAuth();
+
+    // Normalize image path: prepend base URL only if it's not already a data URL or absolute URL
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('data:') || path.startsWith('http')) return path;
+
+        // Remove /api if BASE_URL already contains it and path starts with it
+        const baseUrl = BASE_URL.endsWith('/api') ? BASE_URL.slice(0, -4) : BASE_URL;
+        return `${baseUrl}${path}`;
+    };
 
     // States for forms
     const [profile, setProfile] = useState({
@@ -25,7 +35,18 @@ const ProfilePage = () => {
 
     const [isEditing, setIsEditing] = useState(false);
     const [imageFile, setImageFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(user?.image ? `https://invertar.astiedu.uz${user.image}` : null);
+    const [imagePreview, setImagePreview] = useState(getImageUrl(user?.image));
+
+    const handleEditToggle = () => {
+        const nextState = !isEditing;
+        setIsEditing(nextState);
+        if (nextState) {
+            toast("Endi rasmingizni ham o'zgartirishingiz mumkin", {
+                icon: '📸',
+                duration: 4000
+            });
+        }
+    };
 
     const handleProfileChange = (e) => {
         setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -53,6 +74,7 @@ const ProfilePage = () => {
             const formData = new FormData();
             formData.append('name', profile.name);
             formData.append('department', profile.department);
+            formData.append('phone', profile.phone);
             if (imageFile) {
                 formData.append('image', imageFile);
             }
@@ -104,7 +126,7 @@ const ProfilePage = () => {
                     <div className="relative pt-12 px-6 pb-6">
                         <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 mb-6">
                             <div className="relative group">
-                                <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-md overflow-hidden">
+                                <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-md overflow-hidden relative">
                                     {imagePreview ? (
                                         <img src={imagePreview} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
                                     ) : (
@@ -112,10 +134,17 @@ const ProfilePage = () => {
                                             {profile.name.charAt(0)}
                                         </div>
                                     )}
+
+                                    {isEditing && (
+                                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center pointer-events-none">
+                                            <div className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center text-indigo-600 shadow-sm">
+                                                <RiCameraSwitchLine size={20} />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 {isEditing && (
-                                    <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-xs font-medium">
-                                        O'zgartirish
+                                    <label className="absolute inset-0 z-10 cursor-pointer">
                                         <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                                     </label>
                                 )}
@@ -128,10 +157,12 @@ const ProfilePage = () => {
                                 </p>
                             </div>
                             <button
-                                onClick={() => setIsEditing(!isEditing)}
-                                className={`btn ${isEditing ? 'btn-primary' : 'btn-outline'}`}
+                                onClick={handleEditToggle}
+                                className={`btn ${isEditing ? 'btn-primary shadow-indigo-200 shadow-lg' : 'btn-outline border-indigo-200 text-indigo-600 hover:bg-indigo-50'}`}
                             >
-                                {isEditing ? 'Bekor qilish' : "Tahrirlash"}
+                                <span className="flex items-center gap-2">
+                                    {isEditing ? 'Bekor qilish' : "Tahrirlash"}
+                                </span>
                             </button>
                         </div>
 

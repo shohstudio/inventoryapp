@@ -79,8 +79,16 @@ const Header = ({ onMenuClick }) => {
                             <p className="text-sm font-semibold text-gray-800">{user?.name}</p>
                             <p className="text-xs text-gray-500 capitalize">{user?.role === 'accounter' ? 'Hisobchi' : user?.role}</p>
                         </div>
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md">
-                            {user?.name?.charAt(0)}
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md overflow-hidden border-2 border-white dark:border-slate-800">
+                            {user?.image ? (
+                                <img
+                                    src={user.image.startsWith('http') ? user.image : `https://invertar.astiedu.uz${user.image}`}
+                                    alt="User"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                user?.name?.charAt(0)
+                            )}
                         </div>
                         <RiArrowDownSLine className={`text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                     </button>

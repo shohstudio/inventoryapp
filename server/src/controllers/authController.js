@@ -35,6 +35,8 @@ const login = async (req, res) => {
                 username: user.username,
                 role: user.role,
                 pinfl: user.pinfl,
+                image: user.image,
+                phone: user.phone,
                 token: generateToken(user.id, user.role, user.name),
             });
         } else {
@@ -141,7 +143,9 @@ const eimzoLogin = async (req, res) => {
                     username: `eri_${pinfl}`,
                     password: await bcrypt.hash(Math.random().toString(), 10), // Random password
                     role: 'employee',
-                    pinfl: pinfl
+                    pinfl: pinfl,
+                    image: null,
+                    phone: null
                 }
             });
         }
@@ -153,6 +157,8 @@ const eimzoLogin = async (req, res) => {
             username: user.username,
             role: user.role,
             pinfl: user.pinfl,
+            image: user.image,
+            phone: user.phone,
             token: generateToken(user.id, user.role, user.name),
         });
 

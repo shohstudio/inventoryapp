@@ -307,13 +307,14 @@ const checkAvailability = async (req, res) => {
 // @access  Private
 const updateProfile = async (req, res) => {
     try {
-        const { name, department, position, password } = req.body;
+        const { name, department, position, phone, password } = req.body;
         const userId = req.user.id;
 
         const dataToUpdate = {};
         if (name) dataToUpdate.name = name;
         if (department) dataToUpdate.department = department;
         if (position) dataToUpdate.position = position;
+        if (phone) dataToUpdate.phone = phone;
 
         if (password) {
             const salt = await bcrypt.genSalt(10);
