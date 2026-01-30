@@ -121,7 +121,7 @@ const RequestsPage = () => {
                     if (description) formData.append('description', description);
                     formData.append('file', file);
                     data = formData;
-                    config.headers = { 'Content-Type': 'multipart/form-data' };
+
                 } else {
                     data = { status: newStatus, signature, description };
                 }
