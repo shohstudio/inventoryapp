@@ -48,6 +48,8 @@ const getUsers = async (req, res) => {
                     position: true,
                     status: true,
                     pinfl: true,
+                    image: true,
+                    phone: true,
                     createdAt: true,
                     _count: {
                         select: { items: true }
@@ -95,6 +97,8 @@ const getUserById = async (req, res) => {
                 position: true,
                 status: true,
                 pinfl: true,
+                image: true,
+                phone: true,
                 items: true
             }
         });

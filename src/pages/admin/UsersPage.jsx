@@ -158,8 +158,16 @@ const UsersPage = () => {
                                     <tr key={user.id} className="hover:bg-gray-50/80 transition-colors group">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                                                    {user.name.charAt(0)}
+                                                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold overflow-hidden border border-gray-100">
+                                                    {user.image ? (
+                                                        <img
+                                                            src={user.image.startsWith('http') ? user.image : `https://invertar.astiedu.uz${user.image}`}
+                                                            alt={user.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        user.name.charAt(0)
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <div className="font-medium text-gray-900">{user.name}</div>
