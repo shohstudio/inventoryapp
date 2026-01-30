@@ -111,7 +111,7 @@ const EmployeeRequestsPage = () => {
                 </div>
             ),
             onConfirm: () => processAction(id, 'completed'),
-            confirmText: "Ha, bo'ynimga olaman",
+            confirmText: "Ha, qabul qilaman",
             isDanger: false
         });
     };
