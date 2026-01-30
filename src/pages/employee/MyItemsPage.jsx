@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line } from "react-icons/ri";
+import { read, utils, writeFile } from 'xlsx';
+import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line, RiFileExcel2Line } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
@@ -74,6 +75,37 @@ const MyItemsPage = () => {
     const currentItems = myItems.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(myItems.length / itemsPerPage);
 
+    const handleExportExcel = () => {
+        const exportData = myItems.map((item, index) => ({
+            "№": index + 1,
+            "Jihoz Nomi": item.name,
+            "Model": item.model || "-",
+            "Seriya Raqami": item.serialNumber || "-",
+            "Kategoriya": item.category || "-",
+            "Holat": item.status === 'working' ? "Faol" : "Ta'mirda",
+            "Biriktirilgan Sana": item.dateAssigned,
+            "PINFL": item.assignedTo?.pinfl || "-"
+        }));
+
+        const ws = utils.json_to_sheet(exportData);
+        // Auto-width for columns
+        const wscols = [
+            { wch: 5 },  // #
+            { wch: 25 }, // Name
+            { wch: 15 }, // Model
+            { wch: 20 }, // Serial
+            { wch: 15 }, // Category
+            { wch: 10 }, // Status
+            { wch: 15 }, // Date
+            { wch: 15 }  // PINFL
+        ];
+        ws['!cols'] = wscols;
+
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, "Mening Jihozlarim");
+        writeFile(wb, "Mening_Jihozlarim.xlsx");
+    };
+
     if (loading) return <div className="p-10 text-center text-gray-500">Yuklanmoqda...</div>;
 
     if (myItems.length === 0 && requests.length === 0) {
@@ -90,7 +122,19 @@ const MyItemsPage = () => {
 
     return (
         <div className="animate-in fade-in duration-500">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Mening Jihozlarim</h1>
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <h1 className="text-2xl font-bold text-gray-800">Mening Jihozlarim</h1>
+
+                {myItems.length > 0 && (
+                    <button
+                        onClick={handleExportExcel}
+                        className="btn bg-green-600 hover:bg-green-700 text-white shadow-green-200 shadow-lg flex items-center gap-2"
+                    >
+                        <RiFileExcel2Line size={20} />
+                        Excelga yuklash
+                    </button>
+                )}
+            </div>
 
             {requests.length > 0 && (
                 <div className="mb-8 animate-in slide-in-from-top duration-500">
