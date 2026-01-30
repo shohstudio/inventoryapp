@@ -105,6 +105,21 @@ const EmployeeRequestsPage = () => {
                                 <span className="text-gray-500">Kimdan:</span>
                                 <span className="font-medium text-gray-900">{req.requester?.name || "Admin"}</span>
                             </div>
+                            {req.accountantDocument && (
+                                <div className="mt-3 pt-2 border-t border-blue-200 flex justify-between items-center">
+                                    <span className="text-gray-500 text-xs flex items-center gap-1">
+                                        <RiFileList3Line /> Asos hujjat:
+                                    </span>
+                                    <a
+                                        href={`https://invertar.astiedu.uz/api${req.accountantDocument}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:text-blue-800 text-xs font-medium underline"
+                                    >
+                                        Ko'rish (PDF)
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     )}
                     <p className="text-xs text-gray-400">Tasdiqlash orqali siz jihoz uchun javobgarlikni o'z zimmangizga olasiz.</p>

@@ -5,7 +5,7 @@ import api from "../../api/axios";
 import { toast } from "react-hot-toast";
 
 const ProfilePage = () => {
-    const { user } = useAuth();
+    const { user, updateUser } = useAuth();
 
     // States for forms
     const [profile, setProfile] = useState({
@@ -24,6 +24,8 @@ const ProfilePage = () => {
     });
 
     const [isEditing, setIsEditing] = useState(false);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(user?.image ? `https://invertar.astiedu.uz${user.image}` : null);
 
     const handleProfileChange = (e) => {
         setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -33,14 +35,35 @@ const ProfilePage = () => {
         setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const saveProfile = async (e) => {
         e.preventDefault();
         try {
-            await api.put(`/users/${user.id}`, {
-                name: profile.name,
-                phone: profile.phone,
-                department: profile.department
+            const formData = new FormData();
+            formData.append('name', profile.name);
+            formData.append('department', profile.department);
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
+            const { data } = await api.put(`/users/profile`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
+
+            // Sync with global state
+            updateUser(data);
+
             setIsEditing(false);
             toast.success("Profil ma'lumotlari muvaffaqiyatli yangilandi!");
         } catch (error) {
@@ -56,7 +79,7 @@ const ProfilePage = () => {
             return;
         }
         try {
-            await api.put(`/users/${user.id}`, {
+            await api.put(`/users/profile`, {
                 password: passwords.new
             });
             toast.success("Parol muvaffaqiyatli o'zgartirildi!");
@@ -80,10 +103,22 @@ const ProfilePage = () => {
                     <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
                     <div className="relative pt-12 px-6 pb-6">
                         <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 mb-6">
-                            <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-md">
-                                <div className="w-full h-full bg-indigo-50 rounded-xl flex items-center justify-center text-4xl text-indigo-500 font-bold">
-                                    {profile.name.charAt(0)}
+                            <div className="relative group">
+                                <div className="w-24 h-24 rounded-2xl bg-white p-1 shadow-md overflow-hidden">
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Avatar" className="w-full h-full object-cover rounded-xl" />
+                                    ) : (
+                                        <div className="w-full h-full bg-indigo-50 rounded-xl flex items-center justify-center text-4xl text-indigo-500 font-bold">
+                                            {profile.name.charAt(0)}
+                                        </div>
+                                    )}
                                 </div>
+                                {isEditing && (
+                                    <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer text-white text-xs font-medium">
+                                        O'zgartirish
+                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                                    </label>
+                                )}
                             </div>
                             <div className="text-center sm:text-left flex-1">
                                 <h2 className="text-2xl font-bold text-gray-900">{profile.name}</h2>

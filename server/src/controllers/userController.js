@@ -302,4 +302,50 @@ const checkAvailability = async (req, res) => {
     }
 }
 
-module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser, checkAvailability };
+// @desc    Update own profile
+// @route   PUT /api/users/profile
+// @access  Private
+const updateProfile = async (req, res) => {
+    try {
+        const { name, department, position, password } = req.body;
+        const userId = req.user.id;
+
+        const dataToUpdate = {};
+        if (name) dataToUpdate.name = name;
+        if (department) dataToUpdate.department = department;
+        if (position) dataToUpdate.position = position;
+
+        if (password) {
+            const salt = await bcrypt.genSalt(10);
+            dataToUpdate.password = await bcrypt.hash(password, salt);
+        }
+
+        if (req.file) {
+            dataToUpdate.image = `/api/uploads/${req.file.filename}`;
+        }
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: dataToUpdate,
+            select: {
+                id: true,
+                name: true,
+                username: true,
+                email: true,
+                role: true,
+                department: true,
+                position: true,
+                status: true,
+                pinfl: true,
+                image: true
+            }
+        });
+
+        res.json(user);
+    } catch (error) {
+        console.error("Profile update error:", error);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+module.exports = { getUsers, getUserById, createUser, updateUser, deleteUser, checkAvailability, updateProfile };

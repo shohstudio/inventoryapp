@@ -145,7 +145,8 @@ const updateRequestStatus = async (req, res) => {
             data: {
                 status,
                 ...(signature && { accountantSignature: signature }),
-                ...(description && { description: description }) // Allow updating description (e.g. rejection reason)
+                ...(description && { description: description }), // Allow updating description (e.g. rejection reason)
+                ...(req.file && { accountantDocument: `/uploads/${req.file.filename}` }) // Save uploaded file path
             }
         });
 
@@ -157,6 +158,7 @@ const updateRequestStatus = async (req, res) => {
                     data: {
                         assignedUserId: request.targetUserId,
                         assignedDate: new Date(),
+                        assignedDocument: request.accountantDocument, // Persist the basis document
                         status: 'working' // Active
                     }
                 });

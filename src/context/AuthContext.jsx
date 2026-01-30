@@ -79,8 +79,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("inventory_user");
   };
 
+  const updateUser = (data) => {
+    const newUser = { ...user, ...data };
+    setUser(newUser);
+    localStorage.setItem("inventory_user", JSON.stringify(newUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, loginWithEImzo, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, loginWithEImzo, logout, updateUser, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

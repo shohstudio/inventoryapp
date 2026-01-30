@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getUsers, getUserById, createUser, updateUser, deleteUser, checkAvailability } = require('../controllers/userController');
+const { getUsers, getUserById, createUser, updateUser, deleteUser, checkAvailability, updateProfile } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 router.post('/check-availability', protect, admin, checkAvailability);
+router.put('/profile', protect, upload.single('image'), updateProfile);
 
 router.route('/')
     .get(protect, (req, res, next) => {
