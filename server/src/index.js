@@ -67,7 +67,7 @@ app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/stats', require('./routes/statsRoutes'));
 
 // Make uploads folder static
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Serve Frontend (Vite build)
 // Expects 'dist' folder in the project root
