@@ -227,7 +227,7 @@ const TMJPage = () => {
                 inventoryType: 'tmj'
             };
 
-            if (type === 'warehouse') params.isAssigned = 'unassigned';
+            if (type === 'stock') params.isAssigned = 'unassigned';
             else if (type === 'assigned') params.isAssigned = 'assigned';
             // 'all' -> no extra filter
 
