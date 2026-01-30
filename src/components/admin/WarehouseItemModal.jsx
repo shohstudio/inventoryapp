@@ -27,9 +27,13 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                 ...item,
                 category: item.category || categories[0],
                 // Parse images if it's a JSON string to avoid .map error
-                images: typeof item.images === 'string'
+                images: (typeof item.images === 'string'
                     ? JSON.parse(item.images || "[]")
-                    : (item.images || []),
+                    : (item.images || [])).map(url => ({
+                        preview: url,
+                        file: null,
+                        isExisting: true
+                    })),
                 pdf: item.contractPdf || null
             });
         } else {
@@ -43,7 +47,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                 warranty: "",
                 price: "",
                 quantity: "1",
-                images: [],
+                images: [], // Array of { preview, file, isExisting }
                 pdf: null
             });
         }
@@ -91,8 +95,14 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
 
     const handleImageChange = (e) => {
         if (e.target.files) {
-            const filesArray = Array.from(e.target.files).map(file => URL.createObjectURL(file));
-            setFormData(prev => ({ ...prev, images: [...prev.images, ...filesArray] }));
+            const newImages = Array.from(e.target.files).map(file => ({
+                preview: URL.createObjectURL(file),
+                file: file,
+                isExisting: false
+            }));
+
+            setFormData(prev => ({ ...prev, images: [...prev.images, ...newImages] }));
+
             if (errors.images) {
                 setErrors(prev => ({ ...prev, images: null }));
             }
@@ -299,9 +309,9 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                         {/* Image Previews */}
                         {formData.images.length > 0 && (
                             <div className="grid grid-cols-4 gap-2 mt-4">
-                                {formData.images.map((img, index) => (
+                                {formData.images.map((imgObj, index) => (
                                     <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100">
-                                        <img src={img} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                        <img src={imgObj.preview} alt={`Preview ${index}`} className="w-full h-full object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => removeImage(index)}

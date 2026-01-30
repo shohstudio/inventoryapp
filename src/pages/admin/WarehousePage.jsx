@@ -95,396 +95,417 @@ const WarehousePage = () => {
             const formData = new FormData();
 
             // Convert simple object to FormData for file upload
-            Object.keys(itemData).forEach(key => {
-                if (key === 'imageFile' && itemData[key]) {
-                    formData.append('image', itemData[key]);
-                } else if (key !== 'images' && key !== 'imageFile') {
-                    // If ID is present (update), don't append it to body, it's in URL usually. 
-                    // But create needs fields.
-                    formData.append(key, itemData[key]);
-                }
-            });
-
-            // Ensure no user is assigned for warehouse items
-            formData.append('assignedUserId', '');
-
-            if (selectedItem) {
-                // Update
-                await api.put(`/items/${selectedItem.id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-                toast.success(t('warehouse_item_updated'));
-            } else {
-                // Create
-                await api.post('/items', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-                toast.success(t('warehouse_item_added'));
+            if (key === 'images') {
+                // Skip 'images' here, will handle specially
+                return;
             }
-            fetchItems();
-            setIsModalOpen(false);
-        } catch (error) {
-            console.error("Error saving item:", error);
-            const msg = error.response?.data?.message || error.message;
-            toast.error("Xatolik: " + msg);
+
+            if (key !== 'imageFile') {
+                // If ID is present (update), don't append it to body, it's in URL usually. 
+                // But create needs fields.
+                formData.append(key, itemData[key]);
+            }
+        });
+
+        // Handle Images
+        if (itemData.images && Array.isArray(itemData.images)) {
+            // 1. Existing Images (URLs)
+            const existingImages = itemData.images
+                .filter(img => img.isExisting)
+                .map(img => img.preview);
+
+            if (existingImages.length > 0) {
+                formData.append('existingImages', JSON.stringify(existingImages));
+            }
+
+            // 2. New Image Files
+            itemData.images
+                .filter(img => !img.isExisting && img.file)
+                .forEach(img => {
+                    formData.append('images', img.file);
+                });
         }
-    };
 
-    const openModal = (item = null) => {
-        setSelectedItem(item);
-        setIsModalOpen(true);
-    };
+        // Ensure no user is assigned for warehouse items
+        formData.append('assignedUserId', '');
 
-    const openQRModal = (item) => {
-        setQrItem(item);
-        setIsQRGenOpen(true);
-    };
-
-    // Bulk Delete Logic
-    const toggleSelectAll = () => {
-        if (selectedItems.size === items.length) { // filteredItems is now items
-            setSelectedItems(new Set());
+        if (selectedItem) {
+            // Update
+            await api.put(`/items/${selectedItem.id}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            toast.success(t('warehouse_item_updated'));
         } else {
-            const allIds = new Set(items.map(i => i.id));
-            setSelectedItems(allIds);
+            // Create
+            await api.post('/items', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            toast.success(t('warehouse_item_added'));
         }
-    };
+        fetchItems();
+        setIsModalOpen(false);
+    } catch (error) {
+        console.error("Error saving item:", error);
+        const msg = error.response?.data?.message || error.message;
+        toast.error("Xatolik: " + msg);
+    }
+};
 
-    const toggleSelectItem = (id) => {
-        const newSet = new Set(selectedItems);
-        if (newSet.has(id)) {
-            newSet.delete(id);
-        } else {
-            newSet.add(id);
-        }
-        setSelectedItems(newSet);
-    };
+const openModal = (item = null) => {
+    setSelectedItem(item);
+    setIsModalOpen(true);
+};
 
-    const handleBulkDelete = async () => {
-        if (!window.confirm(t('confirm_delete_many').replace('{count}', selectedItems.size))) return;
+const openQRModal = (item) => {
+    setQrItem(item);
+    setIsQRGenOpen(true);
+};
 
-        setIsDeleting(true);
-        try {
-            await api.post('/items/delete-many', { ids: Array.from(selectedItems) });
-            toast.success(t('warehouse_items_deleted'));
-            setSelectedItems(new Set());
-            fetchItems();
-        } catch (error) {
-            console.error(error);
-            toast.error("O'chirishda xatolik yuz berdi");
-        } finally {
-            setIsDeleting(false);
-        }
-    };
+// Bulk Delete Logic
+const toggleSelectAll = () => {
+    if (selectedItems.size === items.length) { // filteredItems is now items
+        setSelectedItems(new Set());
+    } else {
+        const allIds = new Set(items.map(i => i.id));
+        setSelectedItems(allIds);
+    }
+};
 
-    // Filter logic - REMOVED client side.
-    const filteredItems = items;
-    // const filteredItems = items.filter(item => {
-    //     ... logic removed ...
-    // });
+const toggleSelectItem = (id) => {
+    const newSet = new Set(selectedItems);
+    if (newSet.has(id)) {
+        newSet.delete(id);
+    } else {
+        newSet.add(id);
+    }
+    setSelectedItems(newSet);
+};
 
-    // We need unique categories for the dropdown. 
-    // Ideally this should come from API 'facets' or metadata, but for now we can extract from CURRENT PAGE items 
-    // OR keep it hardcoded/fetched separately if needed.
-    // If we only show categories present on current page, it's confusing.
-    // Better to fetch all categories once? Or just let user type?
-    // Let's use what we have on page for now, or if it sucks, we can make a separate endpoint for metadata like 'categories'.
-    // For now, let's just stick to what's visible or maybe keep the filter dropdown but accept that it only filters via backend now.
-    // Since we rely on manual input or existing data, let's keep extracting from items but know it's limited to current page.
-    // Actually, uniqueCategories logic was only for dropdown options.
-    // If we paginating, we might not see all categories. 
-    // For now, let's assume it's acceptable or user types it.
-    // To make it better, we could have a hardcoded list or fetch distinct categories from DB.
-    // Let's keep it simple: Extracts from current page items for now. 
+const handleBulkDelete = async () => {
+    if (!window.confirm(t('confirm_delete_many').replace('{count}', selectedItems.size))) return;
 
-    const uniqueCategories = [...new Set(items.map(item => item.category).filter(Boolean))];
+    setIsDeleting(true);
+    try {
+        await api.post('/items/delete-many', { ids: Array.from(selectedItems) });
+        toast.success(t('warehouse_items_deleted'));
+        setSelectedItems(new Set());
+        fetchItems();
+    } catch (error) {
+        console.error(error);
+        toast.error("O'chirishda xatolik yuz berdi");
+    } finally {
+        setIsDeleting(false);
+    }
+};
+
+// Filter logic - REMOVED client side.
+const filteredItems = items;
+// const filteredItems = items.filter(item => {
+//     ... logic removed ...
+// });
+
+// We need unique categories for the dropdown. 
+// Ideally this should come from API 'facets' or metadata, but for now we can extract from CURRENT PAGE items 
+// OR keep it hardcoded/fetched separately if needed.
+// If we only show categories present on current page, it's confusing.
+// Better to fetch all categories once? Or just let user type?
+// Let's use what we have on page for now, or if it sucks, we can make a separate endpoint for metadata like 'categories'.
+// For now, let's just stick to what's visible or maybe keep the filter dropdown but accept that it only filters via backend now.
+// Since we rely on manual input or existing data, let's keep extracting from items but know it's limited to current page.
+// Actually, uniqueCategories logic was only for dropdown options.
+// If we paginating, we might not see all categories. 
+// For now, let's assume it's acceptable or user types it.
+// To make it better, we could have a hardcoded list or fetch distinct categories from DB.
+// Let's keep it simple: Extracts from current page items for now. 
+
+const uniqueCategories = [...new Set(items.map(item => item.category).filter(Boolean))];
 
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Yuklanmoqda...</div>;
+if (loading) return <div className="p-8 text-center text-gray-500">Yuklanmoqda...</div>;
 
-    return (
-        <div>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                        <RiArchiveLine className="text-orange-500" />
-                        {t('warehouse')}
-                    </h1>
-                    <p className="text-gray-500">
-                        {t('inventory_subtitle')}
-                    </p>
-                </div>
-                <div className="flex gap-2">
-                    {selectedItems.size > 0 && user?.role !== 'stat' && (
-                        <button
-                            onClick={handleBulkDelete}
-                            className="btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200 border-red-600 animate-in fade-in zoom-in"
-                            disabled={isDeleting}
-                        >
-                            <RiDeleteBinLine size={20} />
-                            {t('warehouse_delete_selected')} ({selectedItems.size})
-                        </button>
-                    )}
-                    {user?.role !== 'stat' && (
-                        <button
-                            onClick={() => openModal()}
-                            className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
-                        >
-                            <RiAddLine size={20} />
-                            {t('warehouse_add')}
-                        </button>
-                    )}
-                </div>
+return (
+    <div>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+            <div>
+                <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <RiArchiveLine className="text-orange-500" />
+                    {t('warehouse')}
+                </h1>
+                <p className="text-gray-500">
+                    {t('inventory_subtitle')}
+                </p>
             </div>
-
-            <div className="card border-0 shadow-lg shadow-gray-100/50">
-                {/* Search & Filter Controls */}
-                <div className="flex flex-col gap-4 mb-6">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder={t('search')}
-                                className="input pl-10 w-full focus:ring-orange-500 focus:border-orange-500"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Status Tabs for Assigned/Unassigned */}
-                        <div className="flex bg-gray-100 p-1 rounded-lg">
-                            <button
-                                onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'all' }))}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'all' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                {t('warehouse_filter_all')}
-                            </button>
-                            <button
-                                onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'unassigned' }))}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'unassigned' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                {t('warehouse_filter_unassigned')}
-                            </button>
-                            <button
-                                onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'pending' }))}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'pending' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                {t('warehouse_filter_pending')}
-                            </button>
-                        </div>
-                    </div>
-
+            <div className="flex gap-2">
+                {selectedItems.size > 0 && user?.role !== 'stat' && (
                     <button
-                        onClick={() => setShowFilters(!showFilters)}
-                        className={`btn gap-2 transition-colors ${showFilters ? 'bg-orange-50 text-orange-600 border-orange-200' : 'btn-outline text-gray-600'}`}
+                        onClick={handleBulkDelete}
+                        className="btn bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-200 border-red-600 animate-in fade-in zoom-in"
+                        disabled={isDeleting}
                     >
-                        <RiFilter3Line />
-                        {t('filter')}
+                        <RiDeleteBinLine size={20} />
+                        {t('warehouse_delete_selected')} ({selectedItems.size})
                     </button>
-                </div>
-
-                {/* Collapsible Filter Panel */}
-                {showFilters && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
-                        <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('category')}</label>
-                            <select
-                                className="input w-full"
-                                value={filters.category}
-                                onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                            >
-                                <option value="">{t('all')}</option>
-                                {uniqueCategories.map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-gray-500 mb-1">{t('status')}</label>
-                            <select
-                                className="input w-full"
-                                value={filters.status}
-                                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                            >
-                                <option value="all">{t('all')}</option>
-                                <option value="working">{t('status_working')}</option>
-                                <option value="repair">{t('status_repair')}</option>
-                                <option value="written-off">{t('status_written_off')}</option>
-                                <option value="broken">{t('status_broken')}</option>
-                            </select>
-                        </div>
-                    </div>
+                )}
+                {user?.role !== 'stat' && (
+                    <button
+                        onClick={() => openModal()}
+                        className="btn btn-primary bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-200 border-orange-600"
+                    >
+                        <RiAddLine size={20} />
+                        {t('warehouse_add')}
+                    </button>
                 )}
             </div>
+        </div>
 
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden mt-6">
-                <div className="overflow-x-auto min-h-[400px]">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-blue-600 text-white">
-                                <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg w-12">
+        <div className="card border-0 shadow-lg shadow-gray-100/50">
+            {/* Search & Filter Controls */}
+            <div className="flex flex-col gap-4 mb-6">
+                <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder={t('search')}
+                            className="input pl-10 w-full focus:ring-orange-500 focus:border-orange-500"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Status Tabs for Assigned/Unassigned */}
+                    <div className="flex bg-gray-100 p-1 rounded-lg">
+                        <button
+                            onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'all' }))}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'all' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            {t('warehouse_filter_all')}
+                        </button>
+                        <button
+                            onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'unassigned' }))}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'unassigned' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            {t('warehouse_filter_unassigned')}
+                        </button>
+                        <button
+                            onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'pending' }))}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'pending' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            {t('warehouse_filter_pending')}
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className={`btn gap-2 transition-colors ${showFilters ? 'bg-orange-50 text-orange-600 border-orange-200' : 'btn-outline text-gray-600'}`}
+                >
+                    <RiFilter3Line />
+                    {t('filter')}
+                </button>
+            </div>
+
+            {/* Collapsible Filter Panel */}
+            {showFilters && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">{t('category')}</label>
+                        <select
+                            className="input w-full"
+                            value={filters.category}
+                            onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                        >
+                            <option value="">{t('all')}</option>
+                            {uniqueCategories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">{t('status')}</label>
+                        <select
+                            className="input w-full"
+                            value={filters.status}
+                            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                        >
+                            <option value="all">{t('all')}</option>
+                            <option value="working">{t('status_working')}</option>
+                            <option value="repair">{t('status_repair')}</option>
+                            <option value="written-off">{t('status_written_off')}</option>
+                            <option value="broken">{t('status_broken')}</option>
+                        </select>
+                    </div>
+                </div>
+            )}
+        </div>
+
+        <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden mt-6">
+            <div className="overflow-x-auto min-h-[400px]">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-blue-600 text-white">
+                            <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg w-12">
+                                <input
+                                    type="checkbox"
+                                    className="checkbox checkbox-sm border-white checked:bg-white checked:text-blue-600"
+                                    checked={filteredItems.length > 0 && selectedItems.size === filteredItems.length}
+                                    onChange={toggleSelectAll}
+                                />
+                            </th>
+                            <th className="py-4 px-6 font-semibold text-sm">ID</th>
+                            <th className="py-4 px-6 font-semibold text-sm">{t('name')} / {t('model')}</th>
+                            <th className="py-4 px-6 font-semibold text-sm">{t('assigned_to')} ({t('status')})</th>
+                            <th className="py-4 px-6 font-semibold text-sm">{t('warranty')}</th>
+                            <th className="py-4 px-6 font-semibold text-sm">{t('price')}</th>
+                            <th className="py-4 px-6 font-semibold text-sm">{t('image')}</th>
+                            <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                        {filteredItems.map((item) => (
+                            <tr key={item.id} className={`hover:bg-gray-50/80 transition-colors group ${selectedItems.has(item.id) ? 'bg-orange-50' : ''}`}>
+                                <td className="py-4 px-6">
                                     <input
                                         type="checkbox"
-                                        className="checkbox checkbox-sm border-white checked:bg-white checked:text-blue-600"
-                                        checked={filteredItems.length > 0 && selectedItems.size === filteredItems.length}
-                                        onChange={toggleSelectAll}
+                                        className="checkbox checkbox-sm border-gray-300 checked:bg-orange-500 checked:border-orange-500"
+                                        checked={selectedItems.has(item.id)}
+                                        onChange={() => toggleSelectItem(item.id)}
                                     />
-                                </th>
-                                <th className="py-4 px-6 font-semibold text-sm">ID</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('name')} / {t('model')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('assigned_to')} ({t('status')})</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('warranty')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('price')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm">{t('image')}</th>
-                                <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {filteredItems.map((item) => (
-                                <tr key={item.id} className={`hover:bg-gray-50/80 transition-colors group ${selectedItems.has(item.id) ? 'bg-orange-50' : ''}`}>
-                                    <td className="py-4 px-6">
-                                        <input
-                                            type="checkbox"
-                                            className="checkbox checkbox-sm border-gray-300 checked:bg-orange-500 checked:border-orange-500"
-                                            checked={selectedItems.has(item.id)}
-                                            onChange={() => toggleSelectItem(item.id)}
-                                        />
-                                    </td>
-                                    <td className="py-4 px-6 text-gray-600 font-medium">#{item.orderNumber || item.id}</td>
-                                    <td className="py-4 px-6">
-                                        <div className="font-medium text-gray-900">{item.name}</div>
-                                        <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
-                                    </td>
-                                    <td className="py-4 px-6 text-gray-600">
-                                        {/* Display Assigned User or Initial Owner */}
-                                        {item.assignedTo ? (
-                                            <span className="text-blue-600 font-medium">{item.assignedTo.name}</span>
-                                        ) : (item.requests && item.requests.length > 0) ? (
-                                            <div className="flex flex-col">
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                    {t('warehouse_filter_pending')}: {item.requests[0].targetUser?.name}
-                                                </span>
-                                            </div>
-                                        ) : item.initialOwner ? (
-                                            <div className="flex flex-col">
-                                                <span className="text-orange-500 text-sm font-medium">{t('warehouse_filter_unassigned')}</span>
-                                                <span className="text-xs text-gray-400">({item.initialOwner})</span>
+                                </td>
+                                <td className="py-4 px-6 text-gray-600 font-medium">#{item.orderNumber || item.id}</td>
+                                <td className="py-4 px-6">
+                                    <div className="font-medium text-gray-900">{item.name}</div>
+                                    <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
+                                </td>
+                                <td className="py-4 px-6 text-gray-600">
+                                    {/* Display Assigned User or Initial Owner */}
+                                    {item.assignedTo ? (
+                                        <span className="text-blue-600 font-medium">{item.assignedTo.name}</span>
+                                    ) : (item.requests && item.requests.length > 0) ? (
+                                        <div className="flex flex-col">
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                {t('warehouse_filter_pending')}: {item.requests[0].targetUser?.name}
+                                            </span>
+                                        </div>
+                                    ) : item.initialOwner ? (
+                                        <div className="flex flex-col">
+                                            <span className="text-orange-500 text-sm font-medium">{t('warehouse_filter_unassigned')}</span>
+                                            <span className="text-xs text-gray-400">({item.initialOwner})</span>
+                                        </div>
+                                    ) : (
+                                        <span className="text-gray-400 italic">{t('in_warehouse')}</span>
+                                    )}
+                                </td>
+                                <td className="py-4 px-6">
+                                    {/* Warranty not always in API? Using arrivalDate/ManufactureYear as proxy if needed, or check schema if warranty field exists. Schema didn't show warranty field, only purchaseDate. Let's assume frontend handled this loosely. */}
+                                    <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
+                                        {item.condition || t('status_new')}
+                                    </span>
+                                </td>
+                                <td className="py-4 px-6 text-gray-900 font-bold">{parseFloat(item.price).toLocaleString()} so'm</td>
+                                <td className="py-4 px-6">
+                                    <div className="flex items-center gap-3">
+                                        {item.image ? (
+                                            <div
+                                                className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:ring-2 hover:ring-orange-300 transition-all"
+                                                onClick={() => setPreviewImage(item.image)}
+                                            >
+                                                <img
+                                                    src={item.image}
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                />
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400 italic">{t('in_warehouse')}</span>
+                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <RiImage2Line size={20} />
+                                            </div>
                                         )}
-                                    </td>
-                                    <td className="py-4 px-6">
-                                        {/* Warranty not always in API? Using arrivalDate/ManufactureYear as proxy if needed, or check schema if warranty field exists. Schema didn't show warranty field, only purchaseDate. Let's assume frontend handled this loosely. */}
-                                        <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
-                                            {item.condition || t('status_new')}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-6 text-gray-900 font-bold">{parseFloat(item.price).toLocaleString()} so'm</td>
-                                    <td className="py-4 px-6">
-                                        <div className="flex items-center gap-3">
-                                            {item.image ? (
-                                                <div
-                                                    className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:ring-2 hover:ring-orange-300 transition-all"
-                                                    onClick={() => setPreviewImage(item.image)}
-                                                >
-                                                    <img
-                                                        src={item.image}
-                                                        alt={item.name}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
-                                                    <RiImage2Line size={20} />
-                                                </div>
-                                            )}
-                                            <button
-                                                onClick={() => openQRModal(item)}
-                                                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
-                                                title="QR Kodni ko'rish"
-                                            >
-                                                <RiQrCodeLine size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td className="py-4 px-6 text-right">
-                                        {user?.role !== 'stat' && (
-                                            <button
-                                                onClick={() => openModal(item)}
-                                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
-                                            >
-                                                <RiMore2Fill size={20} />
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                            {filteredItems.length === 0 && (
-                                <tr>
-                                    <td colSpan="10" className="text-center py-8 text-gray-500">
-                                        {t('warehouse_no_items')}
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                        <button
+                                            onClick={() => openQRModal(item)}
+                                            className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                                            title="QR Kodni ko'rish"
+                                        >
+                                            <RiQrCodeLine size={16} />
+                                        </button>
+                                    </div>
+                                </td>
+                                <td className="py-4 px-6 text-right">
+                                    {user?.role !== 'stat' && (
+                                        <button
+                                            onClick={() => openModal(item)}
+                                            className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                        >
+                                            <RiMore2Fill size={20} />
+                                        </button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                        {filteredItems.length === 0 && (
+                            <tr>
+                                <td colSpan="10" className="text-center py-8 text-gray-500">
+                                    {t('warehouse_no_items')}
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
-                {/* Pagination */}
-                <div className="p-4 border-t border-gray-100 bg-gray-50">
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div className="text-sm text-gray-500">
-                            Jami: <span className="font-bold text-gray-900">{totalItems}</span> ta jihoz
-                        </div>
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange}
-                        />
+            {/* Pagination */}
+            <div className="p-4 border-t border-gray-100 bg-gray-50">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="text-sm text-gray-500">
+                        Jami: <span className="font-bold text-gray-900">{totalItems}</span> ta jihoz
                     </div>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             </div>
-            {/* Image Preview Modal */}
-            {previewImage && (
-                <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
-                    onClick={() => setPreviewImage(null)}
-                >
-                    <div className="relative max-w-4xl max-h-[90vh] p-2">
-                        <button
-                            onClick={() => setPreviewImage(null)}
-                            className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
-                        >
-                            <RiCloseLine size={32} />
-                        </button>
-                        <img
-                            src={previewImage}
-                            alt="Preview"
-                            className="w-full h-full object-cover rounded-lg shadow-2xl"
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* Modals */}
-            {isModalOpen && (
-                <WarehouseItemModal
-                    isOpen={isModalOpen}
-                    item={selectedItem}
-                    onClose={() => setIsModalOpen(false)}
-                    onSave={handleAddItem}
-                />
-            )}
-
-            <QRGeneratorModal
-                isOpen={isQRGenOpen}
-                onClose={() => setIsQRGenOpen(false)}
-                item={qrItem}
-            />
         </div>
-    );
+        {/* Image Preview Modal */}
+        {previewImage && (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in"
+                onClick={() => setPreviewImage(null)}
+            >
+                <div className="relative max-w-4xl max-h-[90vh] p-2">
+                    <button
+                        onClick={() => setPreviewImage(null)}
+                        className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors"
+                    >
+                        <RiCloseLine size={32} />
+                    </button>
+                    <img
+                        src={previewImage}
+                        alt="Preview"
+                        className="w-full h-full object-cover rounded-lg shadow-2xl"
+                    />
+                </div>
+            </div>
+        )}
+
+        {/* Modals */}
+        {isModalOpen && (
+            <WarehouseItemModal
+                isOpen={isModalOpen}
+                item={selectedItem}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleAddItem}
+            />
+        )}
+
+        <QRGeneratorModal
+            isOpen={isQRGenOpen}
+            onClose={() => setIsQRGenOpen(false)}
+            item={qrItem}
+        />
+    </div>
+);
 };
 
 export default WarehousePage;
