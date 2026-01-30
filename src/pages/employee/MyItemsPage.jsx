@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { RiComputerLine, RiCheckDoubleLine, RiAlertLine } from "react-icons/ri";
+import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
+
+import Pagination from "../../components/common/Pagination";
 
 const MyItemsPage = () => {
     const { user } = useAuth();
@@ -62,6 +64,16 @@ const MyItemsPage = () => {
         }
     };
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+
+    // Pagination Logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = myItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(myItems.length / itemsPerPage);
+
     if (loading) return <div className="p-10 text-center text-gray-500">Yuklanmoqda...</div>;
 
     if (myItems.length === 0 && requests.length === 0) {
@@ -109,41 +121,66 @@ const MyItemsPage = () => {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {myItems.map((item) => (
-                    <div key={item.id} className="bg-white rounded-[20px] p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group">
-                        <div className="flex items-start justify-between mb-4">
-                            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                <RiComputerLine size={24} />
-                            </div>
-                            <span className={`text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1 ${item.status === 'working' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
-                                }`}>
-                                <RiCheckDoubleLine />
-                                {item.status === 'working' ? 'Faol' : 'Ta\'mirda'}
-                            </span>
-                        </div>
-
-                        <h3 className="font-bold text-lg text-gray-800 mb-1">{item.name}</h3>
-                        <div className="flex items-center text-sm text-gray-500 mb-4 gap-2">
-                            <span className="bg-gray-100 px-2 py-0.5 rounded text-xs">{item.category}</span>
-                            <span>•</span>
-                            <span className="font-mono text-xs text-gray-400">{item.serialNumber}</span>
-                        </div>
-
-                        {item.assignedTo?.pinfl && (
-                            <div className="mb-4 text-xs bg-gray-50 p-2 rounded-lg text-gray-600 font-mono border border-gray-100">
-                                <span className="text-gray-400 mr-2">PINFL:</span>
-                                {item.assignedTo.pinfl}
-                            </div>
-                        )}
-
-                        <div className="pt-4 border-t border-gray-100 text-xs text-gray-400 flex justify-between items-center mt-auto">
-                            <span>Biriktirilgan sana:</span>
-                            <span className="font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded">{item.dateAssigned}</span>
-                        </div>
-                    </div>
-                ))}
+            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b border-gray-100">
+                                <th className="p-4 font-semibold">#</th>
+                                <th className="p-4 font-semibold">Jihoz Nomi</th>
+                                <th className="p-4 font-semibold">Seriya Raqami</th>
+                                <th className="p-4 font-semibold">Kategoriya</th>
+                                <th className="p-4 font-semibold">Holat</th>
+                                <th className="p-4 font-semibold">Biriktirilgan Sana</th>
+                                <th className="p-4 font-semibold text-right">Hujjat</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {currentItems.map((item, index) => (
+                                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors text-sm">
+                                    <td className="p-4 text-gray-400">{indexOfFirstItem + index + 1}</td>
+                                    <td className="p-4 font-medium text-gray-900">{item.name}</td>
+                                    <td className="p-4 font-mono text-gray-600">{item.serialNumber || "-"}</td>
+                                    <td className="p-4">
+                                        <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
+                                            {item.category || "-"}
+                                        </span>
+                                    </td>
+                                    <td className="p-4">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                                            }`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'working' ? 'bg-green-500' : 'bg-orange-500'
+                                                }`}></span>
+                                            {item.status === 'working' ? 'Faol' : 'Ta\'mirda'}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-gray-600">{item.dateAssigned}</td>
+                                    <td className="p-4 text-right">
+                                        {item.assignedDocument ? (
+                                            <a
+                                                href={`https://invertar.astiedu.uz/api${item.assignedDocument}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium text-xs transition-colors"
+                                            >
+                                                <RiFileList3Line size={16} /> Asos (PDF)
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-300">-</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 };
