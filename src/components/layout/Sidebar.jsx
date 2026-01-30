@@ -15,7 +15,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         { name: t('warehouse'), path: "/admin/warehouse", icon: <RiArchiveLine size={20} /> },
         { name: t('tmj_sidebar'), path: "/admin/tmj", icon: <RiFilePaper2Line size={20} /> },
         { name: t('inventory_dates'), path: "/admin/inventory-dates", icon: <RiCalendarLine size={20} /> },
-        { name: t('inventory_check'), path: "/admin/inventory-check", icon: <RiQrScan2Line size={20} /> },
+        ...(user?.role !== 'stat' ? [{ name: t('inventory_check'), path: "/admin/inventory-check", icon: <RiQrScan2Line size={20} /> }] : []),
         { name: t('report'), path: "/admin/reports", icon: <RiFileChartLine size={20} /> },
         // Only show Users link to admin
         ...(user?.role === 'admin' ? [{ name: t('users'), path: "/admin/users", icon: <RiUserLine size={20} /> }] : []),
