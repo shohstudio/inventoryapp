@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiFilePaper2Line, RiDeleteBinLine, RiCloseLine, RiFilePdfLine, RiUserReceived2Line } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiFilePaper2Line, RiDeleteBinLine, RiCloseLine, RiFilePdfLine, RiUserReceived2Line, RiFileExcel2Line, RiDownloadLine } from "react-icons/ri";
+import { utils, writeFile } from 'xlsx';
 import TMJItemModal from "../../components/admin/TMJItemModal";
 import HandoverModal from "../../components/admin/HandoverModal";
 import Pagination from "../../components/common/Pagination";
@@ -33,6 +34,8 @@ const TMJPage = () => {
     const [selectedItems, setSelectedItems] = useState(new Set());
     const [isDeleting, setIsDeleting] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+    const [isExporting, setIsExporting] = useState(false);
 
     const fetchItems = async () => {
         setLoading(true);
@@ -216,6 +219,73 @@ const TMJPage = () => {
         }
     };
 
+    const handleExport = async (type) => {
+        setIsExporting(true);
+        try {
+            const params = {
+                limit: 10000, // Fetch all reasonable amount
+                inventoryType: 'tmj'
+            };
+
+            if (type === 'warehouse') params.isAssigned = 'unassigned';
+            else if (type === 'assigned') params.isAssigned = 'assigned';
+            // 'all' -> no extra filter
+
+            const { data } = await api.get('/items', { params });
+
+            if (!data.items || data.items.length === 0) {
+                toast.error("Export qilish uchun ma'lumot topilmadi");
+                return;
+            }
+
+            // Format data for Excel
+            const exportData = data.items.map(item => {
+                const qty = item.quantity || 1;
+                const initQty = item.initialQuantity || qty;
+                let quantityStr = qty.toString();
+
+                if (item.initialOwner || item.assignedTo) {
+                    // Handed over: Current / Initial (e.g. 2/10)
+                    if (initQty > qty) quantityStr = `${qty} / ${initQty}`;
+                } else {
+                    // Stock: Initial / Current (e.g. 10/8)
+                    if (initQty > qty) quantityStr = `${initQty} / ${qty}`;
+                }
+
+                return {
+                    "Nomi": item.name,
+                    "Kategoriya": item.category,
+                    "Model": item.model || "",
+                    "Seriya Raqami": item.serialNumber || "",
+                    "INN": item.inn || "",
+                    "Order Raqam": item.orderNumber || "",
+                    "Holati": item.assignedTo ? item.assignedTo.name : (item.initialOwner || "Omborda"),
+                    "Kelgan Sanasi": item.arrivalDate || item.purchaseDate || "",
+                    "Narxi": item.price,
+                    "Soni": quantityStr, // Formatted string
+                    "Bino": item.building || "",
+                    "Bo'lim": item.department || "",
+                    "Joylashuv": item.location || ""
+                };
+            });
+
+            const ws = utils.json_to_sheet(exportData);
+            const wb = utils.book_new();
+            utils.book_append_sheet(wb, ws, "TMJ Maxsulotlari");
+
+            const fileName = `TMJ_Export_${type}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            writeFile(wb, fileName);
+
+            toast.success("Excel fayl yuklandi");
+            setIsExportModalOpen(false);
+        } catch (error) {
+            console.error("Export error", error);
+            toast.error("Export qilishda xatolik");
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
@@ -233,10 +303,17 @@ const TMJPage = () => {
                         </button>
                     )}
                     {user?.role !== 'stat' && (
-                        <button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="btn btn-primary bg-blue-600">
+                        <button onClick={() => setIsModalOpen(true)} className="btn btn-primary bg-blue-600">
                             <RiAddLine size={20} /> {t('add_new')}
                         </button>
                     )}
+                    <button
+                        onClick={() => setIsExportModalOpen(true)}
+                        className="btn bg-green-50 text-green-600 hover:bg-green-100 border-green-200 ml-2"
+                        title="Excelga yuklash"
+                    >
+                        <RiFileExcel2Line size={20} /> Export
+                    </button>
                 </div>
             </div>
 
@@ -489,6 +566,67 @@ const TMJPage = () => {
                             className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
                             onClick={(e) => e.stopPropagation()}
                         />
+                    </div>
+                </div>
+            )}
+
+            {/* Export Modal */}
+            {isExportModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 transform transition-all scale-100">
+                        <div className="flex justify-between items-center mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="p-3 bg-green-100 rounded-full text-green-600">
+                                    <RiFileExcel2Line size={24} />
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-800">Excelga yuklash</h3>
+                            </div>
+                            <button
+                                onClick={() => setIsExportModalOpen(false)}
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                <RiCloseLine size={24} />
+                            </button>
+                        </div>
+
+                        <p className="text-gray-500 mb-6 text-sm">
+                            Qaysi turdagi ma'lumotlarni yuklab olmoqchisiz?
+                        </p>
+
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => handleExport('all')}
+                                disabled={isExporting}
+                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-all group"
+                            >
+                                <span className="font-medium">Barchasi</span>
+                                <RiDownloadLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </button>
+
+                            <button
+                                onClick={() => handleExport('stock')}
+                                disabled={isExporting}
+                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 transition-all group"
+                            >
+                                <span className="font-medium">Omborga kelgan maxsulotlar</span>
+                                <RiDownloadLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </button>
+
+                            <button
+                                onClick={() => handleExport('assigned')}
+                                disabled={isExporting}
+                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-600 transition-all group"
+                            >
+                                <span className="font-medium">Berilgan maxsulotlar</span>
+                                <RiDownloadLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </button>
+                        </div>
+
+                        {isExporting && (
+                            <div className="mt-4 text-center text-sm text-gray-500 animate-pulse">
+                                Yuklanmoqda...
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
