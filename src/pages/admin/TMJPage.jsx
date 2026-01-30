@@ -321,7 +321,24 @@ const TMJPage = () => {
                                         {parseFloat(item.price).toLocaleString()} so'm
                                     </td>
                                     <td className="p-4 text-gray-900 font-medium whitespace-nowrap text-center">
-                                        {item.quantity || 1}
+                                        {(() => {
+                                            const qty = item.quantity || 1;
+                                            const initQty = item.initialQuantity || qty;
+
+                                            if (item.initialOwner || item.assignedTo) {
+                                                // Handed over item: Show "Current / Initial" (e.g., 2/10)
+                                                // Logic: User holds 2 out of original 10
+                                                return <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded">{qty} / {initQty}</span>;
+                                            } else {
+                                                // Stock item: Show "Initial / Current" (e.g., 10/8) or just "Current" if full
+                                                // Or requested: "8 barchasi ... sonida 10/8"
+                                                // User requested: "10/8" for stock (Initial / Current)
+                                                if (initQty > qty) {
+                                                    return <span className="text-orange-600 bg-orange-50 px-2 py-1 rounded font-bold">{initQty} / {qty}</span>;
+                                                }
+                                                return qty;
+                                            }
+                                        })()}
                                     </td>
                                     <td className="p-4">
 

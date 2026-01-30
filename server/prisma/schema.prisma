@@ -62,6 +62,8 @@ model Item {
   contractPdf  String?  // URL to PDF contract
   inventoryType String @default("warehouse") // warehouse, tmj
 
+  initialQuantity Int? @default(1) // Track original batch size for TMJ partial handover
+
   // If imported from Excel and user not found, store name here
   initialOwner String?
   initialRole  String?  // Store role if user not found

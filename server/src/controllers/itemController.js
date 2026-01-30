@@ -230,6 +230,7 @@ const createItem = async (req, res) => {
             subCategory,
             price: price ? parseFloat(price) : 0,
             quantity: quantity ? parseInt(quantity) : 1,
+            initialQuantity: quantity ? parseInt(quantity) : 1, // Set initial batch size
             purchaseDate,
             status,
             condition,
@@ -434,6 +435,7 @@ const updateItem = async (req, res) => {
 
             // 1. Update ORIGINAL item: just reduce quantity, KEEP it in stock (unassigned)
             // We do NOT apply dataToUpdate (which has assignment info) to the original item.
+            // Ensure initialQuantity remains as is (e.g., 10)
             await prisma.item.update({
                 where: { id: parseInt(id) },
                 data: { quantity: remainingQty }
@@ -454,6 +456,7 @@ const updateItem = async (req, res) => {
                 subCategory: item.subCategory,
                 price: item.price,
                 quantity: splitQty, // The handed over amount
+                initialQuantity: item.initialQuantity || item.quantity, // Preserve the original batch size (e.g., 10)
                 purchaseDate: item.purchaseDate,
                 status: item.status,
                 condition: item.condition,
