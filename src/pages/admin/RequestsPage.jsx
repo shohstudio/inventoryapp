@@ -49,8 +49,7 @@ const RequestsPage = () => {
 
     const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
-    const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
-    const [rejectionReason, setRejectionReason] = useState("");
+
     const [selectedRequestId, setSelectedRequestId] = useState(null);
 
     // Detail Modal State

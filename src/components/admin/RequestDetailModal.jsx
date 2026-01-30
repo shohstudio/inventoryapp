@@ -1,5 +1,5 @@
 import React from 'react';
-import { RiCloseLine, RiTimeLine, RiUserLine, RiMapPinLine, RiFileList3Line, RiShieldCheckLine } from 'react-icons/ri';
+import { RiCloseLine, RiTimeLine, RiUserLine, RiMapPinLine, RiFileList3Line, RiShieldCheckLine, RiBox3Line } from 'react-icons/ri';
 import { useLanguage } from '../../context/LanguageContext';
 
 const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isProcessing, userRole }) => {
@@ -96,8 +96,8 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                             <RiShieldCheckLine className="text-gray-400 text-lg" />
                             <span>Holati:
                                 <span className={`ml-2 px-2 py-0.5 rounded text-xs font-medium border ${status === 'completed' ? 'bg-green-100 text-green-700 border-green-200' :
-                                        status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200' :
-                                            'bg-yellow-100 text-yellow-700 border-yellow-200'
+                                    status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200' :
+                                        'bg-yellow-100 text-yellow-700 border-yellow-200'
                                     }`}>
                                     {status}
                                 </span>
@@ -135,6 +135,4 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
         </div>
     );
 };
-import { RiBox3Line } from "react-icons/ri"; // Added missing import
-
 export default RequestDetailModal;
