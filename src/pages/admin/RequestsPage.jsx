@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
 import { RiFileList3Line, RiCheckDoubleLine, RiTimeLine, RiCloseCircleLine, RiUserStarLine, RiShieldCheckLine } from "react-icons/ri";
+import RequestDetailModal from "../../components/admin/RequestDetailModal";
 
 const RequestsPage = () => {
     const { t } = useLanguage();
@@ -48,7 +49,34 @@ const RequestsPage = () => {
 
     const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
     const [rejectionReason, setRejectionReason] = useState("");
+    const [rejectionModalOpen, setRejectionModalOpen] = useState(false);
+    const [rejectionReason, setRejectionReason] = useState("");
     const [selectedRequestId, setSelectedRequestId] = useState(null);
+
+    // Detail Modal State
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedRequestForDetail, setSelectedRequestForDetail] = useState(null);
+
+    const openDetailModal = (req) => {
+        setSelectedRequestForDetail(req);
+        setIsDetailModalOpen(true);
+    };
+
+    const closeDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setSelectedRequestForDetail(null);
+    };
+
+    const handleApproveFromModal = (id, status) => {
+        handleUpdateStatus(id, status, 'mock_signature_from_modal');
+        closeDetailModal();
+    };
+
+    const handleRejectFromModal = (id) => {
+        closeDetailModal();
+        setSelectedRequestId(id);
+        setRejectionModalOpen(true);
+    };
 
     const handleUpdateStatus = async (id, newStatus, signature = null, description = null) => {
         if (newStatus === 'rejected' && !description) {
@@ -161,8 +189,8 @@ const RequestsPage = () => {
                                         <td className="py-4 px-6 text-gray-600 text-sm">
                                             {new Date(req.createdAt).toLocaleString('uz-UZ')}
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <div className="font-medium text-gray-900">{req.item?.name}</div>
+                                        <td className="py-4 px-6 cursor-pointer group" onClick={() => openDetailModal(req)}>
+                                            <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{req.item?.name}</div>
                                             <div className="text-xs text-gray-400 font-mono">{req.item?.serialNumber}</div>
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 text-sm">
@@ -278,6 +306,16 @@ const RequestsPage = () => {
                     </div>
                 )
             }
+            {/* Detail Modal */}
+            <RequestDetailModal
+                isOpen={isDetailModalOpen}
+                onClose={closeDetailModal}
+                request={selectedRequestForDetail}
+                onApprove={handleApproveFromModal}
+                onReject={handleRejectFromModal}
+                isProcessing={isProcessing}
+                userRole={user?.role}
+            />
         </div >
     );
 };
