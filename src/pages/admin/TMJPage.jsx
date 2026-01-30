@@ -42,7 +42,7 @@ const TMJPage = () => {
         try {
             const params = {
                 page: currentPage,
-                limit: 20,
+                limit: 10,
                 search: searchQuery,
                 inventoryType: 'tmj', // Always TMJ
             };
@@ -383,7 +383,7 @@ const TMJPage = () => {
                                         />
                                     </td>
                                     <td className="p-4 text-gray-500 font-medium">
-                                        {(currentPage - 1) * 20 + index + 1}
+                                        {(currentPage - 1) * 10 + index + 1}
                                     </td>
                                     <td className="p-4">
                                         <div className="font-medium text-gray-900">{item.name}</div>
