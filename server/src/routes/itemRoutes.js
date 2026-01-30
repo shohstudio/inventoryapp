@@ -8,7 +8,7 @@ router.post('/import', protect, admin, upload.single('file'), importItems);
 
 router.route('/')
     .get(protect, getItems)
-    .post(protect, upload.array('images', 10), createItem);
+    .post(protect, upload.any(), createItem);
 
 router.route('/:id')
     .get(protect, getItemById)
