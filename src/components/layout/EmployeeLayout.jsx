@@ -22,8 +22,8 @@ const EmployeeLayout = () => {
             <div className="hidden md:flex flex-col w-64 fixed left-0 top-0 h-screen bg-[#1e1b4b] border-r border-indigo-900/50 shadow-2xl z-40 transition-transform duration-300 ease-in-out">
                 <div className="p-6 border-b border-indigo-900/50 flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">I</div>
-                    <span className="text-xl font-bold text-white tracking-tight">
-                        Employee
+                    <span className="text-xl font-bold text-white tracking-tight truncate max-w-[140px]">
+                        {user?.position || user?.department || "Xodim"}
                     </span>
                 </div>
                 <nav className="flex-1 p-4 space-y-2 overflow-y-auto mt-2">

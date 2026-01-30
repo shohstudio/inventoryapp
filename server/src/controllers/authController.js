@@ -37,6 +37,8 @@ const login = async (req, res) => {
                 pinfl: user.pinfl,
                 image: user.image,
                 phone: user.phone,
+                position: user.position,
+                department: user.department,
                 token: generateToken(user.id, user.role, user.name),
             });
         } else {
@@ -159,6 +161,8 @@ const eimzoLogin = async (req, res) => {
             pinfl: user.pinfl,
             image: user.image,
             phone: user.phone,
+            position: user.position,
+            department: user.department,
             token: generateToken(user.id, user.role, user.name),
         });
 
