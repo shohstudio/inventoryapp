@@ -63,6 +63,12 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                                     {item?.price ? parseInt(item.price).toLocaleString() : 0} so'm
                                 </span>
                             </div>
+                            <div className="flex justify-between">
+                                <span className="text-gray-500 text-sm">Soni:</span>
+                                <span className="text-gray-900">
+                                    {item?.quantity || 1} ta
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -127,7 +133,7 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                         {/* File Upload Input */}
                         <div className="w-full">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Tasdiqlash hujjati (Nakladnoy PDF)
+                                Tasdiqlash hujjati (PDF) <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="file"
