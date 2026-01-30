@@ -282,6 +282,7 @@ const TMJPage = () => {
                                 <th className="p-4 font-semibold text-gray-600">{t('status')} / {t('assigned_to')}</th>
                                 <th className="p-4 font-semibold text-gray-600">{t('arrival_date')}</th>
                                 <th className="p-4 font-semibold text-gray-600">{t('price')}</th>
+                                <th className="p-4 font-semibold text-gray-600">{t('quantity')}</th>
                                 <th className="p-4 font-semibold text-gray-600">Hujjat</th>
                                 <th className="p-4 font-semibold text-gray-600">{t('image')}</th>
                                 <th className="p-4 font-semibold text-gray-600 text-right">{t('actions')}</th>
@@ -318,6 +319,9 @@ const TMJPage = () => {
                                     </td>
                                     <td className="p-4 font-medium">
                                         {parseFloat(item.price).toLocaleString()} so'm
+                                    </td>
+                                    <td className="p-4 text-gray-900 font-medium whitespace-nowrap text-center">
+                                        {item.quantity || 1}
                                     </td>
                                     <td className="p-4">
 
