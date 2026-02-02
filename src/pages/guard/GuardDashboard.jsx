@@ -1,8 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../api/axios';
+import api, { BASE_URL } from '../../api/axios';
 import { toast } from 'react-hot-toast';
-import { RiLogoutBoxRLine, RiAddLine, RiTimeLine, RiCheckLine, RiTruckLine, RiFileList3Line, RiQrCodeLine, RiSearchLine } from 'react-icons/ri';
+import { RiLogoutBoxRLine, RiAddLine, RiTimeLine, RiCheckLine, RiTruckLine, RiFileList3Line, RiQrCodeLine, RiSearchLine, RiUser3Line } from 'react-icons/ri';
+
+const UserAvatar = ({ user, size = "w-8 h-8" }) => {
+    if (!user) return <div className={`${size} rounded-full bg-gray-50 flex items-center justify-center text-gray-300 border border-dashed border-gray-200`}><RiUser3Line size={14} /></div>;
+
+    const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
+
+    return (
+        <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
+            {imageUrl ? (
+                <img src={imageUrl} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+                <div className="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+                    <RiUser3Line size={14} />
+                </div>
+            )}
+        </div>
+    );
+};
 
 const GuardDashboard = () => {
     const { user } = useAuth();
@@ -214,7 +232,12 @@ const GuardDashboard = () => {
                                     exitRequests.map(req => (
                                         <tr key={req.id} className={`hover:bg-gray-50 border-l-4 ${req.status === 'rejected' ? 'border-red-500 bg-red-50/50' : 'border-transparent'}`}>
                                             <td className="p-4 text-sm text-gray-600">{new Date(req.createdAt).toLocaleString('uz-UZ')}</td>
-                                            <td className="p-4 font-medium text-gray-800">{req.requester?.name || '---'}</td>
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-2">
+                                                    <UserAvatar user={req.requester} />
+                                                    <span className="font-medium text-gray-800">{req.requester?.name || '---'}</span>
+                                                </div>
+                                            </td>
                                             <td className="p-4 text-gray-600">{req.item?.name || '---'} <span className="text-xs text-gray-400">({req.item?.serialNumber || 'SN yo\'q'})</span></td>
                                             <td className="p-4">
                                                 {req.status === 'pending_accountant' && <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs border border-orange-200">Hisobchi kutilmoqda</span>}
@@ -356,7 +379,10 @@ const GuardDashboard = () => {
                                     <p className="text-sm text-gray-500">Buyum:</p>
                                     <p className="font-bold text-gray-800 text-lg">{scannedItem.name}</p>
                                     <p className="text-sm text-gray-500 mt-2">Egasi:</p>
-                                    <p className="font-medium text-indigo-600">{scannedItem.assignedTo?.name || "Biriktirilmagan"}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <UserAvatar user={scannedItem.assignedTo} size="w-9 h-9" />
+                                        <p className="font-bold text-indigo-600">{scannedItem.assignedTo?.name || "Biriktirilmagan"}</p>
+                                    </div>
 
                                     <div className="mt-2">
                                         <label className="text-sm text-gray-500">Olib chiqib ketayotgan xodim:</label>

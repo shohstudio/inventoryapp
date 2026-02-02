@@ -98,12 +98,12 @@ const getRequests = async (req, res) => {
                     item: {
                         include: {
                             assignedTo: {
-                                select: { name: true }
+                                select: { name: true, image: true }
                             }
                         }
                     },
-                    requester: { select: { name: true, role: true } },
-                    targetUser: { select: { name: true, pinfl: true } }
+                    requester: { select: { name: true, role: true, image: true } },
+                    targetUser: { select: { name: true, pinfl: true, image: true } }
                 },
                 orderBy: { createdAt: 'desc' }
             }),

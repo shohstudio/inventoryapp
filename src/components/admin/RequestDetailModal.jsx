@@ -1,7 +1,26 @@
 import React from 'react';
-import { RiCloseLine, RiTimeLine, RiUserLine, RiMapPinLine, RiFileList3Line, RiShieldCheckLine, RiBox3Line } from 'react-icons/ri';
+import { RiCloseLine, RiTimeLine, RiUserLine, RiMapPinLine, RiFileList3Line, RiShieldCheckLine, RiBox3Line, RiUser3Line } from 'react-icons/ri';
 import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'react-hot-toast';
+import { BASE_URL } from '../../api/axios';
+
+const UserAvatar = ({ user, size = "w-10 h-10" }) => {
+    if (!user) return <div className={`${size} rounded-full bg-gray-100 flex items-center justify-center text-gray-300 border border-dashed border-gray-200`}><RiUser3Line size={size.includes('10') ? 20 : 16} /></div>;
+
+    const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
+
+    return (
+        <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
+            {imageUrl ? (
+                <img src={imageUrl} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+                <div className="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+                    <RiUser3Line size={size.includes('10') ? 20 : 16} />
+                </div>
+            )}
+        </div>
+    );
+};
 
 const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isProcessing, userRole }) => {
     const { t } = useLanguage();
@@ -74,30 +93,36 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
 
                     {/* Users Involved */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                            <h4 className="text-xs uppercase text-gray-500 font-semibold mb-2 flex items-center gap-1">
-                                <RiUserLine /> Kimdan
-                            </h4>
-                            <p className="font-medium text-sm text-gray-900">
-                                {type === 'exit' ? (item?.assignedTo?.name || "Noma'lum") : requester?.name}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                                {type === 'exit' ? "Egasi" : requester?.role}
-                            </p>
+                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-start gap-3">
+                            <UserAvatar user={type === 'exit' ? item?.assignedTo : requester} />
+                            <div>
+                                <h4 className="text-xs uppercase text-gray-500 font-semibold mb-1 flex items-center gap-1">
+                                    <RiUserLine /> Kimdan
+                                </h4>
+                                <p className="font-medium text-sm text-gray-900">
+                                    {type === 'exit' ? (item?.assignedTo?.name || "Noma'lum") : requester?.name}
+                                </p>
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                    {type === 'exit' ? "Egasi" : requester?.role}
+                                </p>
+                            </div>
                         </div>
-                        <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                            <h4 className="text-xs uppercase text-gray-500 font-semibold mb-2 flex items-center gap-1">
-                                <RiMapPinLine /> Kimga/Qayerga
-                            </h4>
-                            <p className="font-medium text-sm text-gray-900">
-                                {type === 'exit' ?
-                                    (description?.match(/Olib chiquvchi: ([^.]+)/)?.[1] || "Aniqlanmadi") :
-                                    (targetUser?.name || "Bino")
-                                }
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                                {type === 'exit' ? "Olib chiquvchi" : "Qabul qiluvchi"}
-                            </p>
+                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-start gap-3">
+                            <UserAvatar user={type === 'exit' ? null : targetUser} />
+                            <div>
+                                <h4 className="text-xs uppercase text-gray-500 font-semibold mb-1 flex items-center gap-1">
+                                    <RiMapPinLine /> Kimga
+                                </h4>
+                                <p className="font-medium text-sm text-gray-900">
+                                    {type === 'exit' ?
+                                        (description?.match(/Olib chiquvchi: ([^.]+)/)?.[1] || "Aniqlanmadi") :
+                                        (targetUser?.name || "Bino")
+                                    }
+                                </p>
+                                <p className="text-xs text-gray-400 mt-0.5">
+                                    {type === 'exit' ? "Olib chiquvchi" : "Qabul qiluvchi"}
+                                </p>
+                            </div>
                         </div>
                     </div>
 

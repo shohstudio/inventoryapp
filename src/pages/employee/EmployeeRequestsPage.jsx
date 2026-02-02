@@ -1,10 +1,28 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../api/axios";
+import api, { BASE_URL } from "../../api/axios";
 import { toast } from "react-hot-toast";
-import { RiFileList3Line, RiCheckDoubleLine, RiCloseCircleLine, RiTimeLine } from "react-icons/ri";
+import { RiFileList3Line, RiCheckDoubleLine, RiCloseCircleLine, RiTimeLine, RiUser3Line } from "react-icons/ri";
 
 import ConfirmationModal from "../../components/common/ConfirmationModal";
+
+const UserAvatar = ({ user, size = "w-8 h-8" }) => {
+    if (!user) return <div className={`${size} rounded-full bg-gray-50 flex items-center justify-center text-gray-300 border border-dashed border-gray-200`}><RiUser3Line size={14} /></div>;
+
+    const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
+
+    return (
+        <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
+            {imageUrl ? (
+                <img src={imageUrl} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+                <div className="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+                    <RiUser3Line size={14} />
+                </div>
+            )}
+        </div>
+    );
+};
 
 const EmployeeRequestsPage = () => {
     const { user } = useAuth();
@@ -204,8 +222,13 @@ const EmployeeRequestsPage = () => {
                                             <div className="text-xs text-gray-400 font-mono">{req.item?.serialNumber}</div>
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 text-sm">
-                                            {req.requester?.name || "Admin"}
-                                            <div className="text-xs text-gray-400">({req.requester?.role})</div>
+                                            <div className="flex items-center gap-2">
+                                                <UserAvatar user={req.requester} />
+                                                <div>
+                                                    <div className="font-medium text-gray-900">{req.requester?.name || "Admin"}</div>
+                                                    <div className="text-xs text-gray-400">({req.requester?.role})</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td className="py-4 px-6 text-sm">
                                             {req.status === 'pending_accountant' ? (

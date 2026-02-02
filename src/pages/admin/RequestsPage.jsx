@@ -2,11 +2,29 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useLanguage } from "../../context/LanguageContext";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../api/axios";
+import api, { BASE_URL } from "../../api/axios";
 import { toast } from "react-hot-toast";
-import { RiFileList3Line, RiCheckDoubleLine, RiTimeLine, RiCloseCircleLine, RiUserStarLine, RiShieldCheckLine } from "react-icons/ri";
+import { RiFileList3Line, RiCheckDoubleLine, RiTimeLine, RiCloseCircleLine, RiUserStarLine, RiShieldCheckLine, RiUser3Line } from "react-icons/ri";
 import RequestDetailModal from "../../components/admin/RequestDetailModal";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
+
+const UserAvatar = ({ user, size = "w-8 h-8" }) => {
+    if (!user) return <div className={`${size} rounded-full bg-gray-50 flex items-center justify-center text-gray-300 border border-dashed border-gray-200`}><RiUser3Line size={14} /></div>;
+
+    const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
+
+    return (
+        <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
+            {imageUrl ? (
+                <img src={imageUrl} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+                <div className="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+                    <RiUser3Line size={14} />
+                </div>
+            )}
+        </div>
+    );
+};
 
 const RequestsPage = () => {
     const { t } = useLanguage();
@@ -287,27 +305,41 @@ const RequestsPage = () => {
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 text-sm">
                                             {req.type === 'exit' ? (
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-gray-900">{req.item?.assignedTo?.name || "Noma'lum"}</span>
-                                                    <span className="text-xs text-gray-400">Egasi</span>
+                                                <div className="flex items-center gap-2">
+                                                    <UserAvatar user={req.item?.assignedTo} />
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-gray-900">{req.item?.assignedTo?.name || "Noma'lum"}</span>
+                                                        <span className="text-xs text-gray-400">Egasi</span>
+                                                    </div>
                                                 </div>
                                             ) : (
-                                                req.requester?.name
+                                                <div className="flex items-center gap-2">
+                                                    <UserAvatar user={req.requester} />
+                                                    <span className="font-medium text-gray-900">{req.requester?.name}</span>
+                                                </div>
                                             )}
                                         </td>
                                         <td className="py-4 px-6">
                                             {req.type === 'exit' ? (
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-gray-900">
-                                                        {req.description?.match(/Olib chiquvchi: ([^.]+)/)?.[1] || "Aniqlanmadi"}
-                                                    </span>
-                                                    <span className="text-xs text-orange-500">Olib ketmoqda</span>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-400 border border-orange-100 flex-shrink-0">
+                                                        <RiUser3Line size={14} />
+                                                    </div>
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-gray-900">
+                                                            {req.description?.match(/Olib chiquvchi: ([^.]+)/)?.[1] || "Aniqlanmadi"}
+                                                        </span>
+                                                        <span className="text-xs text-orange-500">Olib ketmoqda</span>
+                                                    </div>
                                                 </div>
                                             ) : (
-                                                <>
-                                                    <div className="font-medium text-gray-900">{req.targetUser?.name || "Bino"}</div>
-                                                    {req.targetUser?.pinfl && <div className="text-xs text-gray-500 font-mono">PINFL: {req.targetUser.pinfl}</div>}
-                                                </>
+                                                <div className="flex items-center gap-3">
+                                                    <UserAvatar user={req.targetUser} size="w-9 h-9" />
+                                                    <div>
+                                                        <div className="font-medium text-gray-900">{req.targetUser?.name || "Bino"}</div>
+                                                        {req.targetUser?.pinfl && <div className="text-xs text-gray-500 font-mono">PINFL: {req.targetUser.pinfl}</div>}
+                                                    </div>
+                                                </div>
                                             )}
                                         </td>
                                         <td className="py-4 px-6">
