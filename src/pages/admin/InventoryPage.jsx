@@ -9,15 +9,9 @@ import QRGeneratorModal from "../../components/admin/QRGeneratorModal";
 import Pagination from "../../components/common/Pagination"; // Import Pagination
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import api, { BASE_URL } from "../../api/axios"; // Import API
+import api, { BASE_URL, getImageUrl } from "../../api/axios"; // Import API
 import { toast } from "react-hot-toast";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
-
-const getImageUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return `${BASE_URL.replace('/api', '')}${url}`;
-};
 
 const InventoryPage = () => {
     const location = useLocation();

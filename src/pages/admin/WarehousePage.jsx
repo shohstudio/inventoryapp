@@ -6,14 +6,8 @@ import ConfirmationModal from "../../components/common/ConfirmationModal";
 import Pagination from "../../components/common/Pagination"; // Import Pagination
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
-import api, { BASE_URL } from "../../api/axios";
+import api, { BASE_URL, getImageUrl } from "../../api/axios";
 import { toast } from "react-hot-toast";
-
-const getImageUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    return `${BASE_URL.replace('/api', '')}${url}`;
-};
 
 const WarehousePage = () => {
     const { t } = useLanguage();

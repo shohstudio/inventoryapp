@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine, RiUserLine } from "react-icons/ri";
-import { BASE_URL } from "../../api/axios";
-
-const getImageUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('blob:')) return url;
-    return `${BASE_URL.replace('/api', '')}${url}`;
-};
+import { BASE_URL, getImageUrl } from "../../api/axios";
 
 const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const [formData, setFormData] = useState({

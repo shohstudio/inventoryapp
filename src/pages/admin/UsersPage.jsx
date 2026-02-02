@@ -3,7 +3,7 @@ import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, 
 import Pagination from "../../components/common/Pagination";
 import UserModal from "../../components/admin/UserModal"; // Restored
 import { useLanguage } from "../../context/LanguageContext";
-import api, { BASE_URL } from "../../api/axios";
+import api, { BASE_URL, getImageUrl } from "../../api/axios";
 import { toast } from "react-hot-toast";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
 
@@ -180,7 +180,7 @@ const UsersPage = () => {
                                                 <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold overflow-hidden border border-gray-100">
                                                     {user.image ? (
                                                         <img
-                                                            src={user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`}
+                                                            src={getImageUrl(user.image)}
                                                             alt={user.name}
                                                             className="w-full h-full object-cover"
                                                         />

@@ -8,7 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
-import { BASE_URL } from "../../api/axios";
+import api, { BASE_URL, getImageUrl } from "../../api/axios";
 
 const TMJPage = () => {
     const { t } = useLanguage();
@@ -470,7 +470,7 @@ const TMJPage = () => {
                                             }
 
                                             if (img) {
-                                                const imgSrc = img.startsWith('http') ? img : (BASE_URL.replace('/api', '') + img);
+                                                const imgSrc = getImageUrl(img);
                                                 return (
                                                     <div
                                                         className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100 bg-white cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all shadow-sm"

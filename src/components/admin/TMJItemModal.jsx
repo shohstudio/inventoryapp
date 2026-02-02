@@ -1,14 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
-import { BASE_URL } from "../../api/axios";
-
-const getImageUrl = (url) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('blob:')) return url;
-    return `${BASE_URL.replace('/api', '')}${url}`;
-};
+import { BASE_URL, getImageUrl } from "../../api/axios";
 
 const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
     // TMJ Product Types (Categories)
