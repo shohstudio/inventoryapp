@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLanguage } from "../../context/LanguageContext";
 import { RiHistoryLine, RiFileList3Line, RiTruckLine, RiLogoutBoxRLine, RiFileExcel2Line, RiSearchLine } from "react-icons/ri";
-import api from "../../api/axios";
+import api, { BASE_URL, getImageUrl } from "../../api/axios";
 import * as XLSX from 'xlsx';
 import { toast } from "react-hot-toast";
 import Pagination from "../../components/common/Pagination";
@@ -156,7 +156,20 @@ const LogsPage = () => {
                                             {new Date(log.createdAt).toLocaleString('uz-UZ')}
                                         </td>
                                         <td className="py-3 px-6 font-medium text-gray-800">
-                                            {log.user?.name || "Tizim"}
+                                            <div className="flex items-center gap-2">
+                                                {log.user?.image ? (
+                                                    <img
+                                                        src={getImageUrl(log.user.image)}
+                                                        alt={log.user.name}
+                                                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                                                    />
+                                                ) : (
+                                                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200">
+                                                        {log.user?.name?.charAt(0) || "T"}
+                                                    </div>
+                                                )}
+                                                <span>{log.user?.name || "Tizim"}</span>
+                                            </div>
                                         </td>
                                         <td className="py-3 px-6 text-gray-500">
                                             {log.user?.role || "-"}

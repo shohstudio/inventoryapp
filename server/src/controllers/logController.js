@@ -36,7 +36,7 @@ const getLogs = async (req, res) => {
                 take: limit,
                 include: {
                     user: {
-                        select: { name: true, role: true }
+                        select: { name: true, role: true, image: true }
                     },
                     item: {
                         select: { name: true, serialNumber: true }
