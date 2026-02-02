@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { RiFileExcel2Line, RiSearchLine, RiLoader4Line, RiImage2Line, RiCalendarCheckLine, RiCloseLine, RiArrowLeftLine, RiArrowRightLine } from "react-icons/ri";
-import api from "../../api/axios";
+import api, { BASE_URL, getImageUrl } from "../../api/axios";
 import { toast } from "react-hot-toast";
 import * as XLSX from "xlsx";
 import { useLanguage } from "../../context/LanguageContext";
@@ -78,7 +78,7 @@ const InventoryReportPage = () => {
                     item.status === 'broken' ? t('status_broken') : item.status,
             [t('checked_time')]: new Date(item.lastCheckedAt).toLocaleDateString("ru-RU"),
             [t('department_checked')]: item.department || item.building || "-",
-            [t('image')]: item.image ? (window.location.origin + item.image) : "Rasm yo'q"
+            [t('image')]: item.image ? (window.location.origin + getImageUrl(item.image)) : "Rasm yo'q"
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -233,7 +233,7 @@ const InventoryReportPage = () => {
                                                     }}
                                                 >
                                                     <img
-                                                        src={item.image}
+                                                        src={getImageUrl(item.image)}
                                                         alt={item.name}
                                                         className="w-full h-full object-cover"
                                                     />
@@ -283,7 +283,7 @@ const InventoryReportPage = () => {
                             )}
 
                             <img
-                                src={previewInfo.images[previewInfo.index]}
+                                src={getImageUrl(previewInfo.images[previewInfo.index])}
                                 alt={`Preview ${previewInfo.index + 1}`}
                                 className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                             />
@@ -313,7 +313,7 @@ const InventoryReportPage = () => {
                                     onClick={(e) => { e.stopPropagation(); setPreviewInfo(prev => ({ ...prev, index: i })); }}
                                     className={`w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${i === previewInfo.index ? 'border-white scale-110' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                 >
-                                    <img src={img} className="w-full h-full object-cover" />
+                                    <img src={getImageUrl(img)} className="w-full h-full object-cover" />
                                 </div>
                             ))}
                         </div>
