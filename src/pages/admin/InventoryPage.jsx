@@ -9,9 +9,15 @@ import QRGeneratorModal from "../../components/admin/QRGeneratorModal";
 import Pagination from "../../components/common/Pagination"; // Import Pagination
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import api from "../../api/axios"; // Import API
+import api, { BASE_URL } from "../../api/axios"; // Import API
 import { toast } from "react-hot-toast";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
+
+const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${BASE_URL.replace('/api', '')}${url}`;
+};
 
 const InventoryPage = () => {
     const location = useLocation();
@@ -589,7 +595,7 @@ const InventoryPage = () => {
                                                     }}
                                                 >
                                                     <img
-                                                        src={item.image}
+                                                        src={getImageUrl(item.image)}
                                                         alt={item.name}
                                                         className="w-full h-full object-cover"
                                                     />
@@ -682,7 +688,7 @@ const InventoryPage = () => {
                             )}
 
                             <img
-                                src={previewInfo.images[previewInfo.index]}
+                                src={getImageUrl(previewInfo.images[previewInfo.index])}
                                 alt={`Preview ${previewInfo.index + 1}`}
                                 className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
                             />
@@ -712,7 +718,7 @@ const InventoryPage = () => {
                                     onClick={(e) => { e.stopPropagation(); setPreviewInfo(prev => ({ ...prev, index: i })); }}
                                     className={`w-16 h-16 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${i === previewInfo.index ? 'border-white scale-110' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                 >
-                                    <img src={img} className="w-full h-full object-cover" />
+                                    <img src={getImageUrl(img)} className="w-full h-full object-cover" />
                                 </div>
                             ))}
                         </div>

@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
+import { BASE_URL } from "../../api/axios";
+
+const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('blob:')) return url;
+    return `${BASE_URL.replace('/api', '')}${url}`;
+};
 
 const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
     // Categories matching ItemModal
@@ -311,7 +319,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                             <div className="grid grid-cols-4 gap-2 mt-4">
                                 {formData.images.map((imgObj, index) => (
                                     <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100">
-                                        <img src={imgObj.preview} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                        <img src={getImageUrl(imgObj.preview)} alt={`Preview ${index}`} className="w-full h-full object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => removeImage(index)}

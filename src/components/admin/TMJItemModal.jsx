@@ -3,6 +3,13 @@ import { RiCloseLine, RiSave3Line, RiFilePdfLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
 import { BASE_URL } from "../../api/axios";
 
+const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('blob:')) return url;
+    return `${BASE_URL.replace('/api', '')}${url}`;
+};
+
 const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
     // TMJ Product Types (Categories)
     // User asked for "Maxsulot turi", using 'category' field for this.
@@ -338,10 +345,10 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 {formData.images.map((img, index) => (
                                     <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100 cursor-pointer">
                                         <img
-                                            src={img}
+                                            src={getImageUrl(img)}
                                             alt={`Preview ${index}`}
                                             className="w-full h-full object-cover"
-                                            onClick={() => setLightboxImage(img)}
+                                            onClick={() => setLightboxImage(getImageUrl(img))}
                                         />
                                         <button
                                             type="button"

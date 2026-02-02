@@ -6,8 +6,14 @@ import ConfirmationModal from "../../components/common/ConfirmationModal";
 import Pagination from "../../components/common/Pagination"; // Import Pagination
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
-import api from "../../api/axios";
+import api, { BASE_URL } from "../../api/axios";
 import { toast } from "react-hot-toast";
+
+const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    return `${BASE_URL.replace('/api', '')}${url}`;
+};
 
 const WarehousePage = () => {
     const { t } = useLanguage();
@@ -422,7 +428,7 @@ const WarehousePage = () => {
                                                     onClick={() => setPreviewImage(item.image)}
                                                 >
                                                     <img
-                                                        src={item.image}
+                                                        src={getImageUrl(item.image)}
                                                         alt={item.name}
                                                         className="w-full h-full object-cover"
                                                     />
@@ -492,7 +498,7 @@ const WarehousePage = () => {
                             <RiCloseLine size={32} />
                         </button>
                         <img
-                            src={previewImage}
+                            src={getImageUrl(previewImage)}
                             alt="Preview"
                             className="w-full h-full object-cover rounded-lg shadow-2xl"
                         />

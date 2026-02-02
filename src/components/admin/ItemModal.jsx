@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine, RiUserLine } from "react-icons/ri";
+import { BASE_URL } from "../../api/axios";
+
+const getImageUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith('http')) return url;
+    if (url.startsWith('blob:')) return url;
+    return `${BASE_URL.replace('/api', '')}${url}`;
+};
 
 const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const [formData, setFormData] = useState({
@@ -551,7 +559,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                             <div className="grid grid-cols-4 gap-2 mt-4">
                                 {formData.images.map((img, index) => (
                                     <div key={img.id || index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-100">
-                                        <img src={img.url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                                        <img src={getImageUrl(img.url)} alt={`Preview ${index}`} className="w-full h-full object-cover" />
                                         <button
                                             type="button"
                                             onClick={() => removeImage(index)}
