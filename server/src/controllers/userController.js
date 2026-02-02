@@ -145,6 +145,11 @@ const createUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        let image = null;
+        if (req.file) {
+            image = `/api/uploads/${req.file.filename}`;
+        }
+
         const user = await prisma.user.create({
             data: {
                 name,
@@ -155,7 +160,8 @@ const createUser = async (req, res) => {
                 department,
                 position,
                 status,
-                pinfl
+                pinfl,
+                image
             }
         });
 
@@ -223,6 +229,10 @@ const updateUser = async (req, res) => {
         if (password) {
             const salt = await bcrypt.genSalt(10);
             dataToUpdate.password = await bcrypt.hash(password, salt);
+        }
+
+        if (req.file) {
+            dataToUpdate.image = `/api/uploads/${req.file.filename}`;
         }
 
         const user = await prisma.user.update({

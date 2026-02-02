@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { RiCloseLine, RiSave3Line, RiErrorWarningLine } from "react-icons/ri";
-import api from "../../api/axios";
+import { useState, useEffect, useRef } from "react";
+import { RiCloseLine, RiSave3Line, RiErrorWarningLine, RiImageAddLine, RiImageEditLine } from "react-icons/ri";
+import api, { BASE_URL } from "../../api/axios";
 
 const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const [formData, setFormData] = useState({
@@ -14,12 +14,16 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         pinfl: "",
         password: ""
     });
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
     const [errors, setErrors] = useState({});
+    const fileInputRef = useRef(null);
     const [checking, setChecking] = useState({});
 
     useEffect(() => {
         if (user) {
             setFormData({ ...user, password: "" });
+            setImagePreview(user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null);
         } else {
             setFormData({
                 name: "",
@@ -32,6 +36,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 pinfl: "",
                 password: ""
             });
+            setImagePreview(null);
+            setImageFile(null);
         }
         setErrors({});
     }, [user, isOpen]);
@@ -59,6 +65,11 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         if (!formData.department.trim()) newErrors.department = "Bo'lim kiritish majburiy";
         if (!formData.position?.trim()) newErrors.position = "Lavozim kiritish majburiy";
         if (!formData.pinfl.trim()) newErrors.pinfl = "PINFL kiritish majburiy";
+
+        // Image mandatory for new users
+        if (!user && !imageFile) {
+            newErrors.image = "Profil uchun rasm yuklash majburiy";
+        }
 
         // Also check if any async validations failed (kept in current errors state)
         if (errors.username && errors.username !== "Login kiritish majburiy") newErrors.username = errors.username;
@@ -91,6 +102,25 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         }
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("Rasm hajmi 5MB dan oshmasligi kerak");
+                return;
+            }
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            if (errors.image) {
+                setErrors(prev => ({ ...prev, image: null }));
+            }
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -112,6 +142,10 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
             if (user) delete dataToSave.password;
         }
 
+        if (imageFile) {
+            dataToSave.imageFile = imageFile;
+        }
+
         onSave(dataToSave);
         onClose();
     };
@@ -129,6 +163,36 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                    {/* Profile Image Upload */}
+                    <div className="flex flex-col items-center mb-6">
+                        <div
+                            onClick={() => fileInputRef.current.click()}
+                            className={`w-28 h-28 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer overflow-hidden transition-all relative group ${errors.image ? 'border-red-400 bg-red-50' : 'border-indigo-200 bg-indigo-50 hover:border-indigo-400'}`}
+                        >
+                            {imagePreview ? (
+                                <>
+                                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity">
+                                        <RiImageEditLine size={24} />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-indigo-400 flex flex-col items-center">
+                                    <RiImageAddLine size={32} />
+                                    <span className="text-[10px] mt-1 font-medium">Rasm yuklash</span>
+                                </div>
+                            )}
+                        </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleImageChange}
+                            className="hidden"
+                            accept="image/*"
+                        />
+                        {errors.image && <p className="text-xs text-red-500 mt-2 flex items-center gap-1"><RiErrorWarningLine /> {errors.image}</p>}
+                    </div>
+
                     <div>
                         <label className="label">F.I.SH <span className="text-red-500">*</span></label>
                         <input

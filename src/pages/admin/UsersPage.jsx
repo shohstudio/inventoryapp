@@ -3,7 +3,7 @@ import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, 
 import Pagination from "../../components/common/Pagination";
 import UserModal from "../../components/admin/UserModal"; // Restored
 import { useLanguage } from "../../context/LanguageContext";
-import api from "../../api/axios";
+import api, { BASE_URL } from "../../api/axios";
 import { toast } from "react-hot-toast";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
 
@@ -59,20 +59,37 @@ const UsersPage = () => {
 
     const handleSaveUser = async (userData) => {
         try {
+            const formData = new FormData();
+
+            // Append all fields except imageFile
+            Object.keys(userData).forEach(key => {
+                if (key !== 'imageFile' && userData[key] !== null && userData[key] !== undefined) {
+                    formData.append(key, userData[key]);
+                }
+            });
+
+            // Append image if exists
+            if (userData.imageFile) {
+                formData.append('image', userData.imageFile);
+            }
+
             if (selectedUser) {
                 // Update existing
-                const res = await api.put(`/users/${selectedUser.id}`, userData);
+                const res = await api.put(`/users/${selectedUser.id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
                 setUsers(users.map(u => u.id === selectedUser.id ? res.data : u));
                 toast.success("Foydalanuvchi yangilandi");
             } else {
                 // Create new
-                const res = await api.post('/users', userData);
+                const res = await api.post('/users', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
                 setUsers([...users, res.data]);
                 toast.success("Yangi foydalanuvchi qo'shildi");
             }
         } catch (error) {
             console.error("Save user error:", error);
-            // Handle specific backend error messages if available
             const message = error.response?.data?.message || "Saqlashda xatolik yuz berdi";
             toast.error(message);
         }
@@ -137,6 +154,8 @@ const UsersPage = () => {
                         type="text"
                         placeholder={t('search')}
                         className="input pl-10"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                 </div>
 
@@ -161,7 +180,7 @@ const UsersPage = () => {
                                                 <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold overflow-hidden border border-gray-100">
                                                     {user.image ? (
                                                         <img
-                                                            src={user.image.startsWith('http') ? user.image : `https://invertar.astiedu.uz${user.image}`}
+                                                            src={user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`}
                                                             alt={user.name}
                                                             className="w-full h-full object-cover"
                                                         />

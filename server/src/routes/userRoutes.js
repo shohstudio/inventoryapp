@@ -16,11 +16,11 @@ router.route('/')
             throw new Error('Not authorized as admin or accounter');
         }
     }, getUsers)
-    .post(protect, admin, createUser);
+    .post(protect, admin, upload.single('image'), createUser);
 
 router.route('/:id')
     .get(protect, getUserById)
-    .put(protect, admin, updateUser)
+    .put(protect, admin, upload.single('image'), updateUser)
     .delete(protect, admin, deleteUser);
 
 module.exports = router;
