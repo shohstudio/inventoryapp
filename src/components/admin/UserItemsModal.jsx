@@ -3,6 +3,12 @@ import { RiCloseLine, RiFileExcel2Line, RiComputerLine, RiCheckDoubleLine } from
 import { utils, writeFile } from 'xlsx';
 import api from "../../api/axios";
 
+// Helper for price formatting
+const formatPrice = (price) => {
+    if (!price) return "0";
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+};
+
 const UserItemsModal = ({ isOpen, onClose, user }) => {
     const [items, setItems] = useState([]);
     const [requests, setRequests] = useState([]);
@@ -42,7 +48,9 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
             "№": index + 1,
             "Jihoz Nomi": item.name,
             "Model": item.model || "-",
-            "Seriya Raqami": item.serialNumber || "-",
+            "INN": item.inn || "-",
+            "Soni": item.quantity || 1,
+            "Narxi": item.price ? formatPrice(item.price) : "0",
             "Kategoriya": item.category || "-",
             "Holat": item.status === 'working' ? "Faol" : "Ta'mirda",
             "Biriktirilgan Sana": item.assignedDate ? new Date(item.assignedDate).toLocaleDateString('uz-UZ') : "-",
@@ -54,7 +62,9 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
             { wch: 5 },  // #
             { wch: 25 }, // Name
             { wch: 15 }, // Model
-            { wch: 20 }, // Serial
+            { wch: 15 }, // INN
+            { wch: 10 }, // Quantity
+            { wch: 15 }, // Price
             { wch: 15 }, // Category
             { wch: 10 }, // Status
             { wch: 15 }, // Date
@@ -69,9 +79,25 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
 
     if (!isOpen) return null;
 
+    const getStatusBadge = (status) => {
+        switch (status) {
+            case 'completed':
+            case 'approved':
+                return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">Yakunlangan</span>;
+            case 'rejected':
+                return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">Rad etilgan</span>;
+            case 'pending':
+            case 'pending_accountant':
+            case 'pending_employee':
+                return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700">Kutilmoqda</span>;
+            default:
+                return <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700">{status}</span>;
+        }
+    };
+
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all scale-100 max-h-[90vh] flex flex-col">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all scale-100 max-h-[90vh] flex flex-col">
                 <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
                     <div>
                         <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -125,7 +151,9 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                             <tr>
                                                 <th className="p-3 font-semibold text-xs text-gray-600 uppercase">#</th>
                                                 <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Jihoz</th>
-                                                <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Seriya</th>
+                                                <th className="p-3 font-semibold text-xs text-gray-600 uppercase">INN</th>
+                                                <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Soni</th>
+                                                <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Narxi</th>
                                                 <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Holat</th>
                                                 <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Sana</th>
                                             </tr>
@@ -138,7 +166,9 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                                         <div className="font-medium text-gray-800 text-sm">{item.name}</div>
                                                         <div className="text-xs text-gray-500">{item.model || '-'}</div>
                                                     </td>
-                                                    <td className="p-3 text-sm font-mono text-gray-600">{item.serialNumber || '-'}</td>
+                                                    <td className="p-3 text-sm font-mono text-gray-600">{item.inn || '-'}</td>
+                                                    <td className="p-3 text-sm text-gray-600">{item.quantity || 1}</td>
+                                                    <td className="p-3 text-sm text-gray-600 font-mono">{item.price ? formatPrice(item.price) : '0'}</td>
                                                     <td className="p-3">
                                                         <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${item.status === 'working' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
                                                             {item.status === 'working' ? 'Faol' : "Ta'mirda"}
@@ -170,6 +200,9 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                         <tr>
                                             <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Turi</th>
                                             <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Jihoz</th>
+                                            <th className="p-3 font-semibold text-xs text-gray-600 uppercase">INN</th>
+                                            <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Soni</th>
+                                            <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Narxi</th>
                                             <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Holat</th>
                                             <th className="p-3 font-semibold text-xs text-gray-600 uppercase">Sana</th>
                                         </tr>
@@ -188,13 +221,11 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                                     <div className="font-medium text-gray-800 text-sm">{req.item?.name || 'Jihoz o\'chirilgan'}</div>
                                                     <div className="text-xs text-gray-500">{req.item?.model || '-'}</div>
                                                 </td>
+                                                <td className="p-3 text-sm font-mono text-gray-600">{req.item?.inn || '-'}</td>
+                                                <td className="p-3 text-sm text-gray-600">{req.item?.quantity || 1}</td>
+                                                <td className="p-3 text-sm text-gray-600 font-mono">{req.item?.price ? formatPrice(req.item.price) : '0'}</td>
                                                 <td className="p-3">
-                                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${req.status === 'completed' || req.status === 'approved' ? 'bg-green-100 text-green-700' :
-                                                            req.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                                                'bg-yellow-100 text-yellow-700'
-                                                        }`}>
-                                                        {req.status}
-                                                    </span>
+                                                    {getStatusBadge(req.status)}
                                                 </td>
                                                 <td className="p-3 text-sm text-gray-600">
                                                     {new Date(req.createdAt).toLocaleDateString('uz-UZ')}
