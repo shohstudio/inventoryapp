@@ -21,9 +21,9 @@ const Header = ({ onMenuClick }) => {
     const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
     const languages = [
-        { code: 'uz', label: "O'zbekcha", short: "O'Z" },
-        { code: 'oz', label: "Ўзбекча", short: "ЎЗ" },
-        { code: 'ru', label: "Русский", short: "RU" }
+        { code: 'uz', label: "O'zbekcha", flag: "🇺🇿" },
+        { code: 'oz', label: "Ўзбекча", flag: "🇺🇿" },
+        { code: 'ru', label: "Русский", flag: "🇷🇺" }
         // { code: 'en', label: "English", short: "EN" } // Add if supported later
     ];
 
@@ -62,15 +62,16 @@ const Header = ({ onMenuClick }) => {
                     <div className="relative">
                         <button
                             onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                            className="w-10 h-10 rounded-xl border border-indigo-100 dark:border-slate-700 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                            className="w-10 h-10 rounded-xl border border-indigo-100 dark:border-slate-700 flex items-center justify-center text-xl hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                            title={currentLang.label}
                         >
-                            {currentLang.short}
+                            {currentLang.flag}
                         </button>
 
                         {isLangMenuOpen && (
                             <>
                                 <div className="fixed inset-0 z-10" onClick={() => setIsLangMenuOpen(false)}></div>
-                                <div className="absolute top-full right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 p-1 z-20 animate-fade-in origin-top-right">
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 p-1 z-20 animate-fade-in origin-top-right">
                                     {languages.map((lang) => (
                                         <button
                                             key={lang.code}
@@ -78,13 +79,14 @@ const Header = ({ onMenuClick }) => {
                                                 setLanguage(lang.code);
                                                 setIsLangMenuOpen(false);
                                             }}
-                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-between ${language === lang.code
+                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-3 ${language === lang.code
                                                     ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-700 dark:text-indigo-400'
                                                     : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
                                                 }`}
                                         >
-                                            {lang.label}
-                                            {language === lang.code && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>}
+                                            <span className="text-xl">{lang.flag}</span>
+                                            <span>{lang.label}</span>
+                                            {language === lang.code && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-500"></span>}
                                         </button>
                                     ))}
                                 </div>
