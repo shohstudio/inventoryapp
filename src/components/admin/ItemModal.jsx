@@ -504,27 +504,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                             setUserSearchResults(users);
                                             setIsSearchingUsers(false);
 
-                                            // Auto-select if exact ID match (5 digits)
-                                            if (val.length === 5 && /^\d+$/.test(val)) {
-                                                const match = users.find(u => String(u.employeeId) === String(val));
-
-                                                if (match) {
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        assignedTo: match.name,
-                                                        assignedRole: match.position || match.role,
-                                                        assignedEmployeeId: match.employeeId
-                                                    }));
-                                                    toast.success("Xodim topildi: " + match.name);
-                                                    setShowUserResults(false);
-                                                } else {
-                                                    // Only show error if we got results but not the exact ID match
-                                                    // If users array is empty, it means API returned nothing
-                                                    if (users.length === 0) {
-                                                        toast.error("Bunday ID raqamli xodim topilmadi");
-                                                    }
-                                                }
-                                            }
+                                            // Remove auto-select logic to allow user to choose from list
+                                            // The list should show up automatically if results exist
+                                            setShowUserResults(true);
                                         }).catch(() => setIsSearchingUsers(false));
                                     } else {
                                         setUserSearchResults([]);
