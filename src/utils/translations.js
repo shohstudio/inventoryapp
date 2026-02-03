@@ -358,7 +358,7 @@ export const translations = {
         not_passed: "Ўтмаган",
 
         // TMJ Page
-        tmj_stock: "Омборга келган маҳсулотлар",
+        tmj_stock: "Омбордаги маҳсулотлар",
         tmj_assigned: "Берилган маҳсулотлар",
         tmj_handover: "Топшириш",
         tmj_handover: "Топшириш",
@@ -543,7 +543,7 @@ export const translations = {
         not_passed: "Не прошел",
 
         // TMJ Page
-        tmj_stock: "Поступившие на склад",
+        tmj_stock: "Товары на складе",
         tmj_assigned: "Выданные товары",
         tmj_handover: "Вручить",
         tmj_handover: "Вручить",
