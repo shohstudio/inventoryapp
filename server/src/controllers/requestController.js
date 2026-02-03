@@ -103,7 +103,7 @@ const getRequests = async (req, res) => {
                         }
                     },
                     requester: { select: { name: true, role: true, image: true } },
-                    targetUser: { select: { name: true, pinfl: true, image: true } }
+                    targetUser: { select: { name: true, employeeId: true, image: true } }
                 },
                 orderBy: { createdAt: 'desc' }
             }),
