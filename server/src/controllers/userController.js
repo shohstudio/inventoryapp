@@ -100,7 +100,17 @@ const getUserById = async (req, res) => {
                 employeeId: true,
                 image: true,
                 phone: true,
-                items: true
+                items: true,
+                sentRequests: {
+                    include: {
+                        item: true
+                    }
+                },
+                receivedRequests: {
+                    include: {
+                        item: true
+                    }
+                }
             }
         });
 
