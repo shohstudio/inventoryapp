@@ -255,16 +255,16 @@ const TMJPage = () => {
                     "№": index + 1,
                     "Nomi": item.name,
                     "Kategoriya": item.category,
-                    "Model": item.model || "",
-                    "Seriya Raqami": item.serialNumber || "",
-                    "INN": item.inn || "",
-                    "Order Raqam": item.orderNumber || "",
+                    // "Model": item.model || "", // User requested to remove
+                    // "Seriya Raqami": item.serialNumber || "", // User requested to remove
+                    // "INN": item.inn || "", // User requested to remove
+                    // "Order Raqam": item.orderNumber || "", // User requested to remove
                     "Holati": item.assignedTo ? item.assignedTo.name : (item.initialOwner || "Omborda"),
                     "Kelgan Sanasi": item.arrivalDate || item.purchaseDate || "",
                     "Narxi": item.price,
                     "Soni": quantityStr, // Formatted string
                     "Bino": item.building || "",
-                    "Bo'lim": item.department || "",
+                    // "Bo'lim": item.department || "", // User requested to remove
                     "Joylashuv": item.location || ""
                 };
             });
