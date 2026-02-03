@@ -504,6 +504,24 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                             const users = Array.isArray(data) ? data : (data.users || []);
                                             setUserSearchResults(users);
                                             setIsSearchingUsers(false);
+
+                                            // Auto-select if exact ID match (5 digits)
+                                            if (val.length === 5 && /^\d+$/.test(val)) {
+                                                const match = users.find(u => u.employeeId === val);
+                                                if (match) {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        assignedTo: match.name,
+                                                        assignedRole: match.position || match.role,
+                                                        assignedEmployeeId: match.employeeId
+                                                    }));
+                                                    toast.success("Xodim topildi: " + match.name);
+                                                    // Close dropdown after auto-select to avoid confusion?
+                                                    // Or keep it open? User said "chiqmadiku" implying they wanted to see something.
+                                                    // But if fields auto-fill, maybe that's enough.
+                                                    setShowUserResults(false);
+                                                }
+                                            }
                                         }).catch(() => setIsSearchingUsers(false));
                                     } else {
                                         setUserSearchResults([]);
