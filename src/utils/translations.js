@@ -172,7 +172,7 @@ export const translations = {
 
         // TMJ Page
         tmj_stock: "Omborda", // Short for "Omborga kelgan maxsulotlar" -> Keep it concise "Omborda" or "Omborga kelgan"
-        tmj_stock: "Omborga kelgan maxsulotlar",
+        tmj_stock: "Ombordagi maxsulotlar",
         tmj_assigned: "Berilgan maxsulotlar",
         tmj_handover: "Topshirish",
         tmj_handover: "Topshirish",

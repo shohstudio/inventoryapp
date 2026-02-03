@@ -631,7 +631,7 @@ const TMJPage = () => {
                                 disabled={isExporting}
                                 className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 transition-all group"
                             >
-                                <span className="font-medium">Omborga kelgan maxsulotlar</span>
+                                <span className="font-medium">Ombordagi maxsulotlar</span>
                                 <RiDownloadLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
 
