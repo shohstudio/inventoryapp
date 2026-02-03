@@ -19,11 +19,26 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
     const [errors, setErrors] = useState({});
     const fileInputRef = useRef(null);
     const [checking, setChecking] = useState({});
+    const [assignedItems, setAssignedItems] = useState([]);
+    const [loadingItems, setLoadingItems] = useState(false);
 
     useEffect(() => {
         if (user) {
             setFormData({ ...user, password: "" });
             setImagePreview(user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null);
+
+            // Fetch assigned items
+            setLoadingItems(true);
+            api.get(`/users/${user.id}`)
+                .then(({ data }) => {
+                    setAssignedItems(data.items || []);
+                })
+                .catch(err => {
+                    console.error("Failed to fetch user items", err);
+                    setAssignedItems([]);
+                })
+                .finally(() => setLoadingItems(false));
+
         } else {
             setFormData({
                 name: "",
@@ -38,6 +53,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
             });
             setImagePreview(null);
             setImageFile(null);
+            setAssignedItems([]);
         }
         setErrors({});
     }, [user, isOpen]);
@@ -327,7 +343,41 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                             maxLength={14}
                         />
                         {errors.pinfl && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.pinfl}</p>}
+                        {errors.pinfl && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.pinfl}</p>}
                     </div>
+
+                    {/* Assigned Items Section - Only visible in Edit Mode */}
+                    {user && (
+                        <div className="pt-4 border-t border-gray-100">
+                            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                Biriktirilgan jihozlar ({assignedItems.length})
+                            </h3>
+
+                            {loadingItems ? (
+                                <div className="text-center py-4 text-gray-400 text-sm">Yuklanmoqda...</div>
+                            ) : assignedItems.length > 0 ? (
+                                <div className="bg-gray-50 rounded-xl p-2 max-h-40 overflow-y-auto space-y-1">
+                                    {assignedItems.map(item => (
+                                        <div key={item.id} className="bg-white p-2 rounded-lg border border-gray-100 shadow-sm flex justify-between items-center text-sm">
+                                            <div>
+                                                <div className="font-medium text-gray-800">{item.name}</div>
+                                                <div className="text-xs text-gray-500 flex gap-2">
+                                                    <span>{item.serialNumber || "-"}</span>
+                                                    <span className="text-gray-300">|</span>
+                                                    <span className="text-indigo-500">{item.status === 'working' ? 'Faol' : "Ta'mirda"}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-sm text-gray-400 italic text-center py-2 bg-gray-50 rounded-lg">
+                                    Hozircha jihozlar biriktirilmagan
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     <div className="pt-4 flex justify-end gap-3">
                         <button
