@@ -4,7 +4,7 @@ import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line, RiFile
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
-
+import { getImageUrl } from "../../api/axios";
 import Pagination from "../../components/common/Pagination";
 
 const MyItemsPage = () => {
@@ -202,7 +202,7 @@ const MyItemsPage = () => {
                                     <td className="p-4 text-right">
                                         {item.assignedDocument ? (
                                             <a
-                                                href={`https://invertar.astiedu.uz/api${item.assignedDocument}`}
+                                                href={getImageUrl(item.assignedDocument)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium text-xs transition-colors"

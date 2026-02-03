@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { getImageUrl } from "../../api/axios";
 import { useLanguage } from "../../context/LanguageContext";
 import { useTheme } from "../../context/ThemeContext";
 import { RiSearchLine, RiMenuLine, RiLogoutBoxLine, RiUserLine, RiArrowDownSLine, RiSunLine, RiMoonLine } from "react-icons/ri";
@@ -82,7 +83,7 @@ const Header = ({ onMenuClick }) => {
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shadow-md overflow-hidden border-2 border-white dark:border-slate-800">
                             {user?.image ? (
                                 <img
-                                    src={user.image.startsWith('http') ? user.image : `https://invertar.astiedu.uz${user.image}`}
+                                    src={getImageUrl(user.image)}
                                     alt="User"
                                     className="w-full h-full object-cover"
                                 />

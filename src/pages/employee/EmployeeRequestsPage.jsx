@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import api, { BASE_URL } from "../../api/axios";
+import api, { BASE_URL, getImageUrl } from "../../api/axios";
 import { toast } from "react-hot-toast";
 import { RiFileList3Line, RiCheckDoubleLine, RiCloseCircleLine, RiTimeLine, RiUser3Line } from "react-icons/ri";
 
@@ -129,7 +129,7 @@ const EmployeeRequestsPage = () => {
                                         <RiFileList3Line /> Asos hujjat:
                                     </span>
                                     <a
-                                        href={`https://invertar.astiedu.uz/api${req.accountantDocument}`}
+                                        href={getImageUrl(req.accountantDocument)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="text-blue-600 hover:text-blue-800 text-xs font-medium underline"
