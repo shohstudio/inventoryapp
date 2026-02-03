@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { RiAddLine, RiSearchLine, RiMore2Fill, RiUserLine, RiShieldKeyholeLine, RiDeleteBinLine, RiCalculatorLine } from "react-icons/ri";
 import Pagination from "../../components/common/Pagination";
-import UserModal from "../../components/admin/UserModal"; // Restored
+import UserModal from "../../components/admin/UserModal";
+import UserItemsModal from "../../components/admin/UserItemsModal";
 import { useLanguage } from "../../context/LanguageContext";
 import api, { BASE_URL, getImageUrl } from "../../api/axios";
 import { toast } from "react-hot-toast";
@@ -12,6 +13,8 @@ const UsersPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [users, setUsers] = useState([]);
+    const [isItemsModalOpen, setIsItemsModalOpen] = useState(false);
+    const [selectedUserForItems, setSelectedUserForItems] = useState(null);
     const [loading, setLoading] = useState(true);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: null, isDanger: false });
 
@@ -123,6 +126,11 @@ const UsersPage = () => {
         setIsModalOpen(true);
     };
 
+    const openItemsModal = (user) => {
+        setSelectedUserForItems(user);
+        setIsItemsModalOpen(true);
+    };
+
     if (loading) {
         return <div className="p-8 text-center text-gray-500">Yuklanmoqda...</div>;
     }
@@ -189,7 +197,12 @@ const UsersPage = () => {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium text-gray-900">{user.name}</div>
+                                                    <div
+                                                        className="font-medium text-gray-900 cursor-pointer hover:text-indigo-600 hover:underline transition-colors"
+                                                        onClick={() => openItemsModal(user)}
+                                                    >
+                                                        {user.name}
+                                                    </div>
                                                     <div className="text-xs text-indigo-500 font-mono">@{user.username}</div>
                                                     <div className="text-xs text-gray-400">{user.email}</div>
                                                 </div>
@@ -256,6 +269,12 @@ const UsersPage = () => {
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSaveUser}
                 user={selectedUser}
+            />
+
+            <UserItemsModal
+                isOpen={isItemsModalOpen}
+                onClose={() => setIsItemsModalOpen(false)}
+                user={selectedUserForItems}
             />
 
             <ConfirmationModal
