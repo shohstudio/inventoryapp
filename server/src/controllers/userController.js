@@ -118,8 +118,8 @@ const generateEmployeeId = async () => {
     let uniqueId;
     let isUnique = false;
     while (!isUnique) {
-        // Generate 6 digit number
-        const randomNum = Math.floor(100000 + Math.random() * 900000);
+        // Generate 5 digit number
+        const randomNum = Math.floor(10000 + Math.random() * 90000);
         uniqueId = randomNum.toString();
 
         const existing = await prisma.user.findUnique({
@@ -203,7 +203,8 @@ const createUser = async (req, res) => {
 // @route   PUT /api/users/:id
 // @access  Private/Admin
 const updateUser = async (req, res) => {
-    const { name, username, email, password, role, department, position, status, pinfl } = req.body;
+    const { id } = req.params;
+    const { name, username, email, role, department, position, status, password, image } = req.body;
 
     try {
         const dataToUpdate = {
@@ -214,9 +215,9 @@ const updateUser = async (req, res) => {
             department,
             position,
             status,
-            status
+            image: req.file ? `/api/uploads/${req.file.filename}` : undefined
+            // employeeId is immutable
         };
-
         if (password) {
             const salt = await bcrypt.genSalt(10);
             dataToUpdate.password = await bcrypt.hash(password, salt);

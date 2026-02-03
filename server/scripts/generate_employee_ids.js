@@ -2,21 +2,14 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 function generateEmployeeId() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return Math.floor(10000 + Math.random() * 90000).toString();
 }
 
 async function main() {
     console.log("Starting Employee ID generation...");
 
-    // Get all users without employeeId
-    const users = await prisma.user.findMany({
-        where: {
-            OR: [
-                { employeeId: null },
-                { employeeId: "" }
-            ]
-        }
-    });
+    // Get all users to ensure 5-digit format
+    const users = await prisma.user.findMany();
 
     console.log(`Found ${users.length} users to update.`);
 
