@@ -18,6 +18,17 @@ const Header = ({ onMenuClick }) => {
         navigate('/login');
     };
 
+    const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+
+    const languages = [
+        { code: 'uz', label: "O'zbekcha", short: "O'Z" },
+        { code: 'oz', label: "Ўзбекча", short: "ЎЗ" },
+        { code: 'ru', label: "Русский", short: "RU" }
+        // { code: 'en', label: "English", short: "EN" } // Add if supported later
+    ];
+
+    const currentLang = languages.find(l => l.code === language) || languages[0];
+
     return (
         <header className="h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md fixed top-0 right-0 left-0 md:left-64 z-30 transition-all duration-300 border-b border-indigo-50/50 dark:border-slate-700 shadow-sm px-6 flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
@@ -46,27 +57,40 @@ const Header = ({ onMenuClick }) => {
                         {theme === 'dark' ? <RiSunLine size={20} /> : <RiMoonLine size={20} />}
                     </button>
                     <div className="w-px h-6 bg-gray-200 dark:bg-slate-700 mx-1"></div>
-                    <button
-                        onClick={() => setLanguage('uz')}
-                        className={`p-1.5 rounded-lg transition-all ${language === 'uz' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 dark:hover:bg-slate-800 grayscale hover:grayscale-0'}`}
-                        title="O'zbekcha (Lotin)"
-                    >
-                        <span className="text-xl">🇺🇿</span>
-                    </button>
-                    <button
-                        onClick={() => setLanguage('oz')}
-                        className={`p-1.5 rounded-lg transition-all ${language === 'oz' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 grayscale hover:grayscale-0'}`}
-                        title="O'zbekcha (Kirill)"
-                    >
-                        <span className="text-xl font-serif">Ўз</span>
-                    </button>
-                    <button
-                        onClick={() => setLanguage('ru')}
-                        className={`p-1.5 rounded-lg transition-all ${language === 'ru' ? 'bg-indigo-100 ring-2 ring-indigo-500' : 'hover:bg-gray-100 grayscale hover:grayscale-0'}`}
-                        title="Русский"
-                    >
-                        <span className="text-xl">🇷🇺</span>
-                    </button>
+
+                    {/* Language Dropdown */}
+                    <div className="relative">
+                        <button
+                            onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                            className="w-10 h-10 rounded-xl border border-indigo-100 dark:border-slate-700 flex items-center justify-center text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+                        >
+                            {currentLang.short}
+                        </button>
+
+                        {isLangMenuOpen && (
+                            <>
+                                <div className="fixed inset-0 z-10" onClick={() => setIsLangMenuOpen(false)}></div>
+                                <div className="absolute top-full right-0 mt-2 w-40 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-100 dark:border-slate-700 p-1 z-20 animate-fade-in origin-top-right">
+                                    {languages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => {
+                                                setLanguage(lang.code);
+                                                setIsLangMenuOpen(false);
+                                            }}
+                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-between ${language === lang.code
+                                                    ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-700 dark:text-indigo-400'
+                                                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                                                }`}
+                                        >
+                                            {lang.label}
+                                            {language === lang.code && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>}
+                                        </button>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
 
 
