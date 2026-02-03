@@ -88,8 +88,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 status: item.status || "working",
                 assignedTo: item.assignedTo ? item.assignedTo.name : (item.requests?.[0]?.targetUser?.name || item.initialOwner || ""),
                 assignedRole: item.assignedTo ? item.assignedTo.position : (item.requests?.[0]?.targetUser?.position || item.initialRole || ""),
-                assignedTo: item.assignedTo ? item.assignedTo.name : (item.requests?.[0]?.targetUser?.name || item.initialOwner || ""),
-                assignedRole: item.assignedTo ? item.assignedTo.position : (item.requests?.[0]?.targetUser?.position || item.initialRole || ""),
+
                 assignedEmployeeId: item.assignedTo ? item.assignedTo.employeeId : (item.requests?.[0]?.targetUser?.employeeId || item.initialEmployeeId || ""), // Use employeeId
                 images: (() => {
                     let imgs = [];
@@ -123,8 +122,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 status: "working",
                 assignedTo: "",
                 assignedRole: roles[4], // Default to "Bo'lim boshlig'i" as it seems most common, or roles[0]
-                assignedTo: "",
-                assignedRole: roles[4],
+
                 assignedEmployeeId: "",
                 images: [], // Start empty for new items, or parse initialData if needed
                 pdf: null,
@@ -507,7 +505,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
 
                                             // Auto-select if exact ID match (5 digits)
                                             if (val.length === 5 && /^\d+$/.test(val)) {
-                                                const match = users.find(u => u.employeeId === val);
+                                                const match = users.find(u => String(u.employeeId) === String(val));
+
                                                 if (match) {
                                                     setFormData(prev => ({
                                                         ...prev,
@@ -516,10 +515,13 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                                         assignedEmployeeId: match.employeeId
                                                     }));
                                                     toast.success("Xodim topildi: " + match.name);
-                                                    // Close dropdown after auto-select to avoid confusion?
-                                                    // Or keep it open? User said "chiqmadiku" implying they wanted to see something.
-                                                    // But if fields auto-fill, maybe that's enough.
                                                     setShowUserResults(false);
+                                                } else {
+                                                    // Only show error if we got results but not the exact ID match
+                                                    // If users array is empty, it means API returned nothing
+                                                    if (users.length === 0) {
+                                                        toast.error("Bunday ID raqamli xodim topilmadi");
+                                                    }
                                                 }
                                             }
                                         }).catch(() => setIsSearchingUsers(false));
