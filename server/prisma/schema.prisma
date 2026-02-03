@@ -21,7 +21,7 @@ model User {
   department String?
   position  String?  // Lavozimi (e.g. Director, Accountant)
   status    String   @default("active") // active, inactive
-  pinfl     String? // JSHSHIR (14 digits) - Optional, no longer unique required
+  employeeId String? @unique // ID raqami (e.g. 100001)
   image     String?  // Profile picture URL
   phone     String?  // Phone number
 
@@ -69,7 +69,7 @@ model Item {
   // If imported from Excel and user not found, store name here
   initialOwner String?
   initialRole  String?  // Store role if user not found
-  initialPinfl String?
+  initialEmployeeId String? // Was initialPinfl
   handoverImage String? // Proof of handover image
   
   // Relations

@@ -173,7 +173,7 @@ const UsersPage = () => {
                             <thead>
                                 <tr className="bg-blue-600 text-white">
                                     <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('name')}</th>
-                                    <th className="py-4 px-6 font-semibold text-sm">PINFL</th>
+                                    <th className="py-4 px-6 font-semibold text-sm">ID Raqami</th>
                                     <th className="py-4 px-6 font-semibold text-sm">Bo'lim</th>
                                     <th className="py-4 px-6 font-semibold text-sm">Role</th>
                                     <th className="py-4 px-6 font-semibold text-sm">Holati</th>
@@ -208,7 +208,7 @@ const UsersPage = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="py-4 px-6 font-mono text-xs text-gray-500">{user.pinfl}</td>
+                                        <td className="py-4 px-6 font-mono text-xs text-gray-500 font-bold">{user.employeeId || "-"}</td>
                                         <td className="py-4 px-6 text-gray-600">{user.department}</td>
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-1.5 text-sm text-gray-600">

@@ -113,28 +113,40 @@ const getUserById = async (req, res) => {
     }
 };
 
+// Helper to generate unique ID
+const generateEmployeeId = async () => {
+    let uniqueId;
+    let isUnique = false;
+    while (!isUnique) {
+        // Generate 6 digit number
+        const randomNum = Math.floor(100000 + Math.random() * 900000);
+        uniqueId = randomNum.toString();
+
+        const existing = await prisma.user.findUnique({
+            where: { employeeId: uniqueId }
+        });
+
+        if (!existing) isUnique = true;
+    }
+    return uniqueId;
+};
+
 // @desc    Create new user
 // @route   POST /api/users
 // @access  Private/Admin
 const createUser = async (req, res) => {
-    const { name, username, email, password, role, department, position, status, pinfl } = req.body;
-    console.log("CREATE USER REQUEST - Password received:", `'${password}'`);
+    const { name, username, email, password, role, department, position, status } = req.body;
+    console.log("CREATE USER REQUEST");
 
     try {
-        // Check for existing user by username, email, OR pinfl
-        const whereClause = {
-            OR: [
-                { username: username },
-                { email: email || undefined }
-            ]
-        };
-
-        if (pinfl) {
-            whereClause.OR.push({ pinfl: pinfl });
-        }
-
+        // Check for existing user by username, email
         const existingUsers = await prisma.user.findMany({
-            where: whereClause
+            where: {
+                OR: [
+                    { username: username },
+                    { email: email || undefined }
+                ]
+            }
         });
 
         if (existingUsers.length > 0) {
@@ -142,7 +154,6 @@ const createUser = async (req, res) => {
             let message = 'Foydalanuvchi allaqachon mavjud';
             if (conflict.username === username) message = 'Bu foydalanuvchi nomi band (username)';
             else if (conflict.email === email) message = 'Bu email allaqachon ro\'yxatdan o\'tgan';
-            else if (conflict.pinfl === pinfl) message = 'Bu PINFL raqami allaqachon mavjud';
 
             return res.status(400).json({ message });
         }
@@ -155,6 +166,9 @@ const createUser = async (req, res) => {
             image = `/api/uploads/${req.file.filename}`;
         }
 
+        // Generate unique ID
+        const employeeId = await generateEmployeeId();
+
         const user = await prisma.user.create({
             data: {
                 name,
@@ -165,7 +179,7 @@ const createUser = async (req, res) => {
                 department,
                 position,
                 status,
-                pinfl,
+                employeeId,
                 image
             }
         });
@@ -174,40 +188,12 @@ const createUser = async (req, res) => {
         await prisma.log.create({
             data: {
                 action: 'create_user',
-                details: `Foydalanuvchi yaratildi: ${name} (${username})`,
+                details: `Foydalanuvchi yaratildi: ${name} (ID: ${employeeId})`,
                 userId: req.user.id
             }
         });
 
         res.status(201).json(user);
-
-        // Retroactive Assignment Check
-        // If items were imported with this PINFL but no user existed then, we link them now via a Request.
-        if (pinfl) {
-            const pendingItems = await prisma.item.findMany({
-                where: {
-                    initialPinfl: pinfl,
-                    assignedUserId: null
-                }
-            });
-
-            if (pendingItems.length > 0) {
-                console.log(`Found ${pendingItems.length} items for new user ${name} (${pinfl}). Creating requests...`);
-
-                const requestsData = pendingItems.map(item => ({
-                    type: 'assignment',
-                    status: 'pending_employee', // Direct to employee for approval
-                    itemId: item.id,
-                    requesterId: req.user.id, // Admin who created the user is technically the requester
-                    targetUserId: user.id,
-                    description: "Avvalgi importdan qolgan biriktirilmagan jihoz (PINFL mosligi bo'yicha)"
-                }));
-
-                await prisma.request.createMany({
-                    data: requestsData
-                });
-            }
-        }
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
@@ -228,7 +214,7 @@ const updateUser = async (req, res) => {
             department,
             position,
             status,
-            pinfl
+            status
         };
 
         if (password) {
@@ -293,7 +279,7 @@ const checkAvailability = async (req, res) => {
 
         if (username) where.OR.push({ username });
         if (email) where.OR.push({ email });
-        if (pinfl) where.OR.push({ pinfl });
+        // if (pinfl) where.OR.push({ pinfl });
 
         if (where.OR.length === 0) return res.json({ available: true });
 
@@ -310,7 +296,7 @@ const checkAvailability = async (req, res) => {
             let message = 'Band';
             if (exists.username === username) message = 'Login band';
             if (exists.email === email) message = 'Email band';
-            if (exists.pinfl === pinfl) message = 'PINFL band';
+            // if (exists.pinfl === pinfl) message = 'PINFL band';
 
             return res.json({ available: false, message });
         }

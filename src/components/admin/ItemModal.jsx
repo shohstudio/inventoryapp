@@ -22,10 +22,15 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         assignedPINFL: "",
         images: [],
         pdf: null,
-        inventoryType: 'warehouse'
+        inventoryType: 'warehouse',
+        assignedEmployeeId: "" // Store ID here
     });
 
-    // Custom Input States
+    // User Search State
+    const [userSearchQuery, setUserSearchQuery] = useState("");
+    const [userSearchResults, setUserSearchResults] = useState([]);
+    const [isSearchingUsers, setIsSearchingUsers] = useState(false);
+    const [showUserResults, setShowUserResults] = useState(false);
     const [isCustomCategory, setIsCustomCategory] = useState(false);
     const [isCustomDepartment, setIsCustomDepartment] = useState(false);
 
@@ -83,7 +88,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 status: item.status || "working",
                 assignedTo: item.assignedTo ? item.assignedTo.name : (item.requests?.[0]?.targetUser?.name || item.initialOwner || ""),
                 assignedRole: item.assignedTo ? item.assignedTo.position : (item.requests?.[0]?.targetUser?.position || item.initialRole || ""),
-                assignedPINFL: item.assignedTo ? item.assignedTo.pinfl : (item.requests?.[0]?.targetUser?.pinfl || item.initialPinfl || ""),
+                assignedTo: item.assignedTo ? item.assignedTo.name : (item.requests?.[0]?.targetUser?.name || item.initialOwner || ""),
+                assignedRole: item.assignedTo ? item.assignedTo.position : (item.requests?.[0]?.targetUser?.position || item.initialRole || ""),
+                assignedEmployeeId: item.assignedTo ? item.assignedTo.employeeId : (item.requests?.[0]?.targetUser?.employeeId || item.initialEmployeeId || ""), // Use employeeId
                 images: (() => {
                     let imgs = [];
                     if (item.images) {
@@ -116,7 +123,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                 status: "working",
                 assignedTo: "",
                 assignedRole: roles[4], // Default to "Bo'lim boshlig'i" as it seems most common, or roles[0]
-                assignedPINFL: "",
+                assignedTo: "",
+                assignedRole: roles[4],
+                assignedEmployeeId: "",
                 images: [], // Start empty for new items, or parse initialData if needed
                 pdf: null,
                 inventoryType: initialData?.inventoryType || 'warehouse'
@@ -153,7 +162,10 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         // Assigned Person Mandatory
         if (!formData.assignedTo.trim()) newErrors.assignedTo = "Shu joyni to'ldirish majburiy";
         if (!formData.assignedRole.trim()) newErrors.assignedRole = "Shu joyni to'ldirish majburiy";
-        if (!formData.assignedPINFL.trim()) newErrors.assignedPINFL = "Shu joyni to'ldirish majburiy";
+        // Assigned Person Mandatory
+        if (!formData.assignedTo.trim()) newErrors.assignedTo = "Shu joyni to'ldirish majburiy";
+        if (!formData.assignedRole.trim()) newErrors.assignedRole = "Shu joyni to'ldirish majburiy";
+        // if (!formData.assignedEmployeeId.trim()) newErrors.assignedEmployeeId = "Shu joyni to'ldirish majburiy";
 
         // Image Validation
         if (formData.images.length < 4) {
@@ -468,54 +480,105 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    {/* User Search Logic */}
+                    <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 relative">
                         <h3 className="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                            <RiUserLine /> Javobgar shaxs ma'lumotlari
+                            <RiUserLine /> Javobgar shaxsni biriktirish
                         </h3>
+
+                        <div className="mb-4 relative">
+                            <label className="label">Xodimni qidirish (ID yoki Ism)</label>
+                            <input
+                                type="text"
+                                className="input"
+                                placeholder="Ism yoki ID kiriting..."
+                                value={userSearchQuery}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setUserSearchQuery(val);
+                                    if (val.length > 1) {
+                                        setIsSearchingUsers(true);
+                                        setShowUserResults(true);
+                                        // Simple search debounce could be added here, but direct call for now
+                                        api.get(`/users?search=${val}`).then(({ data }) => {
+                                            setUserSearchResults(data.users || []); // Assuming data.users from pagination response or array
+                                            setIsSearchingUsers(false);
+                                        }).catch(() => setIsSearchingUsers(false));
+                                    } else {
+                                        setUserSearchResults([]);
+                                        setShowUserResults(false);
+                                    }
+                                }}
+                                onFocus={() => userSearchQuery.length > 1 && setShowUserResults(true)}
+                            />
+                            {showUserResults && userSearchResults.length > 0 && (
+                                <div className="absolute z-10 w-full bg-white shadow-xl max-h-60 overflow-y-auto rounded-b-lg border border-gray-200 mt-1">
+                                    {userSearchResults.map(u => (
+                                        <div
+                                            key={u.id}
+                                            className="p-3 hover:bg-indigo-50 cursor-pointer border-b border-gray-100 last:border-0"
+                                            onClick={() => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    assignedTo: u.name,
+                                                    assignedRole: u.position || u.role, // Fallback
+                                                    assignedEmployeeId: u.employeeId
+                                                }));
+                                                setUserSearchQuery("");
+                                                setShowUserResults(false);
+                                            }}
+                                        >
+                                            <div className="font-bold text-gray-800">{u.name}</div>
+                                            <div className="text-xs text-gray-500 flex gap-2">
+                                                <span>ID: {u.employeeId}</span>
+                                                <span>•</span>
+                                                <span>{u.department}</span>
+                                                <span>•</span>
+                                                <span>{u.position}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
                                 <label className="label">F.I.SH <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     name="assignedTo"
-                                    className={`input bg-white ${errors.assignedTo ? 'border-red-500 ring-red-500' : ''}`}
+                                    className={`input bg-gray-100 ${errors.assignedTo ? 'border-red-500 ring-red-500' : ''}`}
                                     value={formData.assignedTo}
-                                    onChange={handleChange}
-                                    placeholder="Ali Valiyev"
+                                    readOnly
+                                    placeholder="Qidiruvdan tanlang"
                                 />
                                 {errors.assignedTo && <span className="text-red-500 text-xs mt-1 block">{errors.assignedTo}</span>}
                             </div>
                             <div>
                                 <label className="label">Lavozimi <span className="text-red-500">*</span></label>
-                                <select
+                                <input
+                                    type="text"
                                     name="assignedRole"
-                                    className={`input bg-white ${errors.assignedRole ? 'border-red-500 ring-red-500' : ''}`}
-                                    value={roles.includes(formData.assignedRole) ? formData.assignedRole : roles[0]}
-                                    onChange={handleChange}
-                                >
-                                    {roles.map(role => (
-                                        <option key={role} value={role}>{role}</option>
-                                    ))}
-                                </select>
+                                    className={`input bg-gray-100 ${errors.assignedRole ? 'border-red-500 ring-red-500' : ''}`}
+                                    value={formData.assignedRole}
+                                    readOnly // Make read only as it comes from user
+                                    placeholder="Avtomatik"
+                                />
                                 {errors.assignedRole && <span className="text-red-500 text-xs mt-1 block">{errors.assignedRole}</span>}
                             </div>
                             <div>
-                                <label className="label">JSHSHIR (PINFL) <span className="text-red-500">*</span></label>
+                                <label className="label">ID Raqami <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
-                                    name="assignedPINFL"
-                                    className={`input bg-white ${errors.assignedPINFL ? 'border-red-500 ring-red-500' : ''}`}
-                                    value={formData.assignedPINFL}
-                                    onChange={(e) => {
-                                        const val = e.target.value.replace(/\D/g, '').slice(0, 14);
-                                        setFormData(prev => ({ ...prev, assignedPINFL: val }));
-                                        if (errors.assignedPINFL) setErrors(prev => ({ ...prev, assignedPINFL: "" }));
-                                    }}
-                                    placeholder="14 xonali raqam"
-                                    minLength={14}
-                                    maxLength={14}
+                                    name="assignedEmployeeId"
+                                    className={`input bg-gray-100 font-bold font-mono ${errors.assignedEmployeeId ? 'border-red-500 ring-red-500' : ''}`}
+                                    value={formData.assignedEmployeeId}
+                                    readOnly
+                                    placeholder="ID"
                                 />
-                                {errors.assignedPINFL && <span className="text-red-500 text-xs mt-1 block">{errors.assignedPINFL}</span>}
+                                {errors.assignedEmployeeId && <span className="text-red-500 text-xs mt-1 block">{errors.assignedEmployeeId}</span>}
                             </div>
                         </div>
                     </div>

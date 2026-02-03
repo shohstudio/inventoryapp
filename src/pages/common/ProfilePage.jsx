@@ -23,7 +23,7 @@ const ProfilePage = () => {
         phone: user?.phone || "+998 90 123 45 67",
         email: user?.email || "user@inv.uz",
         role: user?.role === 'admin' ? "Administrator" : "Xodim",
-        pinfl: user?.pinfl || "",
+        employeeId: user?.employeeId || "ID-XXXXXX",
         department: user?.department || ""
     });
 
@@ -214,18 +214,18 @@ const ProfilePage = () => {
                                 </div>
 
                                 <div>
-                                    <label className="label">JSHSHIR (PINFL)</label>
+                                    <label className="label">ID Raqami</label>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                                             <RiShieldKeyholeLine size={18} />
                                         </span>
                                         <input
                                             type="text"
-                                            name="pinfl"
-                                            value={profile.pinfl}
+                                            name="employeeId"
+                                            value={profile.employeeId}
                                             disabled={true}
                                             className="input pl-10 bg-gray-50 cursor-not-allowed text-gray-500 font-mono"
-                                            placeholder="Kiritilmagan"
+                                            placeholder="ID-XXXXXX"
                                         />
                                     </div>
                                 </div>

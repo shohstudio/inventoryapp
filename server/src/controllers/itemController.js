@@ -109,7 +109,7 @@ const getItems = async (req, res) => {
                 take,
                 include: {
                     assignedTo: {
-                        select: { name: true, pinfl: true, position: true }
+                        select: { name: true, employeeId: true, position: true }
                     },
                     requests: {
                         where: {
@@ -118,7 +118,7 @@ const getItems = async (req, res) => {
                         select: {
                             id: true,
                             status: true,
-                            targetUser: { select: { name: true, pinfl: true, position: true } }
+                            targetUser: { select: { name: true, employeeId: true, position: true } }
                         }
                     }
                 },
@@ -187,7 +187,7 @@ const createItem = async (req, res) => {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId,
-            assignedPINFL, assignedTo, assignedRole // Extract new fields
+            assignedEmployeeId, assignedTo, assignedRole // Extract new fields
         } = req.body;
 
         // MULTI-IMAGE & PDF HANDLING
@@ -212,12 +212,12 @@ const createItem = async (req, res) => {
         }
         // Legacy single file fallback (removed mostly, but safe to keep check if needed, but Multer usually arrays now)
 
-        // Check if User exists by PINFL or assignedUserId
+        // Check if User exists by Employee ID or assignedUserId
         let targetUser = null;
         if (assignedUserId) {
             targetUser = await prisma.user.findUnique({ where: { id: parseInt(assignedUserId) } });
-        } else if (assignedPINFL) {
-            targetUser = await prisma.user.findFirst({ where: { pinfl: assignedPINFL } });
+        } else if (assignedEmployeeId) {
+            targetUser = await prisma.user.findUnique({ where: { employeeId: assignedEmployeeId } });
         }
 
         const itemData = {
@@ -245,7 +245,7 @@ const createItem = async (req, res) => {
             assignedUserId: null,
             assignedDate: null,
             // Save initial info if user not found (for future linking)
-            initialPinfl: !targetUser && assignedPINFL ? assignedPINFL : null,
+            initialEmployeeId: !targetUser && assignedEmployeeId ? assignedEmployeeId : null,
             initialOwner: !targetUser && assignedTo ? assignedTo : null,
             initialRole: !targetUser && assignedRole ? assignedRole : null
         };
@@ -273,7 +273,8 @@ const createItem = async (req, res) => {
                     itemId: item.id,
                     requesterId: req.user.id,
                     targetUserId: targetUser.id,
-                    description: `Yangi jihoz yaratildi va biriktirildi. (PINFL: ${targetUser.pinfl})`
+                    targetUserId: targetUser.id,
+                    description: `Yangi jihoz yaratildi va biriktirildi. (ID: ${targetUser.employeeId})`
                 }
             });
             // We can return a specific message saying request created
@@ -298,7 +299,7 @@ const updateItem = async (req, res) => {
         const {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
-            building, location, department, assignedUserId, assignedPINFL, assignedRole, assignedTo,
+            building, location, department, assignedUserId, assignedEmployeeId, assignedRole, assignedTo,
             existingImages, // JSON string or array of strings of OLD images to keep
             initialOwner, initialRole, assignedDate, handoverQuantity, // Extract Handover fields directly
             inventoryType // Allow updating inventory type
@@ -379,10 +380,10 @@ const updateItem = async (req, res) => {
             }
         }
 
-        // Handle Assignment Logic by PINFL or ID
-        if (assignedPINFL) {
-            // Check if user exists with this PINFL
-            const targetUser = await prisma.user.findFirst({ where: { pinfl: assignedPINFL } });
+        // Handle Assignment Logic by Employee ID or ID
+        if (assignedEmployeeId) {
+            // Check if user exists with this Employee ID
+            const targetUser = await prisma.user.findUnique({ where: { employeeId: assignedEmployeeId } });
 
             if (targetUser) {
                 // User found -> Reassign
@@ -402,14 +403,15 @@ const updateItem = async (req, res) => {
                 }
             } else {
                 // User NOT found -> Unassign from current user (if any) and store PINFL/Role/Name
+                // User NOT found -> Unassign from current user (if any) and store ID/Role/Name
                 dataToUpdate.assignedUserId = null;
                 dataToUpdate.assignedDate = null;
-                dataToUpdate.initialPinfl = assignedPINFL;
+                dataToUpdate.initialEmployeeId = assignedEmployeeId;
                 dataToUpdate.initialOwner = assignedTo; // Save Name
                 dataToUpdate.initialRole = assignedRole; // Save Role
             }
         } else if (assignedUserId !== undefined) {
-            // Fallback to explicit ID assignment logic if PINFL not provided/priority
+            // Fallback to explicit ID assignment logic if Employee ID not provided/priority
             if (assignedUserId === 'null' || assignedUserId === null || assignedUserId === "") {
                 dataToUpdate.assignedUserId = null;
                 dataToUpdate.assignedDate = null;
@@ -576,8 +578,8 @@ const importItems = async (req, res) => {
         const sheet = workbook.Sheets[sheetName];
         const data = xlsx.utils.sheet_to_json(sheet);
 
-        // 1. Gather all PINFLs from the file to fetch users efficiently
-        const pinflsFromFile = new Set();
+        // 1. Gather all Employee IDs from the file to fetch users efficiently
+        const employeeIdsFromFile = new Set();
         data.forEach(row => {
             // Helper to get value case-insensitively
             const getVal = (keys) => {
@@ -586,22 +588,22 @@ const importItems = async (req, res) => {
                 }
                 return null;
             };
-            // Assume PINFL is in 'JSHSHIR' or 'PINFL' column
-            const pinfl = getVal(['JSHSHIR', 'PINFL', 'pinfl', 'jshshir']);
-            if (pinfl) pinflsFromFile.add(String(pinfl).replace(/\D/g, ''));
+            // Assume Employee ID is in 'Employee ID', 'ID', 'Tabel' column
+            const empId = getVal(['Employee ID', 'EmployeeID', 'ID', 'id', 'Tabel', 'tabel']);
+            if (empId) employeeIdsFromFile.add(String(empId).trim());
         });
 
-        // 2. Fetch existing users with these PINFLs
+        // 2. Fetch existing users with these IDs
         const existingUsers = await prisma.user.findMany({
             where: {
-                pinfl: { in: Array.from(pinflsFromFile) }
+                employeeId: { in: Array.from(employeeIdsFromFile) }
             },
-            select: { id: true, pinfl: true, name: true }
+            select: { id: true, employeeId: true, name: true }
         });
 
-        const userMap = new Map(); // pinfl -> userObject
+        const userMap = new Map(); // employeeId -> userObject
         existingUsers.forEach(u => {
-            if (u.pinfl) userMap.set(u.pinfl, u);
+            if (u.employeeId) userMap.set(u.employeeId, u);
         });
 
         const itemsToCreate = [];
@@ -625,23 +627,23 @@ const importItems = async (req, res) => {
             else if (s.includes('buzilgan') || s.includes('broken')) status = 'broken';
 
             // Get Owner Info
-            const pinflRaw = getVal(['JSHSHIR', 'PINFL', 'pinfl', 'jshshir']);
-            const pinfl = pinflRaw ? String(pinflRaw).replace(/\D/g, '') : null;
+            const empIdRaw = getVal(['Employee ID', 'EmployeeID', 'ID', 'id', 'Tabel', 'tabel']);
+            const empId = empIdRaw ? String(empIdRaw).trim() : null;
             const ownerName = getVal(['Ega', 'Owner', 'F.I.SH', 'FIO', 'fullname']) || getVal(['Mas\'ul', 'Responsible']);
 
             let assignedUserId = null;
             let assignedDate = null;
             let initialOwner = null;
-            let initialPinfl = null;
+            let initialEmployeeId = null;
 
-            if (pinfl && userMap.has(pinfl)) {
+            if (empId && userMap.has(empId)) {
                 // User found! Assign item.
-                assignedUserId = userMap.get(pinfl).id;
+                assignedUserId = userMap.get(empId).id;
                 assignedDate = new Date();
             } else {
                 // User NOT found
                 if (ownerName) initialOwner = String(ownerName);
-                if (pinfl) initialPinfl = String(pinfl);
+                if (empId) initialEmployeeId = String(empId);
             }
 
             itemsToCreate.push({
@@ -662,7 +664,7 @@ const importItems = async (req, res) => {
                 assignedUserId,
                 assignedDate,
                 initialOwner,
-                initialPinfl
+                initialEmployeeId
             });
         }
 

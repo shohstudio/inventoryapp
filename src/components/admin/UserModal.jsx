@@ -11,7 +11,7 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
         department: "",
         position: "",
         status: "active",
-        pinfl: "",
+        employeeId: "",
         password: ""
     });
     const [imageFile, setImageFile] = useState(null);
@@ -47,8 +47,9 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 role: "employee",
                 department: "",
                 position: "",
+                position: "",
                 status: "active",
-                pinfl: "",
+                employeeId: "",
                 password: ""
             });
             setImagePreview(null);
@@ -327,25 +328,15 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                     </div>
 
                     <div>
-                        <div>
-                            <label className="label">JSHSHIR (PINFL) <span className="text-gray-400 text-xs">(Ixtiyoriy)</span></label>
-                            <input
-                                type="text"
-                                name="pinfl"
-                                className={`input ${errors.pinfl ? 'border-red-500 focus:ring-red-200' : ''}`}
-                                value={formData.pinfl}
-                                onChange={(e) => {
-                                    const val = e.target.value.replace(/\D/g, '').slice(0, 14);
-                                    setFormData(prev => ({ ...prev, pinfl: val }));
-                                    if (errors.pinfl) setErrors(prev => ({ ...prev, pinfl: null }));
-                                }}
-                                onBlur={(e) => validateField('pinfl', e.target.value)}
-                                placeholder="14 xonali raqam"
-                                maxLength={14}
-                            />
-                            {/* Errors hidden since optional */}
-                        </div>
-                        {errors.pinfl && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.pinfl}</p>}
+                        <label className="label">ID Raqami <span className="text-gray-400 text-xs">(Avtomatik beriladi)</span></label>
+                        <input
+                            type="text"
+                            name="employeeId"
+                            className="input bg-gray-50 text-gray-500 font-mono tracking-wider font-bold"
+                            value={formData.employeeId || "NEW-ID"}
+                            disabled={true}
+                            placeholder="Avtomatik"
+                        />
                     </div>
 
                     {/* Assigned Items Section - Only visible in Edit Mode */}
