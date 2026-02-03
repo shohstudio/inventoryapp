@@ -332,7 +332,7 @@ const InventoryPage = () => {
                         {filters.status === 'repair' ? t('repair_subtitle') : t('inventory_subtitle')}
                     </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                     {['admin', 'accounter', 'warehouseman'].includes(user?.role) && (
                         <>
                             {selectedIds.length > 0 && (
@@ -384,7 +384,7 @@ const InventoryPage = () => {
                 </div>
             </div>
 
-            <div className="card border-0 shadow-lg shadow-gray-100/50">
+            <div className="card bg-white p-4 rounded-xl border-0 shadow-lg shadow-gray-100/50">
                 {/* Search & Filter Controls */}
                 <div className="flex flex-col gap-4 mb-6">
                     <div className="flex flex-col sm:flex-row gap-4">
