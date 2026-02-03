@@ -501,7 +501,8 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                         setShowUserResults(true);
                                         // Simple search debounce could be added here, but direct call for now
                                         api.get(`/users?search=${val}`).then(({ data }) => {
-                                            setUserSearchResults(data.users || []); // Assuming data.users from pagination response or array
+                                            const users = Array.isArray(data) ? data : (data.users || []);
+                                            setUserSearchResults(users);
                                             setIsSearchingUsers(false);
                                         }).catch(() => setIsSearchingUsers(false));
                                     } else {
