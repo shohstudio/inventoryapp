@@ -25,7 +25,7 @@ const AdminLayout = () => {
 
             <main className="md:pl-64 pt-16 min-h-screen transition-all duration-300">
                 <GlobalAlert />
-                <div className="container mx-auto p-4 md:p-6 max-w-7xl animate-fade-in">
+                <div className="w-full px-4 md:px-6 animate-fade-in">
                     <Outlet />
                 </div>
             </main>
