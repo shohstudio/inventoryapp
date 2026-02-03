@@ -543,7 +543,7 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                         </div>
 
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="label">F.I.SH <span className="text-red-500">*</span></label>
                                 <input
@@ -567,48 +567,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                     placeholder="Avtomatik"
                                 />
                                 {errors.assignedRole && <span className="text-red-500 text-xs mt-1 block">{errors.assignedRole}</span>}
-                            </div>
-                            <div>
-                                <label className="label">ID Raqami <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    name="assignedEmployeeId"
-                                    className={`input bg-white font-bold font-mono ${errors.assignedEmployeeId ? 'border-red-500 ring-red-500' : ''}`}
-                                    value={formData.assignedEmployeeId}
-                                    onChange={(e) => {
-                                        const val = e.target.value.replace(/\D/g, '').slice(0, 5); // Max 5 digits
-                                        setFormData(prev => ({ ...prev, assignedEmployeeId: val }));
-
-                                        // Auto-search if 5 digits
-                                        if (val.length === 5) {
-                                            api.get(`/users?search=${val}`).then(({ data }) => {
-                                                // Handle both array (no pagination) and object (pagination) responses
-                                                const users = Array.isArray(data) ? data : (data.users || []);
-
-                                                const match = users.find(u => u.employeeId === val);
-                                                if (match) {
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        assignedTo: match.name,
-                                                        assignedRole: match.position || match.role,
-                                                        assignedEmployeeId: match.employeeId
-                                                    }));
-                                                    toast.success("Xodim topildi: " + match.name);
-                                                } else {
-                                                    toast.error("Xodim topilmadi");
-                                                    // Clear fields if not found? Maybe better to keep ID but clear others.
-                                                    setFormData(prev => ({
-                                                        ...prev,
-                                                        assignedTo: "",
-                                                        assignedRole: ""
-                                                    }));
-                                                }
-                                            }).catch(() => toast.error("Qidirishda xatolik"));
-                                        }
-                                    }}
-                                    placeholder="ID"
-                                />
-                                {errors.assignedEmployeeId && <span className="text-red-500 text-xs mt-1 block">{errors.assignedEmployeeId}</span>}
                             </div>
                         </div>
                     </div>
