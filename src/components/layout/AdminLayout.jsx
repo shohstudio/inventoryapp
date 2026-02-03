@@ -11,15 +11,12 @@ const AdminLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [showQRScanner, setShowQRScanner] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation();
 
     const handleScanSuccess = (decodedText) => {
         setShowQRScanner(false);
         // Navigate to inventory page with the scanned code
         navigate("/admin/inventory", { state: { scanCode: decodedText } });
     };
-
-    const isFullWidth = location.pathname.includes('/tmj');
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-slate-900 pb-24 md:pb-0">
@@ -28,7 +25,7 @@ const AdminLayout = () => {
 
             <main className="md:pl-64 pt-16 min-h-screen transition-all duration-300">
                 <GlobalAlert />
-                <div className={`container mx-auto px-4 md:px-6 animate-fade-in ${isFullWidth ? 'max-w-full' : 'max-w-7xl'}`}>
+                <div className="w-full px-4 md:px-6 animate-fade-in">
                     <Outlet />
                 </div>
             </main>
