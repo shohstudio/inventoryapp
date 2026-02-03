@@ -27,8 +27,9 @@ const getUsers = async (req, res) => {
         if (search) {
             where.OR = [
                 { name: { contains: search } },
+                { name: { contains: search } },
                 { username: { contains: search } },
-                { pinfl: { contains: search } }
+                { employeeId: { contains: search } }
             ];
         }
         if (role) {
@@ -47,7 +48,7 @@ const getUsers = async (req, res) => {
                     department: true,
                     position: true,
                     status: true,
-                    pinfl: true,
+                    employeeId: true,
                     image: true,
                     phone: true,
                     createdAt: true,
@@ -96,7 +97,7 @@ const getUserById = async (req, res) => {
                 department: true,
                 position: true,
                 status: true,
-                pinfl: true,
+                employeeId: true,
                 image: true,
                 phone: true,
                 items: true
