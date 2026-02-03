@@ -582,7 +582,9 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                         // Auto-search if 5 digits
                                         if (val.length === 5) {
                                             api.get(`/users?search=${val}`).then(({ data }) => {
-                                                const users = data.users || [];
+                                                // Handle both array (no pagination) and object (pagination) responses
+                                                const users = Array.isArray(data) ? data : (data.users || []);
+
                                                 const match = users.find(u => u.employeeId === val);
                                                 if (match) {
                                                     setFormData(prev => ({
