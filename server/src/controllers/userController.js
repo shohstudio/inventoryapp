@@ -122,14 +122,19 @@ const createUser = async (req, res) => {
 
     try {
         // Check for existing user by username, email, OR pinfl
+        const whereClause = {
+            OR: [
+                { username: username },
+                { email: email || undefined }
+            ]
+        };
+
+        if (pinfl) {
+            whereClause.OR.push({ pinfl: pinfl });
+        }
+
         const existingUsers = await prisma.user.findMany({
-            where: {
-                OR: [
-                    { username: username },
-                    { email: email || undefined }, // undefined to skip if email is null 
-                    { pinfl: pinfl || undefined }
-                ]
-            }
+            where: whereClause
         });
 
         if (existingUsers.length > 0) {

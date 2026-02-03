@@ -21,7 +21,7 @@ model User {
   department String?
   position  String?  // Lavozimi (e.g. Director, Accountant)
   status    String   @default("active") // active, inactive
-  pinfl     String?  @unique // JSHSHIR (14 digits)
+  pinfl     String? // JSHSHIR (14 digits) - Optional, no longer unique required
   image     String?  // Profile picture URL
   phone     String?  // Phone number
 

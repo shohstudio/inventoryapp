@@ -80,7 +80,8 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
 
         if (!formData.department.trim()) newErrors.department = "Bo'lim kiritish majburiy";
         if (!formData.position?.trim()) newErrors.position = "Lavozim kiritish majburiy";
-        if (!formData.pinfl.trim()) newErrors.pinfl = "PINFL kiritish majburiy";
+        // if (!formData.pinfl.trim()) newErrors.pinfl = "PINFL kiritish majburiy"; 
+
 
         // Image mandatory for new users
         if (!user && !imageFile) {
@@ -326,23 +327,24 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                     </div>
 
                     <div>
-                        <label className="label">JSHSHIR (PINFL) <span className="text-red-500">*</span></label>
-                        <input
-                            type="text"
-                            name="pinfl"
-                            className={`input ${errors.pinfl ? 'border-red-500 focus:ring-red-200' : ''}`}
-                            value={formData.pinfl}
-                            onChange={(e) => {
-                                const val = e.target.value.replace(/\D/g, '').slice(0, 14);
-                                setFormData(prev => ({ ...prev, pinfl: val }));
-                                if (errors.pinfl) setErrors(prev => ({ ...prev, pinfl: null }));
-                            }}
-                            onBlur={(e) => validateField('pinfl', e.target.value)}
-                            placeholder="14 xonali raqam"
-                            minLength={14}
-                            maxLength={14}
-                        />
-                        {errors.pinfl && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.pinfl}</p>}
+                        <div>
+                            <label className="label">JSHSHIR (PINFL) <span className="text-gray-400 text-xs">(Ixtiyoriy)</span></label>
+                            <input
+                                type="text"
+                                name="pinfl"
+                                className={`input ${errors.pinfl ? 'border-red-500 focus:ring-red-200' : ''}`}
+                                value={formData.pinfl}
+                                onChange={(e) => {
+                                    const val = e.target.value.replace(/\D/g, '').slice(0, 14);
+                                    setFormData(prev => ({ ...prev, pinfl: val }));
+                                    if (errors.pinfl) setErrors(prev => ({ ...prev, pinfl: null }));
+                                }}
+                                onBlur={(e) => validateField('pinfl', e.target.value)}
+                                placeholder="14 xonali raqam"
+                                maxLength={14}
+                            />
+                            {/* Errors hidden since optional */}
+                        </div>
                         {errors.pinfl && <p className="text-xs text-red-500 mt-1 flex items-center gap-1"><RiErrorWarningLine /> {errors.pinfl}</p>}
                     </div>
 
