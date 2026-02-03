@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiFilePdfLine, RiUserLine } from "react-icons/ri";
-import { BASE_URL, getImageUrl } from "../../api/axios";
+import { toast } from "react-hot-toast";
+import api, { BASE_URL, getImageUrl } from "../../api/axios";
 
 const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const [formData, setFormData] = useState({
