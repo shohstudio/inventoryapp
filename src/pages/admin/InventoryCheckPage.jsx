@@ -19,8 +19,8 @@ const InventoryCheckPage = () => {
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">{t('scan_title')}</h1>
-                    <p className="text-gray-500 mt-1">{t('scan_subtitle')}</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('scan_title')}</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">{t('scan_subtitle')}</p>
                 </div>
             </div>
 
@@ -40,39 +40,39 @@ const InventoryCheckPage = () => {
 
                 {/* Updates/Stats Section (Placeholder for now) */}
                 <div className="space-y-6">
-                    <div className="card bg-white border border-indigo-100 p-6">
-                        <h3 className="flex items-center gap-2 font-bold text-gray-900 mb-4">
+                    <div className="card bg-white dark:bg-slate-800 border border-indigo-100 dark:border-slate-700 p-6 shadow-sm">
+                        <h3 className="flex items-center gap-2 font-bold text-gray-900 dark:text-white mb-4">
                             <RiCheckDoubleLine className="text-green-500" size={24} />
                             {t('instructions_title')}
                         </h3>
-                        <ul className="space-y-3 text-gray-600 text-sm">
+                        <ul className="space-y-3 text-gray-600 dark:text-gray-300 text-sm">
                             <li className="flex gap-3">
-                                <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">1</span>
+                                <span className="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs ring-1 ring-indigo-100 dark:ring-indigo-800">1</span>
                                 {t('instruction_1')}
                             </li>
                             <li className="flex gap-3">
-                                <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">2</span>
+                                <span className="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs ring-1 ring-indigo-100 dark:ring-indigo-800">2</span>
                                 {t('instruction_2')}
                             </li>
                             <li className="flex gap-3">
-                                <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">3</span>
+                                <span className="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs ring-1 ring-indigo-100 dark:ring-indigo-800">3</span>
                                 {t('instruction_3')}
                             </li>
                             <li className="flex gap-3">
-                                <span className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">4</span>
+                                <span className="w-6 h-6 rounded-full bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs ring-1 ring-indigo-100 dark:ring-indigo-800">4</span>
                                 {t('instruction_4')}
                             </li>
                         </ul>
                     </div>
 
-                    <div className="card bg-blue-50 border border-blue-100 p-6">
+                    <div className="card bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 p-6 shadow-sm">
                         <div className="flex items-start gap-4">
-                            <div className="p-3 bg-blue-100 text-blue-600 rounded-lg">
+                            <div className="p-3 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-lg">
                                 <RiFileList3Line size={24} />
                             </div>
                             <div>
-                                <h4 className="font-bold text-blue-900">{t('note_title')}</h4>
-                                <p className="text-sm text-blue-700 mt-1">
+                                <h4 className="font-bold text-blue-900 dark:text-blue-100">{t('note_title')}</h4>
+                                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                                     {t('note_desc')}
                                 </p>
                             </div>

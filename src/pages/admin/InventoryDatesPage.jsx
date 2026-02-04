@@ -44,37 +44,37 @@ const InventoryDatesPage = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
+                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
                     {t('inventory_dates')}
                 </h1>
             </div>
 
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 p-8 max-w-2xl">
+            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 p-8 max-w-2xl">
                 <div className="flex items-start gap-6">
-                    <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 flex-shrink-0">
                         <RiCalendarLine size={24} />
                     </div>
                     <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">{t('inventory_dates_title')}</h3>
-                        <p className="text-gray-500 text-sm mb-6">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t('inventory_dates_title')}</h3>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
                             {t('inventory_dates_desc')}
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('start_date')}</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('start_date')}</label>
                                 <input
                                     type="date"
-                                    className="input w-full"
+                                    className="input w-full dark:bg-slate-900 dark:border-slate-700 dark:text-white"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">{t('end_date')}</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('end_date')}</label>
                                 <input
                                     type="date"
-                                    className="input w-full"
+                                    className="input w-full dark:bg-slate-900 dark:border-slate-700 dark:text-white"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
                                 />

@@ -36,7 +36,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             <button
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
                 <RiArrowLeftSLine size={20} />
             </button>
@@ -47,10 +47,10 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
                     onClick={() => typeof page === 'number' && onPageChange(page)}
                     disabled={page === '...'}
                     className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${page === currentPage
-                            ? 'bg-blue-600 text-white'
-                            : page === '...'
-                                ? 'text-gray-400 cursor-default'
-                                : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                        ? 'bg-blue-600 text-white'
+                        : page === '...'
+                            ? 'text-gray-400 dark:text-slate-600 cursor-default'
+                            : 'border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800'
                         }`}
                 >
                     {page}
@@ -60,7 +60,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
             <button
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
                 <RiArrowRightSLine size={20} />
             </button>

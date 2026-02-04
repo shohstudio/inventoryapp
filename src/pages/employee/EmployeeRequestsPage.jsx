@@ -7,16 +7,16 @@ import { RiFileList3Line, RiCheckDoubleLine, RiCloseCircleLine, RiTimeLine, RiUs
 import ConfirmationModal from "../../components/common/ConfirmationModal";
 
 const UserAvatar = ({ user, size = "w-8 h-8" }) => {
-    if (!user) return <div className={`${size} rounded-full bg-gray-50 flex items-center justify-center text-gray-300 border border-dashed border-gray-200`}><RiUser3Line size={14} /></div>;
+    if (!user) return <div className={`${size} rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-300 dark:text-gray-600 border border-dashed border-gray-200 dark:border-slate-700`}><RiUser3Line size={14} /></div>;
 
     const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
 
     return (
-        <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
+        <div className={`${size} rounded-full overflow-hidden bg-white dark:bg-slate-800 flex items-center justify-center border border-gray-100 dark:border-slate-700 flex-shrink-0 shadow-sm ring-2 ring-white dark:ring-slate-900`}>
             {imageUrl ? (
                 <img src={imageUrl} alt={user.name} className="w-full h-full object-cover" />
             ) : (
-                <div className="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+                <div className="w-full h-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-400 dark:text-indigo-300">
                     <RiUser3Line size={14} />
                 </div>
             )}
@@ -103,36 +103,36 @@ const EmployeeRequestsPage = () => {
             isOpen: true,
             title: "Qabul qilasizmi?",
             message: (
-                <div className="space-y-3">
-                    <p className="text-gray-600">Siz ushbu jihozni o'z nomingizga qabul qilmoqchisiz:</p>
+                <div className="space-y-3 text-gray-600 dark:text-gray-300">
+                    <p>Siz ushbu jihozni o'z nomingizga qabul qilmoqchisiz:</p>
                     {req && (
-                        <div className="bg-blue-50 p-3 rounded-lg text-sm border border-blue-100">
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm border border-blue-100 dark:border-blue-800/50">
                             <div className="flex justify-between mb-1">
-                                <span className="text-gray-500">Jihoz:</span>
-                                <span className="font-medium text-gray-900">{req.item?.name}</span>
+                                <span className="text-gray-500 dark:text-gray-400">Jihoz:</span>
+                                <span className="font-medium text-gray-900 dark:text-white">{req.item?.name}</span>
                             </div>
                             <div className="flex justify-between mb-1">
-                                <span className="text-gray-500">Model:</span>
-                                <span className="font-medium text-gray-900">{req.item?.model || '-'}</span>
+                                <span className="text-gray-500 dark:text-gray-400">Model:</span>
+                                <span className="font-medium text-gray-900 dark:text-white">{req.item?.model || '-'}</span>
                             </div>
                             <div className="flex justify-between mb-1">
-                                <span className="text-gray-500">Seriya:</span>
-                                <span className="font-mono text-gray-900">{req.item?.serialNumber || '-'}</span>
+                                <span className="text-gray-500 dark:text-gray-400">Seriya:</span>
+                                <span className="font-mono text-gray-900 dark:text-white">{req.item?.serialNumber || '-'}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-gray-500">Kimdan:</span>
-                                <span className="font-medium text-gray-900">{req.requester?.name || "Admin"}</span>
+                                <span className="text-gray-500 dark:text-gray-400">Kimdan:</span>
+                                <span className="font-medium text-gray-900 dark:text-white">{req.requester?.name || "Admin"}</span>
                             </div>
                             {req.accountantDocument && (
-                                <div className="mt-3 pt-2 border-t border-blue-200 flex justify-between items-center">
-                                    <span className="text-gray-500 text-xs flex items-center gap-1">
+                                <div className="mt-3 pt-2 border-t border-blue-200 dark:border-blue-800 flex justify-between items-center">
+                                    <span className="text-gray-500 dark:text-gray-400 text-xs flex items-center gap-1">
                                         <RiFileList3Line /> Asos hujjat:
                                     </span>
                                     <a
                                         href={getImageUrl(req.accountantDocument)}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-blue-600 hover:text-blue-800 text-xs font-medium underline"
+                                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-xs font-medium underline"
                                     >
                                         Ko'rish (PDF)
                                     </a>
@@ -140,7 +140,7 @@ const EmployeeRequestsPage = () => {
                             )}
                         </div>
                     )}
-                    <p className="text-xs text-gray-400">Tasdiqlash orqali siz jihoz uchun javobgarlikni o'z zimmangizga olasiz.</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 italic">Tasdiqlash orqali siz jihoz uchun javobgarlikni o'z zimmangizga olasiz.</p>
                 </div>
             ),
             onConfirm: () => processAction(id, 'completed'),
@@ -182,18 +182,18 @@ const EmployeeRequestsPage = () => {
     return (
         <div className="animate-in fade-in zoom-in duration-300 relative">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 flex items-center gap-2">
-                    <RiFileList3Line className="text-indigo-600" />
+                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 flex items-center gap-2">
+                    <RiFileList3Line className="text-indigo-600 dark:text-indigo-400" />
                     Menga kelgan so'rovlar
                 </h1>
-                <p className="text-gray-500">Jihozlarni qabul qilish yoki rad etish</p>
+                <p className="text-gray-500 dark:text-gray-400">Jihozlarni qabul qilish yoki rad etish</p>
             </div>
 
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-800 text-white">
+                            <tr className="bg-slate-800 dark:bg-indigo-600 text-white">
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Sana</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Jihoz</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Kimdan</th>
@@ -201,7 +201,7 @@ const EmployeeRequestsPage = () => {
                                 <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                             {requests.length === 0 ? (
                                 <tr>
                                     <td colSpan="5" className="text-center py-10 text-gray-500">
@@ -213,20 +213,20 @@ const EmployeeRequestsPage = () => {
                                 </tr>
                             ) : (
                                 requests.map(req => (
-                                    <tr key={req.id} className="hover:bg-gray-50/80 transition-colors">
-                                        <td className="py-4 px-6 text-gray-600 text-sm">
+                                    <tr key={req.id} className="hover:bg-gray-50/80 dark:hover:bg-slate-700/50 transition-colors">
+                                        <td className="py-4 px-6 text-gray-600 dark:text-gray-400 text-sm">
                                             {new Date(req.createdAt).toLocaleString('uz-UZ')}
                                         </td>
                                         <td className="py-4 px-6">
-                                            <div className="font-medium text-gray-900">{req.item?.name}</div>
-                                            <div className="text-xs text-gray-400 font-mono">{req.item?.serialNumber}</div>
+                                            <div className="font-medium text-gray-900 dark:text-gray-100">{req.item?.name}</div>
+                                            <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">{req.item?.serialNumber}</div>
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 text-sm">
                                             <div className="flex items-center gap-2">
                                                 <UserAvatar user={req.requester} />
                                                 <div>
-                                                    <div className="font-medium text-gray-900">{req.requester?.name || "Admin"}</div>
-                                                    <div className="text-xs text-gray-400">({req.requester?.role})</div>
+                                                    <div className="font-medium text-gray-900 dark:text-gray-100">{req.requester?.name || "Admin"}</div>
+                                                    <div className="text-xs text-gray-400 dark:text-gray-500">({req.requester?.role})</div>
                                                 </div>
                                             </div>
                                         </td>
@@ -249,7 +249,7 @@ const EmployeeRequestsPage = () => {
                                                 <div className="flex justify-end gap-2">
                                                     <button
                                                         onClick={() => handleAction(req.id, 'rejected')}
-                                                        className="btn btn-sm bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                                                        className="btn btn-sm bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 border-red-200 dark:border-red-800"
                                                         disabled={isProcessing}
                                                     >
                                                         <RiCloseCircleLine /> Rad etish
@@ -276,12 +276,12 @@ const EmployeeRequestsPage = () => {
 
             {/* Rejection Modal */}
             {rejectionModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-in fade-in duration-200">
-                    <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md mx-4">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">Rad etish sababi</h3>
-                        <p className="text-sm text-gray-500 mb-2">Nega bu so'rovni rad etyapsiz? Izoh qoldirish majburiy.</p>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-md mx-4 border border-transparent dark:border-slate-700">
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Rad etish sababi</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Nega bu so'rovni rad etyapsiz? Izoh qoldirish majburiy.</p>
                         <textarea
-                            className="w-full h-32 p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all resize-none text-sm"
+                            className="w-full h-32 p-3 border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all resize-none text-sm dark:bg-slate-900 dark:text-white"
                             placeholder="Masalan: Jihoz menga tegishli emas..."
                             value={rejectionReason}
                             onChange={(e) => setRejectionReason(e.target.value)}
@@ -290,7 +290,7 @@ const EmployeeRequestsPage = () => {
                         <div className="flex justify-end gap-3 mt-4">
                             <button
                                 onClick={() => setRejectionModalOpen(false)}
-                                className="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors font-medium text-sm"
+                                className="px-4 py-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors font-medium text-sm"
                             >
                                 Bekor qilish
                             </button>

@@ -5,16 +5,16 @@ import { toast } from 'react-hot-toast';
 import { RiLogoutBoxRLine, RiAddLine, RiTimeLine, RiCheckLine, RiTruckLine, RiFileList3Line, RiQrCodeLine, RiSearchLine, RiUser3Line } from 'react-icons/ri';
 
 const UserAvatar = ({ user, size = "w-8 h-8" }) => {
-    if (!user) return <div className={`${size} rounded-full bg-gray-50 flex items-center justify-center text-gray-300 border border-dashed border-gray-200`}><RiUser3Line size={14} /></div>;
+    if (!user) return <div className={`${size} rounded-full bg-gray-50 dark:bg-slate-800 flex items-center justify-center text-gray-300 dark:text-gray-600 border border-dashed border-gray-200 dark:border-slate-700`}><RiUser3Line size={14} /></div>;
 
     const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
 
     return (
-        <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
+        <div className={`${size} rounded-full overflow-hidden bg-white dark:bg-slate-800 flex items-center justify-center border border-gray-100 dark:border-slate-700 flex-shrink-0 shadow-sm ring-2 ring-white dark:ring-slate-900`}>
             {imageUrl ? (
                 <img src={imageUrl} alt={user.name} className="w-full h-full object-cover" />
             ) : (
-                <div className="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+                <div className="w-full h-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-400 dark:text-indigo-300">
                     <RiUser3Line size={14} />
                 </div>
             )}
@@ -184,19 +184,19 @@ const GuardDashboard = () => {
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800">Qoravul Paneli (Guard Dashboard)</h1>
+            <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-white">Qoravul Paneli (Guard Dashboard)</h1>
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b pb-2">
+            <div className="flex gap-4 mb-6 border-b border-gray-100 dark:border-slate-700 pb-2">
                 <button
                     onClick={() => setActiveTab('exit_requests')}
-                    className={`pb-2 px-4 font-medium ${activeTab === 'exit_requests' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`pb-2 px-4 font-medium transition-colors ${activeTab === 'exit_requests' ? 'border-b-2 border-blue-600 dark:border-indigo-400 text-blue-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                 >
                     <RiLogoutBoxRLine className="inline mr-2" /> Chiqish So'rovlari
                 </button>
                 <button
                     onClick={() => setActiveTab('external_items')}
-                    className={`pb-2 px-4 font-medium ${activeTab === 'external_items' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`pb-2 px-4 font-medium transition-colors ${activeTab === 'external_items' ? 'border-b-2 border-blue-600 dark:border-indigo-400 text-blue-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                 >
                     <RiTruckLine className="inline mr-2" /> Tashqi Buyumlar
                 </button>
@@ -214,10 +214,10 @@ const GuardDashboard = () => {
                         </button>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-slate-700">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
-                                <tr>
+                            <thead className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase">
+                                <tr className="border-b border-gray-100 dark:border-slate-700">
                                     <th className="p-4">Sana</th>
                                     <th className="p-4">Xodim</th>
                                     <th className="p-4">Jihoz</th>
@@ -225,28 +225,28 @@ const GuardDashboard = () => {
                                     <th className="p-4">Amallar</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                                 {exitRequests.length === 0 ? (
                                     <tr><td colSpan="5" className="p-6 text-center text-gray-400">So'rovlar yo'q</td></tr>
                                 ) : (
                                     exitRequests.map(req => (
-                                        <tr key={req.id} className={`hover:bg-gray-50 border-l-4 ${req.status === 'rejected' ? 'border-red-500 bg-red-50/50' : 'border-transparent'}`}>
-                                            <td className="p-4 text-sm text-gray-600">{new Date(req.createdAt).toLocaleString('uz-UZ')}</td>
+                                        <tr key={req.id} className={`hover:bg-gray-50 dark:hover:bg-slate-700/50 border-l-4 transition-colors ${req.status === 'rejected' ? 'border-red-500 bg-red-50/50 dark:bg-red-900/10' : 'border-transparent'}`}>
+                                            <td className="p-4 text-sm text-gray-600 dark:text-gray-400">{new Date(req.createdAt).toLocaleString('uz-UZ')}</td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
                                                     <UserAvatar user={req.requester} />
-                                                    <span className="font-medium text-gray-800">{req.requester?.name || '---'}</span>
+                                                    <span className="font-medium text-gray-800 dark:text-gray-100">{req.requester?.name || '---'}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-4 text-gray-600">{req.item?.name || '---'} <span className="text-xs text-gray-400">({req.item?.serialNumber || 'SN yo\'q'})</span></td>
+                                            <td className="p-4 text-gray-600 dark:text-gray-400">{req.item?.name || '---'} <span className="text-xs text-gray-400 dark:text-gray-500">({req.item?.serialNumber || 'SN yo\'q'})</span></td>
                                             <td className="p-4">
-                                                {req.status === 'pending_accountant' && <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs border border-orange-200">Hisobchi kutilmoqda</span>}
-                                                {req.status === 'approved' && <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs border border-green-200">Ruxsat Berilgan</span>}
-                                                {req.status === 'completed' && <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs border border-gray-200">Chiqib ketgan</span>}
+                                                {req.status === 'pending_accountant' && <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 px-2 py-1 rounded text-xs border border-orange-200 dark:border-orange-800">Hisobchi kutilmoqda</span>}
+                                                {req.status === 'approved' && <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded text-xs border border-green-200 dark:border-green-800">Ruxsat Berilgan</span>}
+                                                {req.status === 'completed' && <span className="bg-gray-100 dark:bg-slate-900 text-gray-700 dark:text-gray-400 px-2 py-1 rounded text-xs border border-gray-200 dark:border-slate-700">Chiqib ketgan</span>}
                                                 {req.status === 'rejected' && (
                                                     <div className="flex flex-col gap-1">
-                                                        <span className="bg-red-100 text-red-700 px-2 py-1 rounded text-xs border border-red-200 w-fit">Rad Etildi</span>
-                                                        <span className="text-xs text-red-600 italic">"{req.description}"</span>
+                                                        <span className="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-2 py-1 rounded text-xs border border-red-200 dark:border-red-800 w-fit">Rad Etildi</span>
+                                                        <span className="text-xs text-red-600 dark:text-red-400 italic">"{req.description}"</span>
                                                     </div>
                                                 )}
                                             </td>
@@ -279,7 +279,7 @@ const GuardDashboard = () => {
                             <input
                                 type="text"
                                 placeholder="ID yoki Ism bo'yicha qidirish..."
-                                className="pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none w-64"
+                                className="pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none w-64 text-gray-800 dark:text-white"
                                 onChange={(e) => {
                                     const val = e.target.value.toLowerCase();
                                     // Simple client-side filter
@@ -300,10 +300,10 @@ const GuardDashboard = () => {
                         </button>
                     </div>
 
-                    <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-slate-700">
                         <table className="w-full text-left border-collapse">
-                            <thead className="bg-gray-50 text-gray-600 text-xs uppercase">
-                                <tr>
+                            <thead className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase">
+                                <tr className="border-b border-gray-100 dark:border-slate-700">
                                     <th className="p-4">ID</th>
                                     <th className="p-4">Kirgan Vaqti</th>
                                     <th className="p-4">Buyum Nomi</th>
@@ -313,18 +313,18 @@ const GuardDashboard = () => {
                                     <th className="p-4">Amallar</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                                 {externalItems.length === 0 ? (
                                     <tr><td colSpan="7" className="p-6 text-center text-gray-400">Hozir ichkarida tashqi buyumlar yo'q</td></tr>
                                 ) : (
                                     externalItems.map(item => (
-                                        <tr key={item.id} className="hover:bg-gray-50 ext-item-row">
-                                            <td className="p-4 font-mono font-bold text-blue-600 bg-blue-50/50 rounded-lg">{item.shortId || '---'}</td>
-                                            <td className="p-4 text-sm text-gray-600">{new Date(item.enteredAt).toLocaleString('uz-UZ')}</td>
-                                            <td className="p-4 font-medium text-gray-800">{item.itemName}</td>
-                                            <td className="p-4 text-gray-600">{item.ownerName}</td>
-                                            <td className="p-4 text-gray-500 text-sm">{item.description}</td>
-                                            <td className="p-4 text-xs text-gray-400">{item.guard?.name || '---'}</td>
+                                        <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 ext-item-row transition-colors">
+                                            <td className="p-4 font-mono font-bold text-blue-600 dark:text-indigo-400 bg-blue-50/50 dark:bg-indigo-900/20 rounded-lg">{item.shortId || '---'}</td>
+                                            <td className="p-4 text-sm text-gray-600 dark:text-gray-400">{new Date(item.enteredAt).toLocaleString('uz-UZ')}</td>
+                                            <td className="p-4 font-medium text-gray-800 dark:text-gray-100">{item.itemName}</td>
+                                            <td className="p-4 text-gray-600 dark:text-gray-400">{item.ownerName}</td>
+                                            <td className="p-4 text-gray-500 dark:text-gray-500 text-sm">{item.description}</td>
+                                            <td className="p-4 text-xs text-gray-400 dark:text-gray-500">{item.guard?.name || '---'}</td>
                                             <td className="p-4">
                                                 <button
                                                     onClick={() => handleExitExternal(item.id)}
@@ -344,9 +344,9 @@ const GuardDashboard = () => {
 
             {/* Modal for Creating Exit Request */}
             {showExitModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
-                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><RiQrCodeLine /> Buyumni Tekshirish</h2>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200 border border-transparent dark:border-slate-700">
+                        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 dark:text-white"><RiQrCodeLine /> Buyumni Tekshirish</h2>
 
                         {!scannedItem ? (
                             <div className="space-y-4">
@@ -375,25 +375,25 @@ const GuardDashboard = () => {
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                    <p className="text-sm text-gray-500">Buyum:</p>
-                                    <p className="font-bold text-gray-800 text-lg">{scannedItem.name}</p>
-                                    <p className="text-sm text-gray-500 mt-2">Egasi:</p>
+                                <div className="p-3 bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-100 dark:border-slate-700">
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Buyum:</p>
+                                    <p className="font-bold text-gray-800 dark:text-white text-lg">{scannedItem.name}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Egasi:</p>
                                     <div className="flex items-center gap-2 mt-1">
                                         <UserAvatar user={scannedItem.assignedTo} size="w-9 h-9" />
-                                        <p className="font-bold text-indigo-600">{scannedItem.assignedTo?.name || "Biriktirilmagan"}</p>
+                                        <p className="font-bold text-indigo-600 dark:text-indigo-400">{scannedItem.assignedTo?.name || "Biriktirilmagan"}</p>
                                     </div>
 
-                                    <div className="mt-2">
-                                        <label className="text-sm text-gray-500">Olib chiqib ketayotgan xodim:</label>
+                                    <div className="mt-2 text-gray-700 dark:text-gray-300">
+                                        <label className="text-sm text-gray-500 dark:text-gray-400">Olib chiqib ketayotgan xodim:</label>
                                         <input
                                             type="text"
                                             value={carrierName}
                                             onChange={(e) => setCarrierName(e.target.value)}
-                                            className="w-full bg-white border border-gray-300 rounded px-2 py-1 mt-1 text-gray-800 font-medium focus:ring-2 focus:ring-blue-500 outline-none"
+                                            className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded px-2 py-1 mt-1 text-gray-800 dark:text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none"
                                         />
                                     </div>
-                                    <p className="text-xs text-gray-400 mt-1">S/N: {scannedItem.serialNumber}</p>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">S/N: {scannedItem.serialNumber}</p>
                                 </div>
 
                                 <div className="flex justify-end gap-3 mt-4">
@@ -432,36 +432,36 @@ const GuardDashboard = () => {
 
             {/* Modal for External Item */}
             {showExtModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
-                        <h2 className="text-xl font-bold mb-4">Tashqi Buyumni Ro'yxatga Olish</h2>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200 border border-transparent dark:border-slate-700">
+                        <h2 className="text-xl font-bold mb-4 dark:text-white">Tashqi Buyumni Ro'yxatga Olish</h2>
                         <form onSubmit={handleRegisterExternal} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Buyum Nomi <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Buyum Nomi <span className="text-red-500">*</span></label>
                                 <input
                                     required
                                     type="text"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                    className="w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                     placeholder="Masalan: Noutbuk HP"
                                     value={extFormData.itemName}
                                     onChange={e => setExtFormData({ ...extFormData, itemName: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Egasining Ismi <span className="text-red-500">*</span></label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Egasining Ismi <span className="text-red-500">*</span></label>
                                 <input
                                     required
                                     type="text"
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                    className="w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                     placeholder="Ism Familiya"
                                     value={extFormData.ownerName}
                                     onChange={e => setExtFormData({ ...extFormData, ownerName: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Tavsif / Seriya raqami</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tavsif / Seriya raqami</label>
                                 <textarea
-                                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                    className="w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                     placeholder="Rangi, holati, seriya raqami..."
                                     value={extFormData.description}
                                     onChange={e => setExtFormData({ ...extFormData, description: e.target.value })}

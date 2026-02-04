@@ -167,11 +167,11 @@ const UsersPage = () => {
                     />
                 </div>
 
-                <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden mt-6">
+                <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden mt-6">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-blue-600 text-white">
+                                <tr className="bg-blue-600 dark:bg-indigo-600 text-white">
                                     <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('name')}</th>
                                     <th className="py-4 px-6 font-semibold text-sm">ID Raqami</th>
                                     <th className="py-4 px-6 font-semibold text-sm">Bo'lim</th>
@@ -180,12 +180,12 @@ const UsersPage = () => {
                                     <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                                 {users.map((user) => (
-                                    <tr key={user.id} className="hover:bg-gray-50/80 transition-colors group">
+                                    <tr key={user.id} className="hover:bg-gray-50/80 dark:hover:bg-slate-700/50 transition-colors group">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold overflow-hidden border border-gray-100">
+                                                <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold overflow-hidden border border-gray-100 dark:border-slate-700">
                                                     {user.image ? (
                                                         <img
                                                             src={getImageUrl(user.image)}
@@ -198,7 +198,7 @@ const UsersPage = () => {
                                                 </div>
                                                 <div>
                                                     <div
-                                                        className="font-medium text-gray-900 cursor-pointer hover:text-indigo-600 hover:underline transition-colors"
+                                                        className="font-medium text-gray-900 dark:text-gray-100 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline transition-colors"
                                                         onClick={() => openItemsModal(user)}
                                                     >
                                                         {user.name}
@@ -208,10 +208,10 @@ const UsersPage = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="py-4 px-6 font-mono text-xs text-gray-500 font-bold">{user.employeeId || "-"}</td>
-                                        <td className="py-4 px-6 text-gray-600">{user.department}</td>
+                                        <td className="py-4 px-6 font-mono text-xs text-gray-500 dark:text-gray-400 font-bold">{user.employeeId || "-"}</td>
+                                        <td className="py-4 px-6 text-gray-600 dark:text-gray-300">{user.department}</td>
                                         <td className="py-4 px-6">
-                                            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                                            <div className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300">
                                                 {user.role === 'admin' ? (
                                                     <RiShieldKeyholeLine className="text-indigo-500" />
                                                 ) : user.role === 'accounter' ? (
@@ -225,7 +225,7 @@ const UsersPage = () => {
                                             </div>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${user.status === 'active' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400'
                                                 }`}>
                                                 {user.status === 'active' ? 'Faol' : 'Nofaol'}
                                             </span>
@@ -233,14 +233,14 @@ const UsersPage = () => {
                                         <td className="py-4 px-6 text-right flex justify-end gap-2">
                                             <button
                                                 onClick={() => openModal(user)}
-                                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                                className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors opacity-100"
                                                 title="Tahrirlash"
                                             >
                                                 <RiMore2Fill size={20} />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteUser(user.id)}
-                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                                                 title="O'chirish"
                                             >
                                                 <RiDeleteBinLine size={20} />
@@ -253,7 +253,7 @@ const UsersPage = () => {
                     </div>
                     {/* Pagination */}
                     {users.length > 0 && (
-                        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                        <div className="p-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-end">
                             <Pagination
                                 currentPage={currentPage}
                                 totalPages={totalPages}

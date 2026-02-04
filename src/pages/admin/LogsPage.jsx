@@ -83,19 +83,19 @@ const LogsPage = () => {
         <div>
             <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 flex items-center gap-2">
-                        <RiHistoryLine className="text-indigo-600" />
+                    <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 flex items-center gap-2">
+                        <RiHistoryLine className="text-indigo-600 dark:text-indigo-400" />
                         Tizim Loglari
                     </h1>
-                    <p className="text-gray-500">Barcha harakatlar tarixi ({totalItems})</p>
+                    <p className="text-gray-500 dark:text-gray-400">Barcha harakatlar tarixi ({totalItems})</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-                        <span className="text-xs text-gray-500 font-medium">Dan:</span>
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Dan:</span>
                         <input
                             type="date"
-                            className="text-sm outline-none text-gray-700"
+                            className="text-sm outline-none text-gray-700 dark:text-gray-200 bg-transparent"
                             value={startDate}
                             onChange={(e) => {
                                 setStartDate(e.target.value);
@@ -103,11 +103,11 @@ const LogsPage = () => {
                             }}
                         />
                     </div>
-                    <div className="flex items-center gap-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-                        <span className="text-xs text-gray-500 font-medium">Gacha:</span>
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-lg border border-gray-200 dark:border-slate-700 shadow-sm">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Gacha:</span>
                         <input
                             type="date"
-                            className="text-sm outline-none text-gray-700"
+                            className="text-sm outline-none text-gray-700 dark:text-gray-200 bg-transparent"
                             value={endDate}
                             onChange={(e) => {
                                 setEndDate(e.target.value);
@@ -126,10 +126,10 @@ const LogsPage = () => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                        <thead className="bg-gray-50 dark:bg-slate-900 text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider">
                             <tr>
                                 <th className="py-4 px-6 font-semibold">Sana</th>
                                 <th className="py-4 px-6 font-semibold">Foydalanuvchi</th>
@@ -138,7 +138,7 @@ const LogsPage = () => {
                                 <th className="py-4 px-6 font-semibold">Obyekt/Jihoz</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 text-sm">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700 text-sm">
                             {loading ? (
                                 <tr>
                                     <td colSpan="5" className="text-center py-10">
@@ -151,38 +151,38 @@ const LogsPage = () => {
                                 </tr>
                             ) : (
                                 logs.map((log, idx) => (
-                                    <tr key={log.id || idx} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="py-3 px-6 text-gray-500 whitespace-nowrap">
+                                    <tr key={log.id || idx} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors">
+                                        <td className="py-3 px-6 text-gray-500 dark:text-gray-400 whitespace-nowrap">
                                             {new Date(log.createdAt).toLocaleString('uz-UZ')}
                                         </td>
-                                        <td className="py-3 px-6 font-medium text-gray-800">
+                                        <td className="py-3 px-6 font-medium text-gray-800 dark:text-gray-100">
                                             <div className="flex items-center gap-2">
                                                 {log.user?.image ? (
                                                     <img
                                                         src={getImageUrl(log.user.image)}
                                                         alt={log.user.name}
-                                                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                                                        className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-slate-600"
                                                     />
                                                 ) : (
-                                                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 border border-gray-200">
+                                                    <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-slate-600">
                                                         {log.user?.name?.charAt(0) || "T"}
                                                     </div>
                                                 )}
                                                 <span>{log.user?.name || "Tizim"}</span>
                                             </div>
                                         </td>
-                                        <td className="py-3 px-6 text-gray-500">
+                                        <td className="py-3 px-6 text-gray-500 dark:text-gray-400">
                                             {log.user?.role || "-"}
                                         </td>
                                         <td className="py-3 px-6">
-                                            <span className={`px-2 py-1 rounded text-xs ${log.action?.includes('create') ? 'bg-green-100 text-green-700' :
-                                                log.action?.includes('delete') ? 'bg-red-100 text-red-700' :
-                                                    'bg-gray-100 text-gray-600'
+                                            <span className={`px-2 py-1 rounded text-xs ${log.action?.includes('create') ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                                                log.action?.includes('delete') ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+                                                    'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400'
                                                 }`}>
                                                 {log.action}
                                             </span>
                                         </td>
-                                        <td className="py-3 px-6 text-gray-600 font-mono text-xs">
+                                        <td className="py-3 px-6 text-gray-600 dark:text-gray-400 font-mono text-xs">
                                             {log.item?.name || log.details || "---"}
                                         </td>
                                     </tr>
@@ -193,7 +193,7 @@ const LogsPage = () => {
                 </div>
                 {/* Pagination */}
                 {logs.length > 0 && (
-                    <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+                    <div className="p-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50 flex justify-end">
                         <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}

@@ -238,11 +238,11 @@ const WarehousePage = () => {
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                    <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
                         <RiArchiveLine className="text-orange-500" />
                         {t('warehouse')}
                     </h1>
-                    <p className="text-gray-500">
+                    <p className="text-gray-500 dark:text-gray-400">
                         {t('inventory_subtitle')}
                     </p>
                 </div>
@@ -269,7 +269,7 @@ const WarehousePage = () => {
                 </div>
             </div>
 
-            <div className="card border-0 shadow-lg shadow-gray-100/50">
+            <div className="card bg-white dark:bg-slate-800 border-0 shadow-lg shadow-gray-100/50 dark:shadow-none">
                 {/* Search & Filter Controls */}
                 <div className="flex flex-col gap-4 mb-6">
                     <div className="flex flex-col sm:flex-row gap-4">
@@ -278,29 +278,29 @@ const WarehousePage = () => {
                             <input
                                 type="text"
                                 placeholder={t('search')}
-                                className="input pl-10 w-full focus:ring-orange-500 focus:border-orange-500"
+                                className="input pl-10 w-full focus:ring-orange-500 focus:border-orange-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
 
                         {/* Status Tabs for Assigned/Unassigned */}
-                        <div className="flex bg-gray-100 p-1 rounded-lg">
+                        <div className="flex bg-gray-100 dark:bg-slate-900 p-1 rounded-lg">
                             <button
                                 onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'all' }))}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'all' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'all' ? 'bg-white dark:bg-slate-800 text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                             >
                                 {t('warehouse_filter_all')}
                             </button>
                             <button
                                 onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'unassigned' }))}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'unassigned' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'unassigned' ? 'bg-white dark:bg-slate-800 text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                             >
                                 {t('warehouse_filter_unassigned')}
                             </button>
                             <button
                                 onClick={() => setFilters(prev => ({ ...prev, isAssigned: 'pending' }))}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'pending' ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${filters.isAssigned === 'pending' ? 'bg-white dark:bg-slate-800 text-orange-600 shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                             >
                                 {t('warehouse_filter_pending')}
                             </button>
@@ -318,7 +318,7 @@ const WarehousePage = () => {
 
                 {/* Collapsible Filter Panel */}
                 {showFilters && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 animate-in slide-in-from-top-2">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50/50 dark:bg-slate-900/50 rounded-xl border border-gray-100 dark:border-slate-700 animate-in slide-in-from-top-2">
                         <div>
                             <label className="block text-xs font-medium text-gray-500 mb-1">{t('category')}</label>
                             <select
@@ -350,11 +350,11 @@ const WarehousePage = () => {
                 )}
             </div>
 
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden mt-6">
+            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden mt-6">
                 <div className="overflow-x-auto min-h-[400px]">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-blue-600 text-white">
+                            <tr className="bg-blue-600 dark:bg-indigo-600 text-white">
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg w-12">
                                     <input
                                         type="checkbox"
@@ -372,53 +372,53 @@ const WarehousePage = () => {
                                 <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">{t('actions')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                             {filteredItems.map((item) => (
-                                <tr key={item.id} className={`hover:bg-gray-50/80 transition-colors group ${selectedItems.has(item.id) ? 'bg-orange-50' : ''}`}>
+                                <tr key={item.id} className={`hover:bg-gray-50/80 dark:hover:bg-slate-700/50 transition-colors group ${selectedItems.has(item.id) ? 'bg-orange-50 dark:bg-orange-900/20' : ''}`}>
                                     <td className="py-4 px-6">
                                         <input
                                             type="checkbox"
-                                            className="checkbox checkbox-sm border-gray-300 checked:bg-orange-500 checked:border-orange-500"
+                                            className="checkbox checkbox-sm border-gray-300 dark:border-slate-600 checked:bg-orange-500 checked:border-orange-500"
                                             checked={selectedItems.has(item.id)}
                                             onChange={() => toggleSelectItem(item.id)}
                                         />
                                     </td>
-                                    <td className="py-4 px-6 text-gray-600 font-medium">#{item.orderNumber || item.id}</td>
+                                    <td className="py-4 px-6 text-gray-600 dark:text-gray-400 font-medium">#{item.orderNumber || item.id}</td>
                                     <td className="py-4 px-6">
-                                        <div className="font-medium text-gray-900">{item.name}</div>
-                                        <div className="text-xs text-gray-400">{item.category} • {item.model}</div>
+                                        <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
+                                        <div className="text-xs text-gray-400 dark:text-gray-500">{item.category} • {item.model}</div>
                                     </td>
-                                    <td className="py-4 px-6 text-gray-600">
+                                    <td className="py-4 px-6 text-gray-600 dark:text-gray-400">
                                         {/* Display Assigned User or Initial Owner */}
                                         {item.assignedTo ? (
-                                            <span className="text-blue-600 font-medium">{item.assignedTo.name}</span>
+                                            <span className="text-blue-600 dark:text-blue-400 font-medium">{item.assignedTo.name}</span>
                                         ) : (item.requests && item.requests.length > 0) ? (
                                             <div className="flex flex-col">
-                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400">
                                                     {t('warehouse_filter_pending')}: {item.requests[0].targetUser?.name}
                                                 </span>
                                             </div>
                                         ) : item.initialOwner ? (
                                             <div className="flex flex-col">
-                                                <span className="text-orange-500 text-sm font-medium">{t('warehouse_filter_unassigned')}</span>
-                                                <span className="text-xs text-gray-400">({item.initialOwner})</span>
+                                                <span className="text-orange-500 dark:text-orange-400 text-sm font-medium">{t('warehouse_filter_unassigned')}</span>
+                                                <span className="text-xs text-gray-400 dark:text-gray-500">({item.initialOwner})</span>
                                             </div>
                                         ) : (
-                                            <span className="text-gray-400 italic">{t('in_warehouse')}</span>
+                                            <span className="text-gray-400 dark:text-slate-500 italic">{t('in_warehouse')}</span>
                                         )}
                                     </td>
                                     <td className="py-4 px-6">
                                         {/* Warranty not always in API? Using arrivalDate/ManufactureYear as proxy if needed, or check schema if warranty field exists. Schema didn't show warranty field, only purchaseDate. Let's assume frontend handled this loosely. */}
-                                        <span className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-lg font-medium border border-green-100">
+                                        <span className="px-2 py-1 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-lg font-medium border border-green-100 dark:border-green-800">
                                             {item.condition || t('status_new')}
                                         </span>
                                     </td>
-                                    <td className="py-4 px-6 text-gray-900 font-bold">{parseFloat(item.price).toLocaleString()} so'm</td>
+                                    <td className="py-4 px-6 text-gray-900 dark:text-gray-100 font-bold">{parseFloat(item.price).toLocaleString()} so'm</td>
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-3">
                                             {item.image ? (
                                                 <div
-                                                    className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 cursor-pointer hover:ring-2 hover:ring-orange-300 transition-all"
+                                                    className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 cursor-pointer hover:ring-2 hover:ring-orange-300 transition-all"
                                                     onClick={() => setPreviewImage(item.image)}
                                                 >
                                                     <img
@@ -428,13 +428,13 @@ const WarehousePage = () => {
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                                <div className="w-10 h-10 rounded-lg bg-gray-50 dark:bg-slate-700 flex items-center justify-center text-gray-400 dark:text-slate-500">
                                                     <RiImage2Line size={20} />
                                                 </div>
                                             )}
                                             <button
                                                 onClick={() => openQRModal(item)}
-                                                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+                                                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 flex items-center justify-center text-gray-600 dark:text-gray-400 transition-colors"
                                                 title="QR Kodni ko'rish"
                                             >
                                                 <RiQrCodeLine size={16} />
@@ -445,7 +445,7 @@ const WarehousePage = () => {
                                         {user?.role !== 'stat' && (
                                             <button
                                                 onClick={() => openModal(item)}
-                                                className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors opacity-100"
+                                                className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors opacity-100"
                                             >
                                                 <RiMore2Fill size={20} />
                                             </button>
@@ -455,7 +455,7 @@ const WarehousePage = () => {
                             ))}
                             {filteredItems.length === 0 && (
                                 <tr>
-                                    <td colSpan="10" className="text-center py-8 text-gray-500">
+                                    <td colSpan="10" className="text-center py-8 text-gray-500 dark:text-gray-400">
                                         {t('warehouse_no_items')}
                                     </td>
                                 </tr>
@@ -465,10 +465,10 @@ const WarehousePage = () => {
                 </div>
 
                 {/* Pagination */}
-                <div className="p-4 border-t border-gray-100 bg-gray-50">
+                <div className="p-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
                     <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                        <div className="text-sm text-gray-500">
-                            Jami: <span className="font-bold text-gray-900">{totalItems}</span> ta jihoz
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                            Jami: <span className="font-bold text-gray-900 dark:text-gray-100">{totalItems}</span> ta jihoz
                         </div>
                         <Pagination
                             currentPage={currentPage}

@@ -179,7 +179,7 @@ const AdminDashboard = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-blue-600 text-white">
+                            <tr className="bg-blue-600 dark:bg-indigo-600 text-white">
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">{t('name')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('model')}</th>
                                 <th className="py-4 px-6 font-semibold text-sm">{t('assigned_to')}</th>
@@ -195,11 +195,11 @@ const AdminDashboard = () => {
                                         <td className="py-4 px-6 text-gray-700 dark:text-gray-300">{item.assignedTo?.name || t('in_warehouse')}</td>
                                         <td className="py-4 px-6">
                                             <span className={clsx(
-                                                "px-3 py-1 rounded-full text-xs font-semibold",
-                                                item.status === 'working' ? "bg-green-100 text-green-700" :
-                                                    item.status === 'repair' ? "bg-orange-100 text-orange-700" :
-                                                        item.status === 'written-off' ? "bg-red-100 text-red-700" :
-                                                            "bg-cyan-100 text-cyan-700"
+                                                "px-3 py-1 rounded-full text-xs font-semibold border",
+                                                item.status === 'working' ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800" :
+                                                    item.status === 'repair' ? "bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800" :
+                                                        item.status === 'written-off' ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800" :
+                                                            "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 border-cyan-200 dark:border-cyan-800"
                                             )}>
                                                 {item.status === 'working' ? t('status_active') :
                                                     item.status === 'repair' ? t('status_in_repair') :
@@ -211,7 +211,7 @@ const AdminDashboard = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="py-6 text-center text-gray-500">
+                                    <td colSpan="4" className="py-6 text-center text-gray-500 dark:text-slate-500 italic">
                                         {t('no_data_yet')}
                                     </td>
                                 </tr>
@@ -220,10 +220,10 @@ const AdminDashboard = () => {
                     </table>
                 </div>
                 {/* Pagination Mock */}
-                <div className="p-4 flex justify-end gap-2">
-                    <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">‹</button>
-                    <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 text-blue-600 font-bold border border-blue-100">1</button>
-                    <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">›</button>
+                <div className="p-4 flex justify-end gap-2 bg-gray-50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-slate-700">
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">‹</button>
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold border border-blue-100 dark:border-blue-800">1</button>
+                    <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 dark:border-slate-700 text-gray-400 dark:text-slate-500 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">›</button>
                 </div>
             </div>
             {/* Notification Modal for Accountant */}
@@ -231,7 +231,7 @@ const AdminDashboard = () => {
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-lg p-8 animate-in fade-in zoom-in duration-300 border border-indigo-100 dark:border-slate-700">
                         <div className="flex flex-col items-center text-center">
-                            <div className="w-20 h-20 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-6 shadow-inner ring-8 ring-orange-50">
+                            <div className="w-20 h-20 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full flex items-center justify-center mb-6 shadow-inner ring-8 ring-orange-50 dark:ring-orange-900/20">
                                 <RiAlertLine size={40} />
                             </div>
 

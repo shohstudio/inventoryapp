@@ -14,11 +14,11 @@ const UserAvatar = ({ user, size = "w-8 h-8" }) => {
     const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
 
     return (
-        <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
+        <div className={`${size} rounded-full overflow-hidden bg-white dark:bg-slate-700 flex items-center justify-center border border-gray-100 dark:border-slate-600 flex-shrink-0 shadow-sm ring-2 ring-white dark:ring-slate-800`}>
             {imageUrl ? (
                 <img src={imageUrl} alt={user.name} className="w-full h-full object-cover" />
             ) : (
-                <div className="w-full h-full bg-indigo-50 flex items-center justify-center text-indigo-400">
+                <div className="w-full h-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-400 dark:text-indigo-300">
                     <RiUser3Line size={14} />
                 </div>
             )}
@@ -252,34 +252,34 @@ const RequestsPage = () => {
     return (
         <div>
             <div className="mb-6">
-                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 flex items-center gap-2">
-                    <RiFileList3Line className="text-indigo-600" />
+                <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 flex items-center gap-2">
+                    <RiFileList3Line className="text-indigo-600 dark:text-indigo-400" />
                     So'rovlar (Requests)
                 </h1>
-                <p className="text-gray-500">Jihozlarni biriktirish bo'yicha so'rovlar holati</p>
+                <p className="text-gray-500 dark:text-gray-400">Jihozlarni biriktirish bo'yicha so'rovlar holati</p>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-4 border-b border-gray-100">
+            <div className="flex gap-4 mb-4 border-b border-gray-100 dark:border-slate-700">
                 <button
                     onClick={() => setActiveTab('assignment')}
-                    className={`pb-2 px-1 font-medium transition-colors relative ${activeTab === 'assignment' ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
+                    className={`pb-2 px-1 font-medium transition-colors relative ${activeTab === 'assignment' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                 >
-                    Biriktirish {activeTab === 'assignment' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 rounded-full"></span>}
+                    Biriktirish {activeTab === 'assignment' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-600 dark:bg-indigo-400 rounded-full"></span>}
                 </button>
                 <button
                     onClick={() => setActiveTab('exit')}
-                    className={`pb-2 px-1 font-medium transition-colors relative ${activeTab === 'exit' ? 'text-orange-600' : 'text-gray-400 hover:text-gray-600'}`}
+                    className={`pb-2 px-1 font-medium transition-colors relative ${activeTab === 'exit' ? 'text-orange-600 dark:text-orange-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                 >
-                    Chiqish (Qoravul) {activeTab === 'exit' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 rounded-full"></span>}
+                    Chiqish (Qoravul) {activeTab === 'exit' && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 dark:bg-orange-400 rounded-full"></span>}
                 </button>
             </div>
 
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-800 text-white">
+                            <tr className="bg-slate-800 dark:bg-indigo-600 text-white">
                                 <th className="py-4 px-6 font-semibold text-sm rounded-tl-lg">Sana</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Jihoz</th>
                                 <th className="py-4 px-6 font-semibold text-sm">Kimdan</th>
@@ -288,56 +288,56 @@ const RequestsPage = () => {
                                 <th className="py-4 px-6 font-semibold text-sm text-right rounded-tr-lg">Amallar</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                             {filteredRequests.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-10 text-gray-500">So'rovlar mavjud emas</td>
+                                    <td colSpan="6" className="text-center py-10 text-gray-500 dark:text-gray-400">So'rovlar mavjud emas</td>
                                 </tr>
                             ) : (
                                 filteredRequests.map(req => (
-                                    <tr key={req.id} className="hover:bg-gray-50/80 transition-colors">
-                                        <td className="py-4 px-6 text-gray-600 text-sm">
+                                    <tr key={req.id} className="hover:bg-gray-50/80 dark:hover:bg-slate-700/50 transition-colors">
+                                        <td className="py-4 px-6 text-gray-600 dark:text-gray-400 text-sm">
                                             {new Date(req.createdAt).toLocaleString('uz-UZ')}
                                         </td>
                                         <td className="py-4 px-6 cursor-pointer group" onClick={() => openDetailModal(req)}>
-                                            <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{req.item?.name}</div>
-                                            <div className="text-xs text-gray-400 font-mono">{req.item?.serialNumber}</div>
+                                            <div className="font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{req.item?.name}</div>
+                                            <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">{req.item?.serialNumber}</div>
                                         </td>
-                                        <td className="py-4 px-6 text-gray-700 text-sm">
+                                        <td className="py-4 px-6 text-gray-700 dark:text-gray-300 text-sm">
                                             {req.type === 'exit' ? (
                                                 <div className="flex items-center gap-2">
                                                     <UserAvatar user={req.item?.assignedTo} />
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium text-gray-900">{req.item?.assignedTo?.name || "Noma'lum"}</span>
-                                                        <span className="text-xs text-gray-400">Egasi</span>
+                                                        <span className="font-medium text-gray-900 dark:text-gray-100">{req.item?.assignedTo?.name || "Noma'lum"}</span>
+                                                        <span className="text-xs text-gray-400 dark:text-gray-500">Egasi</span>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-2">
                                                     <UserAvatar user={req.requester} />
-                                                    <span className="font-medium text-gray-900">{req.requester?.name}</span>
+                                                    <span className="font-medium text-gray-900 dark:text-gray-100">{req.requester?.name}</span>
                                                 </div>
                                             )}
                                         </td>
                                         <td className="py-4 px-6">
                                             {req.type === 'exit' ? (
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center text-orange-400 border border-orange-100 flex-shrink-0">
+                                                    <div className="w-8 h-8 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-orange-400 dark:text-orange-300 border border-orange-100 dark:border-orange-800 flex-shrink-0">
                                                         <RiUser3Line size={14} />
                                                     </div>
                                                     <div className="flex flex-col">
-                                                        <span className="font-medium text-gray-900">
+                                                        <span className="font-medium text-gray-900 dark:text-gray-100">
                                                             {req.description?.match(/Olib chiquvchi: ([^.]+)/)?.[1] || "Aniqlanmadi"}
                                                         </span>
-                                                        <span className="text-xs text-orange-500">Olib ketmoqda</span>
+                                                        <span className="text-xs text-orange-500 dark:text-orange-400">Olib ketmoqda</span>
                                                     </div>
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center gap-3">
                                                     <UserAvatar user={req.targetUser} size="w-9 h-9" />
                                                     <div>
-                                                        <div className="font-medium text-gray-900">{req.targetUser?.name || "Bino"}</div>
-                                                        {req.targetUser?.pinfl && <div className="text-xs text-gray-500 font-mono">PINFL: {req.targetUser.pinfl}</div>}
+                                                        <div className="font-medium text-gray-900 dark:text-gray-100">{req.targetUser?.name || "Bino"}</div>
+                                                        {req.targetUser?.pinfl && <div className="text-xs text-gray-500 dark:text-gray-400 font-mono">PINFL: {req.targetUser.pinfl}</div>}
                                                     </div>
                                                 </div>
                                             )}
@@ -351,7 +351,7 @@ const RequestsPage = () => {
                                                 <div className="flex justify-end gap-2">
                                                     <button
                                                         onClick={() => openDetailModal(req)}
-                                                        className="btn btn-sm bg-red-50 text-red-600 hover:bg-red-100 border-red-200 opacity-60 cursor-pointer"
+                                                        className="btn btn-sm bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/50 border-red-200 dark:border-red-800 opacity-60 cursor-pointer"
                                                         title="Batafsil ko'rish uchun bosing"
                                                     >
                                                         Rad etish

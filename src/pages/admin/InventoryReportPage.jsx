@@ -112,15 +112,15 @@ const InventoryReportPage = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <RiCalendarCheckLine className="text-indigo-600" />
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        <RiCalendarCheckLine className="text-indigo-600 dark:text-indigo-400" />
                         {t('report_title')}
                     </h1>
-                    <p className="text-gray-500 mt-1">
-                        {t('total_checked')}: <span className="font-bold text-gray-900">{items.length}</span>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">
+                        {t('total_checked')}: <span className="font-bold text-gray-900 dark:text-white">{items.length}</span>
                     </p>
                     {inventoryStartDate && (
-                        <p className="text-xs text-indigo-500 mt-1 font-medium bg-indigo-50 inline-block px-2 py-1 rounded">
+                        <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-1 font-medium bg-indigo-50 dark:bg-indigo-900/30 inline-block px-2 py-1 rounded">
                             {t('checked_after').replace('{date}', new Date(inventoryStartDate).toLocaleDateString("ru-RU"))}
                         </p>
                     )}
@@ -139,7 +139,7 @@ const InventoryReportPage = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 flex gap-4">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 mb-6 flex gap-4">
                 <div className="relative flex-1 max-w-md">
                     <RiSearchLine className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input
@@ -147,17 +147,17 @@ const InventoryReportPage = () => {
                         placeholder={t('search_placeholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="form-input pl-10 w-full"
+                        className="form-input pl-10 w-full dark:bg-slate-900 dark:border-slate-700 dark:text-white dark:placeholder-slate-500 shadow-sm"
                     />
                 </div>
             </div>
 
             {/* Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50 border-b border-gray-200 text-xs uppercase text-gray-500 font-semibold tracking-wider">
+                            <tr className="bg-gray-50/50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold tracking-wider">
                                 <th className="p-4 w-16 text-center">#</th>
                                 <th className="p-4">{t('name')}</th>
                                 <th className="p-4">ID / {t('inn')}</th>
@@ -167,7 +167,7 @@ const InventoryReportPage = () => {
                                 <th className="p-4 text-center">{t('image')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                             {loading ? (
                                 <tr>
                                     <td colSpan="7" className="p-8 text-center text-gray-500">
@@ -185,44 +185,44 @@ const InventoryReportPage = () => {
                                 </tr>
                             ) : (
                                 filteredItems.map((item, index) => (
-                                    <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
-                                        <td className="p-4 text-center text-gray-400 font-mono text-xs">{index + 1}</td>
+                                    <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors group">
+                                        <td className="p-4 text-center text-gray-400 dark:text-gray-500 font-mono text-xs">{index + 1}</td>
                                         <td className="p-4">
-                                            <div className="font-medium text-gray-900">{item.name}</div>
-                                            <div className="text-xs text-gray-400">{item.model}</div>
+                                            <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
+                                            <div className="text-xs text-gray-400 dark:text-gray-500">{item.model}</div>
                                         </td>
                                         <td className="p-4">
                                             <div className="flex flex-col gap-1">
-                                                <span className="font-mono text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded w-fit">ID: {item.id}</span>
-                                                {item.inn && <span className="font-mono text-xs bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded w-fit">INN: {item.inn}</span>}
+                                                <span className="font-mono text-xs bg-gray-100 dark:bg-slate-900 text-gray-600 dark:text-gray-400 px-1.5 py-0.5 rounded w-fit">ID: {item.id}</span>
+                                                {item.inn && <span className="font-mono text-xs bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded w-fit">INN: {item.inn}</span>}
                                             </div>
                                         </td>
                                         <td className="p-4">
-                                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${item.status === 'working' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                item.status === 'repair' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                                    'bg-red-50 text-red-700 border-red-200'
+                                            <span className={`px-2.5 py-1 rounded-full text-xs font-semibold border ${item.status === 'working' ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' :
+                                                item.status === 'repair' ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800' :
+                                                    'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'
                                                 }`}>
                                                 {item.status === 'working' ? t('status_working') :
                                                     item.status === 'repair' ? t('status_repair') : t('status_broken')}
                                             </span>
                                         </td>
                                         <td className="p-4">
-                                            <div className="text-sm text-gray-900 font-medium">
+                                            <div className="text-sm text-gray-900 dark:text-gray-100 font-medium">
                                                 {new Date(item.lastCheckedAt).toLocaleDateString("ru-RU")}
                                             </div>
-                                            <div className="text-xs text-gray-400">
+                                            <div className="text-xs text-gray-400 dark:text-gray-500">
                                                 {new Date(item.lastCheckedAt).toLocaleTimeString("ru-RU", { hour: '2-digit', minute: '2-digit' })}
                                             </div>
                                         </td>
                                         <td className="p-4">
-                                            <span className="text-sm text-gray-700 font-medium bg-gray-50 px-2 py-1 rounded border border-gray-200">
+                                            <span className="text-sm text-gray-700 dark:text-gray-300 font-medium bg-gray-50 dark:bg-slate-900 px-2 py-1 rounded border border-gray-200 dark:border-slate-700 hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors">
                                                 {item.department || item.building || "-"}
                                             </span>
                                         </td>
                                         <td className="p-4 text-center">
                                             {item.image ? (
                                                 <div
-                                                    className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 mx-auto relative group-hover:scale-105 transition-transform bg-white cursor-pointer"
+                                                    className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 dark:border-slate-700 mx-auto relative group-hover:scale-105 transition-transform bg-white dark:bg-slate-800 cursor-pointer shadow-sm ring-1 ring-black/5 dark:ring-white/5"
                                                     onClick={() => {
                                                         let imgs = [];
                                                         try {
@@ -239,7 +239,7 @@ const InventoryReportPage = () => {
                                                     />
                                                 </div>
                                             ) : (
-                                                <div className="w-12 h-12 rounded-lg bg-gray-50 border border-gray-200 mx-auto flex items-center justify-center text-gray-300">
+                                                <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 mx-auto flex items-center justify-center text-gray-300 dark:text-gray-600">
                                                     <RiImage2Line size={20} />
                                                 </div>
                                             )}

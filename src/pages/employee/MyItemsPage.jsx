@@ -111,19 +111,19 @@ const MyItemsPage = () => {
     if (myItems.length === 0 && requests.length === 0) {
         return (
             <div className="text-center py-20">
-                <div className="w-20 h-20 bg-gray-100 text-gray-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-20 h-20 bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 rounded-full flex items-center justify-center mx-auto mb-4">
                     <RiComputerLine size={40} />
                 </div>
-                <h2 className="text-xl font-bold text-gray-800">Sizga biriktirilgan jihozlar yo'q</h2>
-                <p className="text-gray-500 mt-2">Hozircha sizning nomingizga hech qanday inventar rasmiylashtirilmagan.</p>
+                <h2 className="text-xl font-bold text-gray-800 dark:text-white">Sizga biriktirilgan jihozlar yo'q</h2>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">Hozircha sizning nomingizga hech qanday inventar rasmiylashtirilmagan.</p>
             </div>
         );
     }
 
     return (
-        <div className="animate-in fade-in duration-500">
+        <div className="animate-in fade-in duration-500 pb-20">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                <h1 className="text-2xl font-bold text-gray-800">Mening Jihozlarim</h1>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Mening Jihozlarim</h1>
 
                 {myItems.length > 0 && (
                     <button
@@ -138,18 +138,18 @@ const MyItemsPage = () => {
 
             {requests.length > 0 && (
                 <div className="mb-8 animate-in slide-in-from-top duration-500">
-                    <h2 className="text-xl font-bold text-orange-600 mb-4 flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-orange-600 dark:text-orange-400 mb-4 flex items-center gap-2">
                         <RiAlertLine /> Tasdiqlash kutilmoqda
                     </h2>
-                    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6">
+                    <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/50 rounded-2xl p-6">
                         <div className="grid gap-4">
                             {requests.map(req => (
-                                <div key={req.id} className="bg-white p-4 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+                                <div key={req.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 border border-transparent dark:border-slate-700">
                                     <div>
-                                        <h3 className="font-bold text-gray-800">{req.item?.name}</h3>
-                                        <p className="text-sm text-gray-500">Seriya: {req.item?.serialNumber || "Yo'q"}</p>
-                                        <div className="text-xs text-gray-400 mt-1">
-                                            Kimdan: <span className="font-medium text-gray-600">{req.requester?.name || "Admin"}</span>
+                                        <h3 className="font-bold text-gray-800 dark:text-white">{req.item?.name}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Seriya: {req.item?.serialNumber || "Yo'q"}</p>
+                                        <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                            Kimdan: <span className="font-medium text-gray-600 dark:text-gray-300">{req.requester?.name || "Admin"}</span>
                                         </div>
                                     </div>
                                     <button
@@ -165,11 +165,11 @@ const MyItemsPage = () => {
                 </div>
             )}
 
-            <div className="bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-gray-50 text-gray-600 text-xs uppercase tracking-wider border-b border-gray-100">
+                            <tr className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
                                 <th className="p-4 font-semibold">#</th>
                                 <th className="p-4 font-semibold">Jihoz Nomi</th>
                                 <th className="p-4 font-semibold">Seriya Raqami</th>
@@ -179,26 +179,26 @@ const MyItemsPage = () => {
                                 <th className="p-4 font-semibold text-right">Hujjat</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-50">
+                        <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
                             {currentItems.map((item, index) => (
-                                <tr key={item.id} className="hover:bg-gray-50/50 transition-colors text-sm">
-                                    <td className="p-4 text-gray-400">{indexOfFirstItem + index + 1}</td>
-                                    <td className="p-4 font-medium text-gray-900">{item.name}</td>
-                                    <td className="p-4 font-mono text-gray-600">{item.serialNumber || "-"}</td>
+                                <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors text-sm">
+                                    <td className="p-4 text-gray-400 dark:text-gray-500 font-mono">{indexOfFirstItem + index + 1}</td>
+                                    <td className="p-4 font-medium text-gray-900 dark:text-gray-100">{item.name}</td>
+                                    <td className="p-4 font-mono text-gray-600 dark:text-gray-400">{item.serialNumber || "-"}</td>
                                     <td className="p-4">
-                                        <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
+                                        <span className="bg-gray-100 dark:bg-slate-900 text-gray-600 dark:text-gray-400 px-2 py-1 rounded text-xs border border-transparent dark:border-slate-700">
                                             {item.category || "-"}
                                         </span>
                                     </td>
                                     <td className="p-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${item.status === 'working' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${item.status === 'working' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800'
                                             }`}>
                                             <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'working' ? 'bg-green-500' : 'bg-orange-500'
                                                 }`}></span>
                                             {item.status === 'working' ? 'Faol' : 'Ta\'mirda'}
                                         </span>
                                     </td>
-                                    <td className="p-4 text-gray-600">{item.dateAssigned}</td>
+                                    <td className="p-4 text-gray-600 dark:text-gray-400">{item.dateAssigned}</td>
                                     <td className="p-4 text-right">
                                         {item.assignedDocument ? (
                                             <a

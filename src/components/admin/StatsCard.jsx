@@ -21,7 +21,7 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", on
                         isFeatured ? "text-indigo-600 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400"
                     )}>{title}</p>
                     {isFeatured && (
-                        <div className="p-2 bg-white rounded-xl shadow-sm text-indigo-600 shrink-0 w-10 h-10 flex items-center justify-center">
+                        <div className="p-2 bg-white dark:bg-slate-700 rounded-xl shadow-sm text-indigo-600 dark:text-indigo-400 shrink-0 w-10 h-10 flex items-center justify-center border border-transparent dark:border-slate-600">
                             {icon}
                         </div>
                     )}
@@ -39,7 +39,7 @@ const StatsCard = ({ title, value, icon, trend, trendLabel, color = "indigo", on
                     {footer ? (
                         <span className={clsx(
                             "text-sm",
-                            isFeatured ? "text-indigo-500" : "text-gray-500"
+                            isFeatured ? "text-indigo-500 dark:text-indigo-400" : "text-gray-500 dark:text-gray-400"
                         )}>{footer}</span>
                     ) : (
                         trend !== undefined && (

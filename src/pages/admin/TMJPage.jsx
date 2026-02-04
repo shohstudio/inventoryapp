@@ -289,15 +289,15 @@ const TMJPage = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    <RiFilePaper2Line className="text-blue-600" /> TMJ
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                    <RiFilePaper2Line className="text-blue-600 dark:text-blue-400" /> TMJ
                 </h1>
                 <div className="flex gap-2">
                     {selectedItems.size > 0 && user?.role !== 'stat' && (
                         <button
                             onClick={handleBulkDelete}
                             disabled={isDeleting}
-                            className="btn bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                            className="btn bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/50 border-red-200 dark:border-red-800"
                         >
                             <RiDeleteBinLine size={20} /> {selectedItems.size} {t('warehouse_delete_selected')}
                         </button>
@@ -305,7 +305,7 @@ const TMJPage = () => {
                     {user?.role !== 'stat' && (
                         <button
                             onClick={() => setIsModalOpen(true)}
-                            className="btn bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-200"
+                            className="btn bg-blue-600 dark:bg-blue-500 hover:bg-blue-700 dark:hover:bg-blue-600 text-white border-none shadow-lg shadow-blue-200 dark:shadow-none"
                         >
                             <RiAddLine size={20} /> {t('add_new')}
                         </button>
@@ -323,90 +323,90 @@ const TMJPage = () => {
 
 
             {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b border-gray-200">
+            <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-slate-700">
                 <button
                     onClick={() => setActiveTab('all')}
-                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'all' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'all' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                 >
                     {t('all')}
-                    {activeTab === 'all' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
+                    {activeTab === 'all' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
                 </button>
                 <button
                     onClick={() => setActiveTab('stock')}
-                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'stock' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'stock' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                 >
                     {t('tmj_stock')}
-                    {activeTab === 'stock' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
+                    {activeTab === 'stock' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
                 </button>
                 <button
                     onClick={() => setActiveTab('assigned')}
-                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'assigned' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`pb-2 px-4 font-medium transition-colors relative ${activeTab === 'assigned' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                 >
                     {t('tmj_assigned')}
-                    {activeTab === 'assigned' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-t-full"></div>}
+                    {activeTab === 'assigned' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
                 </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-700">
                             <tr>
                                 <th className="p-4 w-10">
                                     <input
                                         type="checkbox"
-                                        className="checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        className="checkbox rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
                                         checked={selectedItems.size === items.length && items.length > 0}
                                         onChange={toggleSelectAll}
                                     />
                                 </th>
-                                <th className="p-4 font-semibold text-gray-600">№</th>
-                                <th className="p-4 font-semibold text-gray-600">{t('name')} / {t('category')}</th>
-                                <th className="p-4 font-semibold text-gray-600">{t('status')} / {t('assigned_to')}</th>
-                                <th className="p-4 font-semibold text-gray-600">{t('arrival_date')}</th>
-                                <th className="p-4 font-semibold text-gray-600">{t('price')}</th>
-                                <th className="p-4 font-semibold text-gray-600">{t('quantity')}</th>
-                                <th className="p-4 font-semibold text-gray-600">Hujjat</th>
-                                <th className="p-4 font-semibold text-gray-600">{t('image')}</th>
-                                <th className="p-4 font-semibold text-gray-600 text-right">{t('actions')}</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">№</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">{t('name')} / {t('category')}</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">{t('status')} / {t('assigned_to')}</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">{t('arrival_date')}</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">{t('price')}</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">{t('quantity')}</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">Hujjat</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400">{t('image')}</th>
+                                <th className="p-4 font-semibold text-gray-600 dark:text-gray-400 text-right">{t('actions')}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                             {loading ? (
-                                <tr><td colSpan="8" className="p-8 text-center text-gray-500">Yuklanmoqda...</td></tr>
+                                <tr><td colSpan="8" className="p-8 text-center text-gray-500 dark:text-gray-400">Yuklanmoqda...</td></tr>
                             ) : items.length === 0 ? (
-                                <tr><td colSpan="8" className="p-8 text-center text-gray-500">Ma'lumot yo'q</td></tr>
+                                <tr><td colSpan="8" className="p-8 text-center text-gray-500 dark:text-gray-400">Ma'lumot yo'q</td></tr>
                             ) : items.map((item, index) => (
-                                <tr key={item.id} className={`hover:bg-gray-50 transition-colors ${selectedItems.has(item.id) ? 'bg-blue-50' : ''}`}>
+                                <tr key={item.id} className={`hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors ${selectedItems.has(item.id) ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}>
                                     <td className="p-4">
                                         <input
                                             type="checkbox"
-                                            className="checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            className="checkbox rounded border-gray-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
                                             checked={selectedItems.has(item.id)}
                                             onChange={() => toggleSelectItem(item.id)}
                                         />
                                     </td>
-                                    <td className="p-4 text-gray-500 font-medium">
+                                    <td className="p-4 text-gray-500 dark:text-gray-400 font-medium">
                                         {(currentPage - 1) * 10 + index + 1}
                                     </td>
                                     <td className="p-4">
-                                        <div className="font-medium text-gray-900">{item.name}</div>
-                                        <div className="text-xs text-gray-500">{item.category}</div>
+                                        <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">{item.category}</div>
                                     </td>
                                     <td className="p-4">
                                         {item.assignedTo ? (
-                                            <span className="text-blue-600 font-medium btn btn-xs bg-blue-50 border-0">{item.assignedTo.name}</span>
+                                            <span className="text-blue-600 dark:text-blue-400 font-medium btn btn-xs bg-blue-50 dark:bg-blue-900/30 border-0">{item.assignedTo.name}</span>
                                         ) : (
-                                            <span className="text-gray-400 italic">Omborda</span>
+                                            <span className="text-gray-400 dark:text-slate-500 italic">Omborda</span>
                                         )}
                                     </td>
-                                    <td className="p-4 text-gray-600">
+                                    <td className="p-4 text-gray-600 dark:text-gray-400">
                                         {item.arrivalDate || item.purchaseDate || "-"}
                                     </td>
-                                    <td className="p-4 font-medium">
+                                    <td className="p-4 font-medium text-gray-900 dark:text-gray-100">
                                         {parseFloat(item.price).toLocaleString()} so'm
                                     </td>
-                                    <td className="p-4 text-gray-900 font-medium whitespace-nowrap text-center">
+                                    <td className="p-4 text-gray-900 dark:text-gray-100 font-medium whitespace-nowrap text-center">
                                         {(() => {
                                             const qty = item.quantity || 1;
                                             const initQty = item.initialQuantity || qty;
@@ -414,13 +414,13 @@ const TMJPage = () => {
                                             if (item.initialOwner || item.assignedTo) {
                                                 // Handed over item: Show "Current / Initial" (e.g., 2/10)
                                                 // Logic: User holds 2 out of original 10
-                                                return <span className="text-blue-600 bg-blue-50 px-2 py-1 rounded">{qty} / {initQty}</span>;
+                                                return <span className="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded">{qty} / {initQty}</span>;
                                             } else {
                                                 // Stock item: Show "Initial / Current" (e.g., 10/8) or just "Current" if full
                                                 // Or requested: "8 barchasi ... sonida 10/8"
                                                 // User requested: "10/8" for stock (Initial / Current)
                                                 if (initQty > qty) {
-                                                    return <span className="text-orange-600 bg-orange-50 px-2 py-1 rounded font-bold">{initQty} / {qty}</span>;
+                                                    return <span className="text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-2 py-1 rounded font-bold">{initQty} / {qty}</span>;
                                                 }
                                                 return qty;
                                             }
@@ -433,13 +433,13 @@ const TMJPage = () => {
                                                 href={(item.contractPdf.startsWith('http') ? "" : BASE_URL.replace('/api', '')) + item.contractPdf}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="flex items-center gap-1 text-red-600 hover:text-red-700 font-medium text-sm bg-red-50 px-2 py-1 rounded border border-red-100 hover:bg-red-100 transition-colors w-fit"
+                                                className="flex items-center gap-1 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium text-sm bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded border border-red-100 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors w-fit"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 <RiFilePdfLine size={16} /> PDF
                                             </a>
                                         ) : (
-                                            <span className="text-gray-300">-</span>
+                                            <span className="text-gray-300 dark:text-gray-600">-</span>
                                         )}
                                     </td>
                                     <td className="p-4">
@@ -458,7 +458,7 @@ const TMJPage = () => {
                                                 const imgSrc = getImageUrl(img);
                                                 return (
                                                     <div
-                                                        className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100 bg-white cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all shadow-sm"
+                                                        className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all shadow-sm"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setPreviewImage(imgSrc);
@@ -468,7 +468,7 @@ const TMJPage = () => {
                                                     </div>
                                                 );
                                             }
-                                            return <span className="text-gray-300">-</span>;
+                                            return <span className="text-gray-300 dark:text-gray-600">-</span>;
                                         })()}
                                     </td>
                                     <td className="p-4 text-right flex justify-end gap-2">
@@ -477,14 +477,14 @@ const TMJPage = () => {
                                                 <button
                                                     onClick={() => { setSelectedHandoverItem(item); setIsHandoverModalOpen(true); }}
                                                     className={`p-2 rounded-lg flex items-center gap-1 border transition-colors ${item.initialOwner
-                                                        ? 'text-green-600 hover:bg-green-50 border-green-100 bg-green-50/50'
-                                                        : 'text-blue-600 hover:bg-blue-50 border-blue-100'}`}
+                                                        ? 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 border-green-100 dark:border-green-800 bg-green-50/50 dark:bg-green-900/20'
+                                                        : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 border-blue-100 dark:border-blue-800'}`}
                                                     title="Topshirish"
                                                 >
                                                     <RiUserReceived2Line size={18} />
                                                     <span className="text-xs font-medium">{item.initialOwner ? t('tmj_handed_over') : t('tmj_handover')}</span>
                                                 </button>
-                                                <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
+                                                <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
                                                     <RiMore2Fill size={18} />
                                                 </button>
                                             </>
@@ -496,7 +496,7 @@ const TMJPage = () => {
                     </table>
                 </div>
                 {/* Pagination */}
-                <div className="p-4 border-t border-gray-100">
+                <div className="p-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/50">
                     <Pagination
                         currentPage={currentPage}
                         totalPages={totalPages}
@@ -526,20 +526,20 @@ const TMJPage = () => {
 
             {/* Custom Delete Confirmation Modal */}
             {showDeleteConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <RiDeleteBinLine className="text-red-600 text-3xl" />
+                            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <RiDeleteBinLine className="text-red-600 dark:text-red-400 text-3xl" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{t('confirm_delete_title_many')}</h3>
-                            <p className="text-gray-500 mb-6">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('confirm_delete_title_many')}</h3>
+                            <p className="text-gray-500 dark:text-gray-400 mb-6">
                                 {t('confirm_delete_message_many').replace('{count}', selectedItems.size)}
                             </p>
                             <div className="flex gap-3 justify-center">
                                 <button
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="px-5 py-2.5 rounded-xl text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                                    className="px-5 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     {t('cancel')}
                                 </button>
@@ -581,24 +581,24 @@ const TMJPage = () => {
 
             {/* Export Modal */}
             {isExportModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 transform transition-all scale-100">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl max-w-sm w-full p-6 transform transition-all scale-100">
                         <div className="flex justify-between items-center mb-6">
                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-green-100 rounded-full text-green-600">
+                                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full text-green-600 dark:text-green-400">
                                     <RiFileExcel2Line size={24} />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-800">Excelga yuklash</h3>
+                                <h3 className="text-lg font-bold text-gray-800 dark:text-white">Excelga yuklash</h3>
                             </div>
                             <button
                                 onClick={() => setIsExportModalOpen(false)}
-                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                             >
                                 <RiCloseLine size={24} />
                             </button>
                         </div>
 
-                        <p className="text-gray-500 mb-6 text-sm">
+                        <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
                             Qaysi turdagi ma'lumotlarni yuklab olmoqchisiz?
                         </p>
 
@@ -606,27 +606,27 @@ const TMJPage = () => {
                             <button
                                 onClick={() => handleExport('all')}
                                 disabled={isExporting}
-                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 transition-all group"
+                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-200 dark:hover:border-blue-800 hover:text-blue-600 dark:hover:text-blue-400 transition-all group"
                             >
-                                <span className="font-medium">Barchasi</span>
+                                <span className="font-medium dark:text-gray-200">Barchasi</span>
                                 <RiDownloadLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
 
                             <button
                                 onClick={() => handleExport('stock')}
                                 disabled={isExporting}
-                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-orange-50 hover:border-orange-200 hover:text-orange-600 transition-all group"
+                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:border-orange-200 dark:hover:border-orange-800 hover:text-orange-600 dark:hover:text-orange-400 transition-all group"
                             >
-                                <span className="font-medium">Ombordagi maxsulotlar</span>
+                                <span className="font-medium dark:text-gray-200">Ombordagi maxsulotlar</span>
                                 <RiDownloadLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
 
                             <button
                                 onClick={() => handleExport('assigned')}
                                 disabled={isExporting}
-                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-purple-50 hover:border-purple-200 hover:text-purple-600 transition-all group"
+                                className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:border-purple-200 dark:hover:border-purple-800 hover:text-purple-600 dark:hover:text-purple-400 transition-all group"
                             >
-                                <span className="font-medium">Berilgan maxsulotlar</span>
+                                <span className="font-medium dark:text-gray-200">Berilgan maxsulotlar</span>
                                 <RiDownloadLine className="opacity-0 group-hover:opacity-100 transition-opacity" />
                             </button>
                         </div>
