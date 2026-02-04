@@ -354,7 +354,8 @@ const updateProfile = async (req, res) => {
                 department: true,
                 position: true,
                 status: true,
-                pinfl: true,
+                employeeId: true,
+                phone: true,
                 image: true
             }
         });
