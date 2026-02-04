@@ -35,16 +35,7 @@ const Header = ({ onMenuClick }) => {
                 <button onClick={onMenuClick} className="md:hidden text-gray-500 hover:text-indigo-600 transition-colors">
                     <RiMenuLine size={24} />
                 </button>
-                <div className="relative max-w-md w-full hidden md:block">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                        <RiSearchLine size={18} />
-                    </span>
-                    <input
-                        type="text"
-                        placeholder={t('search')}
-                        className="w-full pl-10 pr-4 py-2 rounded-full border-none bg-gray-100 dark:bg-slate-800 focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-indigo-100 transition-all text-sm outline-none dark:text-gray-100 placeholder-gray-400"
-                    />
-                </div>
+
             </div>
 
             <div className="flex items-center gap-4">
@@ -80,8 +71,8 @@ const Header = ({ onMenuClick }) => {
                                                 setIsLangMenuOpen(false);
                                             }}
                                             className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-3 ${language === lang.code
-                                                    ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-700 dark:text-indigo-400'
-                                                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
+                                                ? 'bg-indigo-50 text-indigo-600 dark:bg-slate-700 dark:text-indigo-400'
+                                                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700'
                                                 }`}
                                         >
                                             <span className="text-xl">{lang.flag}</span>
