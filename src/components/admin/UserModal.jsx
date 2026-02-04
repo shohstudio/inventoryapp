@@ -47,7 +47,6 @@ const UserModal = ({ isOpen, onClose, onSave, user }) => {
                 role: "employee",
                 department: "",
                 position: "",
-                position: "",
                 status: "active",
                 employeeId: "",
                 password: ""
