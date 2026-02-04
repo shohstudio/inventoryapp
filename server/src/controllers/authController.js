@@ -16,17 +16,9 @@ const login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        console.log("LOGIN REQUEST - Username:", `'${username}'`, "Password:", `'${password}'`);
         const user = await prisma.user.findUnique({
             where: { username },
         });
-
-        console.log('User found:', user);
-
-        if (user) {
-            const isMatch = await bcrypt.compare(password, user.password);
-            console.log('Password match:', isMatch);
-        }
 
         if (user && (await bcrypt.compare(password, user.password))) {
             res.json({
@@ -96,17 +88,23 @@ const registerSetup = async (req, res) => {
 };
 
 // Verify PKCS#7 Signature (Placeholder)
-// In a real production environment, this should call an external service or use a library
-// like 'node-forge' (complex) or an official E-IMZO server module.
+/**
+ * @CAUTION This is a temporary placeholder.
+ * It DOES NOT verify the actual digital signature (PKCS#7).
+ * For production, this MUST call an official verification service (e.g., Soliq API).
+ */
 const verifyPkcs7 = async (signature) => {
-    // TODO: Implement actual verification using:
-    // 1. External API (e.g., https://sign.soliq.uz/api/verify)
-    // 2. Or local library
+    // SECURITY WARNING: In this placeholder state, anyone can login if they know the PINFL.
+    // This MUST be replaced with real verification logic before going live.
 
-    // For now, we trust the signature is present and not empty.
-    // SECURITY WARNING: This allows anyone to login if they know the PINFL without a valid signature.
-    // MUST BE REPLACED FOR PRODUCTION.
     if (!signature) return false;
+
+    // Check if we are in development mode
+    if (process.env.NODE_ENV === 'production') {
+        console.error("CRITICAL SECURITY RISK: E-IMZO placeholder used in production!");
+        return false; // Force fail in production unless real logic is added
+    }
+
     return true;
 };
 
