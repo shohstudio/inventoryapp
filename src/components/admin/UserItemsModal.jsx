@@ -209,7 +209,7 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                                                 <td className="p-3 text-gray-400 text-sm font-mono">{index + 1}</td>
                                                                 <td className="p-3">
                                                                     <div className="font-semibold text-gray-800 text-xs">{item.name}</div>
-                                                                    <div className="text-[10px] text-gray-500">{item.model || '-'} • {item.serialNumber || '-'}</div>
+                                                                    <div className="text-[10px] text-gray-500">{item.model || '-'}</div>
                                                                 </td>
                                                                 <td className="p-3 text-[11px] font-mono text-gray-600">{item.inn || '-'}</td>
                                                                 <td className="p-3 text-[11px] text-gray-600 font-mono">{item.price ? formatPrice(item.price) : '0'}</td>

@@ -301,7 +301,6 @@ const RequestsPage = () => {
                                         </td>
                                         <td className="py-4 px-6 cursor-pointer group" onClick={() => openDetailModal(req)}>
                                             <div className="font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{req.item?.name}</div>
-                                            <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">{req.item?.serialNumber}</div>
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 dark:text-gray-300 text-sm">
                                             {req.type === 'exit' ? (

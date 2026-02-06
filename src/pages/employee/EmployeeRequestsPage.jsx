@@ -115,10 +115,6 @@ const EmployeeRequestsPage = () => {
                                 <span className="text-gray-500 dark:text-gray-400">Model:</span>
                                 <span className="font-medium text-gray-900 dark:text-white">{req.item?.model || '-'}</span>
                             </div>
-                            <div className="flex justify-between mb-1">
-                                <span className="text-gray-500 dark:text-gray-400">Seriya:</span>
-                                <span className="font-mono text-gray-900 dark:text-white">{req.item?.serialNumber || '-'}</span>
-                            </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-500 dark:text-gray-400">Kimdan:</span>
                                 <span className="font-medium text-gray-900 dark:text-white">{req.requester?.name || "Admin"}</span>
@@ -219,7 +215,6 @@ const EmployeeRequestsPage = () => {
                                         </td>
                                         <td className="py-4 px-6">
                                             <div className="font-medium text-gray-900 dark:text-gray-100">{req.item?.name}</div>
-                                            <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">{req.item?.serialNumber}</div>
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 text-sm">
                                             <div className="flex items-center gap-2">

@@ -67,12 +67,6 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                                 <span className="font-medium text-gray-900">{item?.name}</span>
                             </div>
                             <div className="flex justify-between">
-                                <span className="text-gray-500 text-sm">Seriya raqami:</span>
-                                <span className="font-mono text-gray-900 bg-white px-2 py-0.5 rounded border border-blue-100 text-sm">
-                                    {item?.serialNumber || "Mavjud emas"}
-                                </span>
-                            </div>
-                            <div className="flex justify-between">
                                 <span className="text-gray-500 text-sm">Kategoriya:</span>
                                 <span className="text-gray-900">{item?.category}</span>
                             </div>

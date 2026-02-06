@@ -101,7 +101,6 @@ const QRGeneratorModal = ({ isOpen, onClose, item }) => {
                         </div>
                         <p className="text-gray-500 font-medium mt-1">{item.name}</p>
                         {item.orderNumber && <p className="text-xs text-gray-400 font-mono mt-1">Inv: {item.orderNumber}</p>}
-                        {item.serialNumber && <p className="text-xs text-gray-400 font-mono">S/N: {item.serialNumber}</p>}
                     </div>
                 </div>
 

@@ -7,7 +7,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
     const [formData, setFormData] = useState({
         name: "",
         model: "",
-        serial: "",
         inn: "",
         orderNumber: "",
         category: "",
@@ -76,7 +75,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
             setFormData({
                 name: item.name || "",
                 model: item.model || "",
-                serial: item.serialNumber || "",
                 inn: item.inn || "",
                 orderNumber: item.orderNumber || "",
                 category: item.category || "",
@@ -110,7 +108,6 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
             setFormData({
                 name: initialData?.name || "",
                 model: initialData?.model || "",
-                serial: "",
                 inn: "",
                 orderNumber: "",
                 category: initialData?.category || categories[0],

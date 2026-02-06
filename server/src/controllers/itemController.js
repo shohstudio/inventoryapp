@@ -31,7 +31,6 @@ const getItems = async (req, res) => {
             where.OR = [
                 { name: { contains: search } }, // SQLite is case-insensitive by default roughly, or basic
                 { model: { contains: search } },
-                { serialNumber: { contains: search } },
                 { inn: { contains: search } },
                 { orderNumber: { contains: search } },
                 { assignedTo: { name: { contains: search } } } // Search by assigned user name too
@@ -184,7 +183,7 @@ const getItemById = async (req, res) => {
 const createItem = async (req, res) => {
     try {
         const {
-            name, model, serialNumber, inn, orderNumber, category, subCategory,
+            name, model, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId,
             assignedEmployeeId, assignedTo, assignedRole, unit // Extract new fields
@@ -210,8 +209,6 @@ const createItem = async (req, res) => {
                 contractPdf = `/uploads/${pdfFiles[0].filename}`;
             }
         }
-        // Legacy single file fallback (removed mostly, but safe to keep check if needed, but Multer usually arrays now)
-
         // Check if User exists by Employee ID or assignedUserId
         let targetUser = null;
         if (assignedUserId && !isNaN(parseInt(assignedUserId))) {
@@ -223,29 +220,26 @@ const createItem = async (req, res) => {
         const itemData = {
             name,
             model: model || null,
-            serialNumber: (serialNumber === "" || !serialNumber) ? null : serialNumber,
             inn: (inn === "" || !inn) ? null : inn,
             orderNumber: (orderNumber === "" || !orderNumber) ? null : orderNumber,
             category: category || null,
             subCategory: subCategory || null,
             price: (price && !isNaN(parseFloat(price))) ? parseFloat(price) : 0,
             quantity: (quantity && !isNaN(parseFloat(quantity))) ? parseFloat(quantity) : 1,
-            unit: unit || "dona", // Add unit field
-            initialQuantity: (quantity && !isNaN(parseFloat(quantity))) ? parseFloat(quantity) : 1, // Set initial batch size
+            unit: unit || "dona",
+            initialQuantity: (quantity && !isNaN(parseFloat(quantity))) ? parseFloat(quantity) : 1,
             purchaseDate,
-            status,
+            status: status || "working",
             condition,
             building,
             location,
             department,
             image, // Main image
-            images: JSON.stringify(images), // All images as JSON
+            images: JSON.stringify(images),
             contractPdf,
             inventoryType,
-            // Do NOT assign directly yet
-            assignedUserId: null,
-            assignedDate: null,
-            // Save initial info if user not found (for future linking)
+            assignedUserId: targetUser ? targetUser.id : null,
+            assignedDate: targetUser ? new Date() : null,
             initialEmployeeId: !targetUser && assignedEmployeeId ? assignedEmployeeId : null,
             initialOwner: !targetUser && assignedTo ? assignedTo : null,
             initialRole: !targetUser && assignedRole ? assignedRole : null
@@ -270,21 +264,20 @@ const createItem = async (req, res) => {
             await prisma.request.create({
                 data: {
                     type: 'assignment',
-                    status: 'pending_accountant', // Admin created -> Needs Accountant Approval
+                    status: 'pending_accountant',
                     itemId: item.id,
                     requesterId: req.user.id,
                     targetUserId: targetUser.id,
                     description: `Yangi jihoz yaratildi va biriktirildi. (ID: ${targetUser.employeeId || targetUser.id})`
                 }
             });
-            // We can return a specific message saying request created
         }
 
         res.status(201).json(item);
     } catch (error) {
         console.error(error);
-        if (error.code === 'P2002' && error.meta?.target?.includes('serialNumber')) {
-            return res.status(400).json({ message: "Bunday Seriya/INN raqamli jihoz allaqachon mavjud!" });
+        if (error.code === 'P2002' && error.meta?.target?.includes('inn')) {
+            return res.status(400).json({ message: "Bunday INN raqamli jihoz allaqachon mavjud!" });
         }
         res.status(400).json({ message: error.message });
     }
@@ -297,7 +290,7 @@ const updateItem = async (req, res) => {
     try {
 
         const {
-            name, model, serialNumber, inn, orderNumber, category, subCategory,
+            name, model, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId, assignedEmployeeId, assignedRole, assignedTo,
             existingImages, // JSON string or array of strings of OLD images to keep
@@ -315,7 +308,6 @@ const updateItem = async (req, res) => {
 
         const dataToUpdate = {
             name, model,
-            serialNumber: (serialNumber === "" || serialNumber === null) ? null : serialNumber,
             inn: (inn === "" || inn === null) ? null : inn,
             orderNumber: (orderNumber === "" || orderNumber === null) ? null : orderNumber,
             category, subCategory,
@@ -474,7 +466,6 @@ const updateItem = async (req, res) => {
             const newItemData = {
                 name: item.name,
                 model: item.model,
-                serialNumber: item.serialNumber ? `${item.serialNumber}-split-${Date.now()}` : null, // Ensure uniqueness when splitting batch
                 inn: item.inn,
                 orderNumber: item.orderNumber,
                 category: item.category,
@@ -663,69 +654,43 @@ const importItems = async (req, res) => {
             itemsToCreate.push({
                 name: String(name),
                 model: String(getVal(['Model', 'model']) || ''),
-                serialNumber: getVal(['Seriya', 'Serial', 'Seriya raqami', 'serial', 'serialNumber']) ? String(getVal(['Seriya', 'Serial', 'Seriya raqami', 'serial', 'serialNumber'])) : null,
-                inn: getVal(['INN', 'Inn', 'inn']) ? String(getVal(['INN', 'Inn', 'inn'])) : null,
-                orderNumber: getVal(['OrderNumber', 'orderNumber', 'Invertar raqami', 'Invertar']) ? String(getVal(['OrderNumber', 'orderNumber', 'Invertar raqami', 'Invertar'])) : null,
+                inn: getVal(['INN', 'Inn', 'inn', 'Inventar n', 'Inventar Nomer']) ? String(getVal(['INN', 'Inn', 'inn', 'Inventar n', 'Inventar Nomer'])) : null,
+                orderNumber: getVal(['OrderNumber', 'orderNumber', 'Invertar raqami', 'Invertar', 'Order Number']) ? String(getVal(['OrderNumber', 'orderNumber', 'Invertar raqami', 'Invertar', 'Order Number'])) : null,
                 category: String(getVal(['Kategoriya', 'Category', 'category']) || 'Boshqa'),
-                subCategory: String(getVal(['Subkategoriya', 'SubCategory']) || ''),
-                price: parseFloat(String(getVal(['Narx', 'Price', 'Narxi', 'price']) || '0').replace(/[^0-9.]/g, '')),
-                quantity: parseInt(String(getVal(['Soni', 'Quantity', 'quantity']) || '1')),
-                purchaseDate: String(getVal(['Xarid sanasi', 'Purchase Date', 'purchaseDate']) || ''),
+                subCategory: String(getVal(['Subkategoriya', 'SubCategory', 'Turi']) || ''),
+                price: parseFloat(String(getVal(['Narx', 'Price', 'Narxi', 'price', 'Summa']) || '0').replace(/[^0-9.]/g, '')),
+                quantity: parseInt(String(getVal(['Soni', 'Quantity', 'quantity', 'ta']) || '1')),
+                purchaseDate: String(getVal(['Xarid sanasi', 'Purchase Date', 'purchaseDate', 'Yili']) || ''),
                 building: String(getVal(['Bino', 'Building', 'building']) || ''),
-                location: String(getVal(['Joylashuv', 'Location', 'location']) || 'Ombor'),
+                location: String(getVal(['Joylashuv', 'Location', 'location', 'Joylashuvi']) || 'Ombor'),
                 department: String(getVal(['Bo\'lim', 'Department', 'department']) || ''),
                 status: status,
                 assignedUserId,
                 assignedDate,
                 initialOwner,
-                initialEmployeeId
+                initialEmployeeId,
+                inventoryType: getVal(['Turi', 'Type', 'inventoryType'])?.toString().toLowerCase().trim() === 'tmj' ? 'tmj' : 'warehouse'
             });
         }
 
         if (itemsToCreate.length > 0) {
-            // Deduplication logic (same as before)
-            const uniqueFileItemsMap = new Map();
-            const itemsWithoutSerial = [];
-
-            for (const item of itemsToCreate) {
-                if (item.serialNumber) {
-                    if (!uniqueFileItemsMap.has(item.serialNumber)) {
-                        uniqueFileItemsMap.set(item.serialNumber, item);
-                    }
-                } else {
-                    itemsWithoutSerial.push(item);
-                }
-            }
-
-            const uniqueFileItems = [...Array.from(uniqueFileItemsMap.values()), ...itemsWithoutSerial];
-            const serials = uniqueFileItems.map(item => item.serialNumber).filter(s => s);
-
-            const existingItems = await prisma.item.findMany({
-                where: { serialNumber: { in: serials } },
-                select: { serialNumber: true }
+            // Simplified: Creation without deduplication on serialNumber
+            await prisma.item.createMany({
+                data: itemsToCreate
             });
 
-            const existingSerials = new Set(existingItems.map(i => i.serialNumber));
-            const newItems = uniqueFileItems.filter(item => !item.serialNumber || !existingSerials.has(item.serialNumber));
+            await prisma.log.create({
+                data: {
+                    action: 'import',
+                    details: `Imported ${itemsToCreate.length} items from Excel.`,
+                    userId: req.user.id
+                }
+            });
 
-            if (newItems.length > 0) {
-                await prisma.item.createMany({
-                    data: newItems
-                });
-
-                await prisma.log.create({
-                    data: {
-                        action: 'import',
-                        details: `Imported ${newItems.length} items from Excel.`,
-                        userId: req.user.id
-                    }
-                });
-            }
-
-            fs.unlinkSync(req.file.path);
+            if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
 
             return res.json({
-                message: `${newItems.length} ta yangi jihoz yuklandi! (${itemsToCreate.length - newItems.length} ta dublikat tashlab ketildi)`
+                message: `${itemsToCreate.length} ta yangi jihoz yuklandi!`
             });
         }
     } catch (error) {

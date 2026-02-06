@@ -106,7 +106,6 @@ const MyItemsPage = () => {
             "№": index + 1,
             "Jihoz Nomi": item.name,
             "Model": item.model || "-",
-            "Seriya Raqami": item.serialNumber || "-",
             "Kategoriya": item.category || "-",
             "Holat": item.status === 'working' ? "Faol" : "Ta'mirda",
             "Biriktirilgan Sana": item.dateAssigned,
@@ -177,7 +176,6 @@ const MyItemsPage = () => {
                                 <div key={req.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 border border-transparent dark:border-slate-700">
                                     <div>
                                         <h3 className="font-bold text-gray-800 dark:text-white">{req.item?.name}</h3>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">Seriya: {req.item?.serialNumber || "Yo'q"}</p>
                                         <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                             Kimdan: <span className="font-medium text-gray-600 dark:text-gray-300">{req.requester?.name || "Admin"}</span>
                                         </div>
@@ -222,7 +220,6 @@ const MyItemsPage = () => {
                                     <tr className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
                                         <th className="p-4 font-semibold">#</th>
                                         <th className="p-4 font-semibold">Jihoz Nomi</th>
-                                        <th className="p-4 font-semibold">Seriya Raqami</th>
                                         <th className="p-4 font-semibold">Kategoriya</th>
                                         <th className="p-4 font-semibold">Holat</th>
                                         <th className="p-4 font-semibold text-right">Hujjat</th>
@@ -233,7 +230,6 @@ const MyItemsPage = () => {
                                         <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors text-sm">
                                             <td className="p-4 text-gray-400 dark:text-gray-500 font-mono">{index + 1}</td>
                                             <td className="p-4 font-medium text-gray-900 dark:text-gray-100">{item.name}</td>
-                                            <td className="p-4 font-mono text-gray-600 dark:text-gray-400">{item.serialNumber || "-"}</td>
                                             <td className="p-4">
                                                 <span className="bg-gray-100 dark:bg-slate-900 text-gray-600 dark:text-gray-400 px-2 py-1 rounded text-xs border border-transparent dark:border-slate-700">
                                                     {item.category || "-"}

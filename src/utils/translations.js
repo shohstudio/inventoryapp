@@ -16,7 +16,7 @@ export const translations = {
 
         // General
         search: "Qidirish...",
-        search_placeholder: "Qidirish (Nomi, Model, Seriya, INN, JSHShIR)...",
+        search_placeholder: "Jihoz nomi yoki INN bo'yicha qidirish...",
         filter: "Filter",
         add_new: "Yangi qo'shish",
         attach_warehouse: "Ombordan biriktirish",
@@ -65,7 +65,6 @@ export const translations = {
         edit_item: "Jihozni tahrirlash",
         add_item: "Yangi jihoz qo'shish",
         basic_info: "Asosiy ma'lumotlar",
-        serial_number: "Seriya raqami",
         category: "Kategoriya",
         assigned_to: "Javobgar shaxs",
         upload_images: "Rasmlarni yuklash",
@@ -172,9 +171,7 @@ export const translations = {
 
         // TMJ Page
         tmj_stock: "Omborda", // Short for "Omborga kelgan maxsulotlar" -> Keep it concise "Omborda" or "Omborga kelgan"
-        tmj_stock: "Ombordagi maxsulotlar",
         tmj_assigned: "Berilgan maxsulotlar",
-        tmj_handover: "Topshirish",
         tmj_handover: "Topshirish",
         tmj_handed_over: "Topshirilgan",
         tmj_sidebar: "TMJ",
@@ -252,7 +249,6 @@ export const translations = {
         edit_item: "Жиҳозни таҳрирлаш",
         add_item: "Янги жиҳоз қўшиш",
         basic_info: "Асосий маълумотлар",
-        serial_number: "Серия рақами",
         category: "Категория",
         assigned_to: "Жавобгар шахс",
         upload_images: "Расмларни юклаш",
@@ -280,7 +276,7 @@ export const translations = {
 
         // Inventory Dates Page
         inventory_dates_title: "Инвертаризация даври",
-        inventory_dates_desc: "Белгиланган саналар оралиғида тизимда инвертаризация ўтказилаётгани ҳақида барча фойдаланувчиларга огоҳлантириш кўрсатилади.",
+        inventory_dates_desc: "Белгиланган саналар оралиғида тизимда инвертаризация ўтказилаётгани ҳақида барча фойдаланувчиларгa огоҳлантириш кўрсатилади.",
         start_date: "Бошлаш санаси",
         end_date: "Тугаш санаси",
         save_and_publish: "Сақлаш ва Эълон қилиш",
@@ -361,7 +357,6 @@ export const translations = {
         tmj_stock: "Омбордаги маҳсулотлар",
         tmj_assigned: "Берилган маҳсулотлар",
         tmj_handover: "Топшириш",
-        tmj_handover: "Топшириш",
         tmj_handed_over: "Топширилган",
         tmj_sidebar: "ТМЖ", // Cirillic TMJ
 
@@ -437,7 +432,6 @@ export const translations = {
         edit_item: "Редактировать",
         add_item: "Добавить оборудование",
         basic_info: "Основная информация",
-        serial_number: "Серийный номер",
         category: "Категория",
         assigned_to: "Ответственное лицо",
         upload_images: "Загрузить фото",
