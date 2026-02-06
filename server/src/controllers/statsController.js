@@ -163,55 +163,36 @@ const getDashboardStats = async (req, res) => {
 
 const getTMJStats = async (req, res) => {
     try {
-        const tmjFilter = { inventoryType: 'tmj' };
+        const tmjFilter = { inventoryType: 'tmj', status: { not: 'written-off' } };
 
-        // 1. Total TMJ Items
-        const totalItemsCount = await prisma.item.count({
-            where: {
-                ...tmjFilter,
-                status: { not: 'written-off' }
-            }
-        });
-
-        // 2. Handed-over Count
-        // Item is handed over if assignedUserId is NOT null OR initialOwner is NOT null/empty
-        const handedOverFilter = {
-            ...tmjFilter,
-            OR: [
-                { assignedUserId: { not: null } },
-                { initialOwner: { not: null, not: '' } }
-            ]
-        };
-        const handedOverCount = await prisma.item.count({ where: handedOverFilter });
-
-        // 3. Values
         const allTmjItems = await prisma.item.findMany({
-            where: {
-                ...tmjFilter,
-                status: { not: 'written-off' }
-            },
+            where: tmjFilter,
             select: { price: true, quantity: true, assignedUserId: true, initialOwner: true }
         });
 
-        let inStockValue = 0;
+        let totalProducts = 0;
+        let handedOverProducts = 0;
+        let totalValue = 0;
         let handedOverValue = 0;
 
         allTmjItems.forEach(item => {
             const price = parseFloat(item.price?.toString() || 0);
-            const quantity = parseInt(item.quantity || 1);
-            const isHandedOver = item.assignedUserId || (item.initialOwner && item.initialOwner !== "");
+            const qty = parseInt(item.quantity || 0);
+            const isHandedOver = !!(item.assignedUserId || (item.initialOwner && item.initialOwner !== ""));
+
+            totalProducts += qty;
+            totalValue += (price * qty);
 
             if (isHandedOver) {
-                handedOverValue += (price * quantity);
-            } else {
-                inStockValue += (price * quantity);
+                handedOverProducts += qty;
+                handedOverValue += (price * qty);
             }
         });
 
         res.json({
-            totalItems: totalItemsCount,
-            handedOverCount,
-            inStockValue,
+            totalItems: totalProducts,
+            handedOverCount: handedOverProducts,
+            totalValue,
             handedOverValue
         });
     } catch (error) {

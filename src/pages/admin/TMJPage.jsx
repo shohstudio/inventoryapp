@@ -366,10 +366,10 @@ const TMJPage = () => {
                 />
                 <StatsCard
                     title="Umumiy qiymat"
-                    value={formatValue(tmjStats.inStockValue) + " so'm"}
+                    value={formatValue(tmjStats.totalValue) + " so'm"}
                     icon={<RiMoneyDollarCircleLine size={24} />}
                     color="purple"
-                    trendLabel="Omborda"
+                    trendLabel="Barchasi"
                     trend={0}
                 />
                 <StatsCard
