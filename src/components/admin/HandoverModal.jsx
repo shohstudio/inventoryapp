@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiCloseLine, RiSave3Line, RiImageAddLine } from "react-icons/ri";
 import { toast } from "react-hot-toast";
-import { BASE_URL } from "../../api/axios";
+import api, { getImageUrl } from "../../api/axios";
 
 const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
     const [formData, setFormData] = useState({
@@ -29,7 +29,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                 handoverQuantity: "1", // Default to 1
                 handoverDate: item.assignedDate ? item.assignedDate.split('T')[0] : new Date().toISOString().split('T')[0],
                 handoverImage: item.handoverImage || null,
-                handoverImagePreview: item.handoverImage ? (item.handoverImage.startsWith('http') ? item.handoverImage : BASE_URL.replace('/api', '') + item.handoverImage) : null,
+                handoverImagePreview: getImageUrl(item.handoverImage),
                 assignedEmployeeId: item.initialEmployeeId || ""
             });
         } else {
