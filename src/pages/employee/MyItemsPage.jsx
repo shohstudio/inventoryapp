@@ -65,6 +65,27 @@ const MyItemsPage = () => {
         }
     };
 
+    const handleReportUpload = async (itemId, file) => {
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('employeeReport', file);
+
+        const loadingToast = toast.loading("Hisobot yuklanmoqda...");
+        try {
+            await api.put(`/items/${itemId}`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            toast.success("Hisobot muvaffaqiyatli yuklandi!");
+            fetchData(); // Refresh to show the new file
+        } catch (error) {
+            console.error("Upload report error", error);
+            toast.error("Yuklashda xatolik yuz berdi");
+        } finally {
+            toast.dismiss(loadingToast);
+        }
+    };
+
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -278,7 +299,27 @@ const MyItemsPage = () => {
                                                             <RiFileList3Line size={16} /> Shartnoma (PDF)
                                                         </a>
                                                     )}
-                                                    {!item.assignedDocument && !item.contractPdf && <span className="text-gray-300">-</span>}
+                                                    {item.employeeReport ? (
+                                                        <a href={getImageUrl(item.employeeReport)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-green-600 hover:text-green-800 hover:underline font-medium text-xs">
+                                                            <RiFileList3Line size={16} /> Mening Hisobotim
+                                                        </a>
+                                                    ) : (
+                                                        <div className="mt-1">
+                                                            <input
+                                                                type="file"
+                                                                id={`report-${item.id}`}
+                                                                className="hidden"
+                                                                onChange={(e) => handleReportUpload(item.id, e.target.files[0])}
+                                                            />
+                                                            <label
+                                                                htmlFor={`report-${item.id}`}
+                                                                className="cursor-pointer inline-flex items-center gap-1 text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-1 rounded transition-colors"
+                                                            >
+                                                                <RiFileList3Line size={12} /> Hisobot yuklash
+                                                            </label>
+                                                        </div>
+                                                    )}
+                                                    {!item.assignedDocument && !item.contractPdf && !item.employeeReport && <span className="text-gray-300">-</span>}
                                                 </div>
                                             </td>
                                         </tr>

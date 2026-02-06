@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x", "rhel-openssl-1.0.x"]
+  binaryTargets = ["native"]
 }
 
 datasource db {
@@ -80,6 +80,7 @@ model Item {
   assignedDate DateTime? // When it was assigned
   lastCheckedAt DateTime? // When it was last verified during inventory
   assignedDocument String? // PDF document from accountant (Nakladnoy)
+  employeeReport String? // Report uploaded by employee
 
   logs         Log[]
   requests     Request[]

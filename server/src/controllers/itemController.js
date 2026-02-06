@@ -381,6 +381,10 @@ const updateItem = async (req, res) => {
             if (handoverFile) {
                 dataToUpdate.handoverImage = `/uploads/${handoverFile.filename}`;
             }
+            const reportFile = req.files.find(f => f.fieldname === 'employeeReport');
+            if (reportFile) {
+                dataToUpdate.employeeReport = `/uploads/${reportFile.filename}`;
+            }
         }
 
         // Handle Assignment Logic by Employee ID or ID
