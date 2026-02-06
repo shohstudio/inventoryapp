@@ -24,13 +24,7 @@ const getDashboardStats = async (req, res) => {
 
         // 2. Item Stats & Trends (Warehouse Only)
         // Exclude TMJ from main dashboard counts
-        // Explicitly include warehouse and null (in case some records missed migration default)
-        const warehouseFilter = {
-            OR: [
-                { inventoryType: 'warehouse' },
-                { inventoryType: null }
-            ]
-        };
+        const warehouseFilter = { inventoryType: { not: 'tmj' } };
 
         const totalItems = await prisma.item.count({
             where: {
@@ -79,7 +73,7 @@ const getDashboardStats = async (req, res) => {
         });
 
         const totalValue = currentItemsValue.reduce((acc, item) => {
-            const price = parseFloat(item.price || 0);
+            const price = parseFloat(item.price?.toString() || 0);
             const quantity = parseInt(item.quantity || 1);
             return acc + (price * quantity);
         }, 0);
@@ -93,7 +87,7 @@ const getDashboardStats = async (req, res) => {
             select: { price: true, quantity: true }
         });
         const newValue = newItemsThisMonth.reduce((acc, item) => {
-            const price = parseFloat(item.price || 0);
+            const price = parseFloat(item.price?.toString() || 0);
             const quantity = parseInt(item.quantity || 1);
             return acc + (price * quantity);
         }, 0);
