@@ -213,8 +213,8 @@ const EmployeeRequestsPage = () => {
                                         <td className="py-4 px-6 text-gray-600 dark:text-gray-400 text-sm">
                                             {new Date(req.createdAt).toLocaleString('uz-UZ')}
                                         </td>
-                                        <td className="py-4 px-6">
-                                            <div className="font-medium text-gray-900 dark:text-gray-100">{req.item?.name}</div>
+                                        <td className="py-4 px-6 cursor-pointer group" onClick={() => openDetailModal(req)}>
+                                            <div className="font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{req.item?.name}</div>
                                         </td>
                                         <td className="py-4 px-6 text-gray-700 text-sm">
                                             <div className="flex items-center gap-2">
