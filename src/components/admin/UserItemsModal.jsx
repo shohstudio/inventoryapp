@@ -255,7 +255,7 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                                                     <div className="text-[10px] text-gray-500">{item.model || '-'} • {item.category || '-'}</div>
                                                                 </td>
                                                                 <td className="p-3">
-                                                                    <div className="text-xs font-bold text-gray-900">{item.quantity || 1} ta</div>
+                                                                    <div className="text-xs font-bold text-gray-900">{item.quantity || 1} {item.unit || 'dona'}</div>
                                                                     <div className="text-[10px] text-gray-500 font-mono">{item.price ? formatPrice(item.price) : '0'} som</div>
                                                                 </td>
                                                                 <td className="p-3">
@@ -332,7 +332,7 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                                                 <div className="text-[10px] text-gray-500">{req.item?.model || '-'}</div>
                                                             </td>
                                                             <td className="p-3">
-                                                                <div className="text-xs font-bold text-gray-900">{req.item?.quantity || 1} ta</div>
+                                                                <div className="text-xs font-bold text-gray-900">{req.item?.quantity || 1} {req.item?.unit || 'dona'}</div>
                                                                 <div className="text-[10px] text-gray-500 font-mono">{req.item?.price ? formatPrice(req.item.price) : '0'} som</div>
                                                             </td>
                                                             <td className="p-3">

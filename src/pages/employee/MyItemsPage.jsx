@@ -302,7 +302,7 @@ const MyItemsPage = () => {
                                                 <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
                                                 <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{item.model} • {item.category}</div>
                                             </td>
-                                            <td className="p-4 font-mono text-gray-900 dark:text-gray-100 font-bold">{item.quantity} ta</td>
+                                            <td className="p-4 font-mono text-gray-900 dark:text-gray-100 font-bold">{item.quantity} {item.unit || 'dona'}</td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
                                                     {item.image && (

@@ -22,6 +22,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
         warranty: "",
         price: "",
         quantity: "1",
+        unit: "dona", // Add unit field
         images: [],
         imageFiles: [], // Store NEW files here
         pdf: null
@@ -67,6 +68,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                 warranty: "",
                 price: "",
                 quantity: "1",
+                unit: "dona",
                 images: [],
                 imageFiles: [],
                 pdf: null
@@ -228,21 +230,40 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                         </div>
                     </div>
 
-                    {/* row 3 */}
+                    {/* row 3: Unit and Quantity */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Soni <span className="text-red-500">*</span></label>
+                            <label className="label">O'lchov Birligi <span className="text-red-500">*</span></label>
+                            <select
+                                name="unit"
+                                className="input"
+                                value={formData.unit}
+                                onChange={handleChange}
+                            >
+                                <option value="dona">Soni (dona)</option>
+                                <option value="metr">Metri (m)</option>
+                                <option value="kg">Kilogramm (kg)</option>
+                                <option value="litr">Litri (l)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="label">Miqdori <span className="text-red-500">*</span></label>
                             <input
                                 type="number"
                                 name="quantity"
                                 className={`input ${errors.quantity ? 'border-red-500 ring-red-500' : ''}`}
                                 value={formData.quantity}
                                 onChange={handleChange}
-                                min="1"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="Masalan: 10.5"
                             />
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Narxi (1 dona) <span className="text-red-500">*</span></label>
+                            <label className="label">Narxi (1 {formData.unit === 'dona' ? 'dona' : formData.unit === 'metr' ? 'metr' : formData.unit === 'kg' ? 'kg' : 'litr'}) <span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 name="price"
@@ -252,70 +273,70 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 placeholder="So'm"
                             />
                         </div>
-                    </div>
 
-                    {/* Optional Extras */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
-                        {/* Hiding Model/Year/Warranty if not explicitly asked, to keep UI clean as requested, or keep them? 
+                        {/* Optional Extras */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                            {/* Hiding Model/Year/Warranty if not explicitly asked, to keep UI clean as requested, or keep them? 
                            User listed specific fields. I'll keep them in state but hide/show based on preference.
                            User said "huddi ombornikiga o'xshasin LEKIN unda..." implies modification.
                            If I remove them, backend might complain about valid fields? No, backend models are strings/optional.
                            I'll keep them accessible or just omit from UI if strict.
                            Let's render them as optional for completeness.
                         */}
-                    </div>
+                        </div>
 
-                    {/* PDF Upload */}
-                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                        <label className="label flex items-center gap-2">
-                            <RiFilePdfLine className="text-blue-600" />
-                            Shartnoma (PDF)
-                        </label>
-                        <div className="flex flex-col gap-2">
-                            <div className="flex items-center gap-3">
-                                <input
-                                    type="file"
-                                    accept="application/pdf"
-                                    onChange={(e) => {
-                                        if (e.target.files[0]) {
-                                            setFormData(prev => ({ ...prev, pdf: e.target.files[0] }));
-                                        }
-                                    }}
-                                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 text-sm text-gray-500"
-                                />
-                            </div>
-                            {formData.pdf && (
-                                <div className="mt-2 p-3 bg-white rounded-lg border border-blue-200 flex items-center justify-between shadow-sm">
-                                    <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
-                                        <RiFilePdfLine className="text-red-500 text-lg" />
-                                        {typeof formData.pdf === 'string'
-                                            ? "Joriy shartnoma fayli"
-                                            : formData.pdf.name}
-                                    </span>
-                                    {typeof formData.pdf === 'string' ? (
-                                        <a
-                                            href={getImageUrl(formData.pdf)}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors"
-                                        >
-                                            Ko'rish
-                                        </a>
-                                    ) : (
-                                        <div className="flex items-center gap-2">
+                        {/* PDF Upload */}
+                        <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <label className="label flex items-center gap-2">
+                                <RiFilePdfLine className="text-blue-600" />
+                                Shartnoma (PDF)
+                            </label>
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="file"
+                                        accept="application/pdf"
+                                        onChange={(e) => {
+                                            if (e.target.files[0]) {
+                                                setFormData(prev => ({ ...prev, pdf: e.target.files[0] }));
+                                            }
+                                        }}
+                                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 text-sm text-gray-500"
+                                    />
+                                </div>
+                                {formData.pdf && (
+                                    <div className="mt-2 p-3 bg-white rounded-lg border border-blue-200 flex items-center justify-between shadow-sm">
+                                        <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
+                                            <RiFilePdfLine className="text-red-500 text-lg" />
+                                            {typeof formData.pdf === 'string'
+                                                ? "Joriy shartnoma fayli"
+                                                : formData.pdf.name}
+                                        </span>
+                                        {typeof formData.pdf === 'string' ? (
                                             <a
-                                                href={URL.createObjectURL(formData.pdf)}
+                                                href={getImageUrl(formData.pdf)}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className="px-3 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium hover:bg-green-100 transition-colors"
+                                                className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors"
                                             >
                                                 Ko'rish
                                             </a>
-                                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-1 rounded uppercase">Yangi</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                                        ) : (
+                                            <div className="flex items-center gap-2">
+                                                <a
+                                                    href={URL.createObjectURL(formData.pdf)}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="px-3 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium hover:bg-green-100 transition-colors"
+                                                >
+                                                    Ko'rish
+                                                </a>
+                                                <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-1 rounded uppercase">Yangi</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 

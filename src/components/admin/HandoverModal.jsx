@@ -115,11 +115,11 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
         if (!formData.handoverPosition.trim()) newErrors.handoverPosition = "Lavozim kiritilishi shart";
         if (!formData.handoverBuilding.trim()) newErrors.handoverBuilding = "Bino tanlanishi shart";
 
-        const qty = parseInt(formData.handoverQuantity);
-        if (!formData.handoverQuantity || isNaN(qty) || qty < 1) {
+        const qty = parseFloat(formData.handoverQuantity);
+        if (!formData.handoverQuantity || isNaN(qty) || qty <= 0) {
             newErrors.handoverQuantity = "Soni noto'g'ri";
-        } else if (item && qty > item.quantity) {
-            newErrors.handoverQuantity = `Mavjud sonidan ko'p (Maks: ${item.quantity})`;
+        } else if (item && qty > parseFloat(item.quantity)) {
+            newErrors.handoverQuantity = `Mavjud sonidan ko'p (Maks: ${item.quantity} ${item.unit || 'dona'})`;
         }
 
         if (!formData.handoverDate) newErrors.handoverDate = "Sana kiritilishi shart";
@@ -231,14 +231,15 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                     </div>
 
                     <div>
-                        <label className="label">Topshirilayotgan soni (Mavjud: {item?.quantity || 0}) <span className="text-red-500">*</span></label>
+                        <label className="label">Topshirilayotgan soni (Mavjud: {item?.quantity || 0} {item?.unit || 'dona'}) <span className="text-red-500">*</span></label>
                         <input
                             type="number"
                             name="handoverQuantity"
                             className={`input ${errors.handoverQuantity ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             value={formData.handoverQuantity}
                             onChange={handleChange}
-                            min="1"
+                            min="0.01"
+                            step="0.01"
                             max={item?.quantity || 1}
                             disabled={readOnly}
                         />

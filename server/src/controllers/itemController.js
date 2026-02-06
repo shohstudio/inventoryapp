@@ -187,7 +187,7 @@ const createItem = async (req, res) => {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
             price, quantity, purchaseDate, status, condition,
             building, location, department, assignedUserId,
-            assignedEmployeeId, assignedTo, assignedRole // Extract new fields
+            assignedEmployeeId, assignedTo, assignedRole, unit // Extract new fields
         } = req.body;
 
         // MULTI-IMAGE & PDF HANDLING
@@ -229,8 +229,9 @@ const createItem = async (req, res) => {
             category: category || null,
             subCategory: subCategory || null,
             price: (price && !isNaN(parseFloat(price))) ? parseFloat(price) : 0,
-            quantity: (quantity && !isNaN(parseInt(quantity))) ? parseInt(quantity) : 1,
-            initialQuantity: (quantity && !isNaN(parseInt(quantity))) ? parseInt(quantity) : 1, // Set initial batch size
+            quantity: (quantity && !isNaN(parseFloat(quantity))) ? parseFloat(quantity) : 1,
+            unit: unit || "dona", // Add unit field
+            initialQuantity: (quantity && !isNaN(parseFloat(quantity))) ? parseFloat(quantity) : 1, // Set initial batch size
             purchaseDate,
             status,
             condition,
@@ -301,7 +302,8 @@ const updateItem = async (req, res) => {
             building, location, department, assignedUserId, assignedEmployeeId, assignedRole, assignedTo,
             existingImages, // JSON string or array of strings of OLD images to keep
             initialOwner, initialRole, assignedDate, handoverQuantity, // Extract Handover fields directly
-            inventoryType // Allow updating inventory type
+            inventoryType, // Allow updating inventory type
+            unit // Extract unit
         } = req.body;
 
         const id = parseInt(req.params.id);
@@ -318,10 +320,11 @@ const updateItem = async (req, res) => {
             orderNumber: (orderNumber === "" || orderNumber === null) ? null : orderNumber,
             category, subCategory,
             price: (price !== undefined && price !== "") ? (isNaN(parseFloat(price)) ? 0 : parseFloat(price)) : undefined,
-            quantity: (quantity !== undefined && quantity !== "") ? (isNaN(parseInt(quantity)) ? 1 : parseInt(quantity)) : undefined,
+            quantity: (quantity !== undefined && quantity !== "") ? (isNaN(parseFloat(quantity)) ? 1 : parseFloat(quantity)) : undefined,
             purchaseDate, status, condition,
             building, location, department,
-            ...(inventoryType && { inventoryType }) // Only update if provided
+            ...(inventoryType && { inventoryType }), // Only update if provided
+            ...(unit && { unit }) // Only update if provided
         };
 
         // IMAGE & PDF HANDLING
@@ -440,8 +443,8 @@ const updateItem = async (req, res) => {
 
         // --- PARTIAL HANDOVER SPLIT LOGIC ---
         // If handoverQuantity is provided and it is LESS than current item quantity, we must SPLIT the item.
-        if (initialOwner && handoverQuantity && parseInt(handoverQuantity) < item.quantity) {
-            const splitQty = parseInt(handoverQuantity);
+        if (initialOwner && handoverQuantity && parseFloat(handoverQuantity) < item.quantity) {
+            const splitQty = parseFloat(handoverQuantity);
             const remainingQty = item.quantity - splitQty;
 
             // Fix for Legacy Data:

@@ -335,7 +335,7 @@ const TMJPage = () => {
                     "Holati": item.assignedTo ? item.assignedTo.name : (item.initialOwner || "Omborda"),
                     "Kelgan Sanasi": item.arrivalDate || item.purchaseDate || "",
                     "Narxi": item.price,
-                    "Soni": quantityStr, // Formatted string
+                    "Soni": `${quantityStr} ${item.unit || 'dona'}`, // Formatted string with unit
                     "Bino": item.building || "",
                     // "Bo'lim": item.department || "", // User requested to remove
                     "Joylashuv": item.location || ""
@@ -527,9 +527,9 @@ const TMJPage = () => {
                                                 // Or requested: "8 barchasi ... sonida 10/8"
                                                 // User requested: "10/8" for stock (Initial / Current)
                                                 if (initQty > qty) {
-                                                    return <span className="text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-2 py-1 rounded font-bold">{initQty} / {qty}</span>;
+                                                    return <span className="text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/30 px-2 py-1 rounded font-bold">{initQty} / {qty} {item.unit || 'dona'}</span>;
                                                 }
-                                                return qty;
+                                                return `${qty} ${item.unit || 'dona'}`;
                                             }
                                         })()}
                                     </td>

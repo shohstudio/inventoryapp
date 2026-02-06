@@ -49,7 +49,8 @@ model Item {
   subCategory  String?
   
   price        Decimal  @default(0)
-  quantity     Int      @default(1)
+  quantity     Decimal  @default(1)
+  unit         String?  @default("dona") // dona, metr, kg, litr
   purchaseDate String?  // Storing as String to match "YYYY-MM-DD" easily, or could be DateTime
   
   status       String   @default("working") // working, repair, written-off, lost, empty
@@ -65,7 +66,7 @@ model Item {
   contractPdf  String?  // URL to PDF contract
   inventoryType String @default("warehouse") // warehouse, tmj
 
-  initialQuantity Int? @default(1) // Track original batch size for TMJ partial handover
+  initialQuantity Decimal? @default(1) // Track original batch size for TMJ partial handover
 
   // If imported from Excel and user not found, store name here
   initialOwner String?
