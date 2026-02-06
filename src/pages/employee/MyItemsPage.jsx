@@ -70,13 +70,20 @@ const MyItemsPage = () => {
     const itemsPerPage = 10;
 
     // Pagination Logic
+    const [activeTab, setActiveTab] = useState('inventory'); // 'inventory' or 'tmj'
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = myItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(myItems.length / itemsPerPage);
+
+    const filteredInventoryItems = myItems.filter(item => item.inventoryType !== 'tmj');
+    const filteredTMJItems = myItems.filter(item => item.inventoryType === 'tmj');
+
+    const displayItems = activeTab === 'inventory' ? filteredInventoryItems : filteredTMJItems;
+    const currentItems = displayItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(displayItems.length / itemsPerPage);
 
     const handleExportExcel = () => {
-        const exportData = myItems.map((item, index) => ({
+        const exportData = displayItems.map((item, index) => ({
             "№": index + 1,
             "Jihoz Nomi": item.name,
             "Model": item.model || "-",
@@ -102,8 +109,8 @@ const MyItemsPage = () => {
         ws['!cols'] = wscols;
 
         const wb = utils.book_new();
-        utils.book_append_sheet(wb, ws, "Mening Jihozlarim");
-        writeFile(wb, "Mening_Jihozlarim.xlsx");
+        utils.book_append_sheet(wb, ws, activeTab === 'inventory' ? "Asosiy Jihozlar" : "TMJ Jihozlari");
+        writeFile(wb, activeTab === 'inventory' ? "Mening_Jihozlarim.xlsx" : "Mening_TMJ_Jihozlarim.xlsx");
     };
 
     if (loading) return <div className="p-10 text-center text-gray-500">Yuklanmoqda...</div>;
@@ -125,13 +132,13 @@ const MyItemsPage = () => {
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Mening Jihozlarim</h1>
 
-                {myItems.length > 0 && (
+                {displayItems.length > 0 && (
                     <button
                         onClick={handleExportExcel}
                         className="btn bg-green-600 hover:bg-green-700 text-white shadow-green-200 shadow-lg flex items-center gap-2"
                     >
                         <RiFileExcel2Line size={20} />
-                        Excelga yuklash
+                        Excelga yuklash ({activeTab === 'inventory' ? 'Inventory' : 'TMJ'})
                     </button>
                 )}
             </div>
@@ -165,6 +172,24 @@ const MyItemsPage = () => {
                 </div>
             )}
 
+            {/* Tabs */}
+            <div className="flex gap-4 mb-6 border-b border-gray-100 dark:border-slate-700">
+                <button
+                    onClick={() => { setActiveTab('inventory'); setCurrentPage(1); }}
+                    className={`pb-4 px-2 text-sm font-semibold transition-all relative ${activeTab === 'inventory' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                    Asosiy jihozlar ({filteredInventoryItems.length})
+                    {activeTab === 'inventory' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
+                </button>
+                <button
+                    onClick={() => { setActiveTab('tmj'); setCurrentPage(1); }}
+                    className={`pb-4 px-2 text-sm font-semibold transition-all relative ${activeTab === 'tmj' ? 'text-orange-600' : 'text-gray-400 hover:text-gray-600'}`}
+                >
+                    TMJ jihozlari ({filteredTMJItems.length})
+                    {activeTab === 'tmj' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
+                </button>
+            </div>
+
             <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
@@ -172,8 +197,17 @@ const MyItemsPage = () => {
                             <tr className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
                                 <th className="p-4 font-semibold">#</th>
                                 <th className="p-4 font-semibold">Jihoz Nomi</th>
-                                <th className="p-4 font-semibold">Seriya Raqami</th>
-                                <th className="p-4 font-semibold">Kategoriya</th>
+                                {activeTab === 'inventory' ? (
+                                    <>
+                                        <th className="p-4 font-semibold">Seriya Raqami</th>
+                                        <th className="p-4 font-semibold">Kategoriya</th>
+                                    </>
+                                ) : (
+                                    <>
+                                        <th className="p-4 font-semibold">Soni</th>
+                                        <th className="p-4 font-semibold">Rasm</th>
+                                    </>
+                                )}
                                 <th className="p-4 font-semibold">Holat</th>
                                 <th className="p-4 font-semibold">Biriktirilgan Sana</th>
                                 <th className="p-4 font-semibold text-right">Hujjat</th>
@@ -183,13 +217,40 @@ const MyItemsPage = () => {
                             {currentItems.map((item, index) => (
                                 <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors text-sm">
                                     <td className="p-4 text-gray-400 dark:text-gray-500 font-mono">{indexOfFirstItem + index + 1}</td>
-                                    <td className="p-4 font-medium text-gray-900 dark:text-gray-100">{item.name}</td>
-                                    <td className="p-4 font-mono text-gray-600 dark:text-gray-400">{item.serialNumber || "-"}</td>
                                     <td className="p-4">
-                                        <span className="bg-gray-100 dark:bg-slate-900 text-gray-600 dark:text-gray-400 px-2 py-1 rounded text-xs border border-transparent dark:border-slate-700">
-                                            {item.category || "-"}
-                                        </span>
+                                        <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
+                                        {activeTab === 'tmj' && <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{item.model} • {item.category}</div>}
                                     </td>
+
+                                    {activeTab === 'inventory' ? (
+                                        <>
+                                            <td className="p-4 font-mono text-gray-600 dark:text-gray-400">{item.serialNumber || "-"}</td>
+                                            <td className="p-4">
+                                                <span className="bg-gray-100 dark:bg-slate-900 text-gray-600 dark:text-gray-400 px-2 py-1 rounded text-xs border border-transparent dark:border-slate-700">
+                                                    {item.category || "-"}
+                                                </span>
+                                            </td>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <td className="p-4 font-mono text-gray-900 dark:text-gray-100 font-bold">{item.quantity} ta</td>
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-2">
+                                                    {item.image && (
+                                                        <a href={getImageUrl(item.image)} target="_blank" rel="noreferrer" className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-orange-200 transition-all">
+                                                            <img src={getImageUrl(item.image)} alt="item" className="w-full h-full object-cover" />
+                                                        </a>
+                                                    )}
+                                                    {item.handoverImage && (
+                                                        <a href={getImageUrl(item.handoverImage)} target="_blank" rel="noreferrer" className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-green-200 transition-all">
+                                                            <img src={getImageUrl(item.handoverImage)} alt="handover" className="w-full h-full object-cover" />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </>
+                                    )}
+
                                     <td className="p-4">
                                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${item.status === 'working' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800'
                                             }`}>
@@ -200,18 +261,29 @@ const MyItemsPage = () => {
                                     </td>
                                     <td className="p-4 text-gray-600 dark:text-gray-400">{item.dateAssigned}</td>
                                     <td className="p-4 text-right">
-                                        {item.assignedDocument ? (
-                                            <a
-                                                href={getImageUrl(item.assignedDocument)}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium text-xs transition-colors"
-                                            >
-                                                <RiFileList3Line size={16} /> Asos (PDF)
-                                            </a>
-                                        ) : (
-                                            <span className="text-gray-300">-</span>
-                                        )}
+                                        <div className="flex flex-col items-end gap-1">
+                                            {item.assignedDocument && (
+                                                <a
+                                                    href={getImageUrl(item.assignedDocument)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium text-xs transition-colors"
+                                                >
+                                                    <RiFileList3Line size={16} /> Asos (PDF)
+                                                </a>
+                                            )}
+                                            {item.contractPdf && (
+                                                <a
+                                                    href={getImageUrl(item.contractPdf)}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-800 hover:underline font-medium text-xs transition-colors"
+                                                >
+                                                    <RiFileList3Line size={16} /> Shartnoma (PDF)
+                                                </a>
+                                            )}
+                                            {!item.assignedDocument && !item.contractPdf && <span className="text-gray-300">-</span>}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -220,11 +292,13 @@ const MyItemsPage = () => {
                 </div>
             </div>
 
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-            />
+            <div className="mt-6 flex justify-center">
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                />
+            </div>
         </div>
     );
 };

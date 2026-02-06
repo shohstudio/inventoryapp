@@ -488,6 +488,8 @@ const updateItem = async (req, res) => {
                 building: dataToUpdate.building || item.building, // Updated building
                 initialOwner: dataToUpdate.initialOwner,
                 initialRole: dataToUpdate.initialRole,
+                initialEmployeeId: dataToUpdate.initialEmployeeId,
+                assignedUserId: dataToUpdate.assignedUserId,
                 assignedDate: dataToUpdate.assignedDate,
 
                 // Images

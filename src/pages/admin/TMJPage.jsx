@@ -223,6 +223,11 @@ const TMJPage = () => {
             formData.append('building', data.handoverBuilding); // Update building location
             formData.append('assignedDate', data.handoverDate);
             formData.append('handoverQuantity', data.handoverQuantity);
+            if (data.assignedEmployeeId) {
+                formData.append('assignedEmployeeId', data.assignedEmployeeId);
+                formData.append('assignedTo', data.handoverName);
+                formData.append('assignedRole', data.handoverPosition);
+            }
 
             if (data.handoverImage instanceof File) {
                 formData.append('handoverImage', data.handoverImage);

@@ -15,6 +15,11 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
     });
     const [errors, setErrors] = useState({});
 
+    const [userSearchQuery, setUserSearchQuery] = useState("");
+    const [userSearchResults, setUserSearchResults] = useState([]);
+    const [showUserResults, setShowUserResults] = useState(false);
+    const [isSearchingUsers, setIsSearchingUsers] = useState(false);
+
     useEffect(() => {
         if (item) {
             setFormData({
@@ -24,7 +29,8 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                 handoverQuantity: "1", // Default to 1
                 handoverDate: item.assignedDate ? item.assignedDate.split('T')[0] : new Date().toISOString().split('T')[0],
                 handoverImage: item.handoverImage || null,
-                handoverImagePreview: item.handoverImage ? (item.handoverImage.startsWith('http') ? item.handoverImage : BASE_URL.replace('/api', '') + item.handoverImage) : null
+                handoverImagePreview: item.handoverImage ? (item.handoverImage.startsWith('http') ? item.handoverImage : BASE_URL.replace('/api', '') + item.handoverImage) : null,
+                assignedEmployeeId: item.initialEmployeeId || ""
             });
         } else {
             setFormData({
@@ -34,9 +40,13 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                 handoverQuantity: "1",
                 handoverDate: new Date().toISOString().split('T')[0],
                 handoverImage: null,
-                handoverImagePreview: null
+                handoverImagePreview: null,
+                assignedEmployeeId: ""
             });
         }
+        setUserSearchQuery("");
+        setUserSearchResults([]);
+        setShowUserResults(false);
         setErrors({});
     }, [item, isOpen]);
 
@@ -46,6 +56,37 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
+    };
+
+    const handleUserSearch = async (val) => {
+        setUserSearchQuery(val);
+        if (val.length > 1) {
+            setIsSearchingUsers(true);
+            setShowUserResults(true);
+            try {
+                const { data } = await api.get(`/users?search=${val}`);
+                const users = Array.isArray(data) ? data : (data.users || []);
+                setUserSearchResults(users);
+            } catch (error) {
+                console.error("User search failed", error);
+            } finally {
+                setIsSearchingUsers(false);
+            }
+        } else {
+            setUserSearchResults([]);
+            setShowUserResults(false);
+        }
+    };
+
+    const handleSelectUser = (u) => {
+        setFormData(prev => ({
+            ...prev,
+            handoverName: u.name,
+            handoverPosition: u.position || u.role,
+            assignedEmployeeId: u.employeeId
+        }));
+        setUserSearchQuery("");
+        setShowUserResults(false);
     };
 
     const handleImageChange = (e) => {
@@ -100,8 +141,8 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
-                <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 max-h-[90vh] flex flex-col">
+                <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50 flex-shrink-0">
                     <h2 className="text-xl font-bold text-gray-800">
                         {readOnly ? "Topshirish Ma'lumotlari" : "Topshirish"}
                     </h2>
@@ -110,17 +151,51 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
+                    {!readOnly && (
+                        <div className="relative">
+                            <label className="label">Xodimni qidirish (ID yoki Ism)</label>
+                            <input
+                                type="text"
+                                className="input"
+                                placeholder="Ism yoki ID kiriting..."
+                                value={userSearchQuery}
+                                onChange={(e) => handleUserSearch(e.target.value)}
+                                onFocus={() => userSearchQuery.length > 1 && setShowUserResults(true)}
+                            />
+                            {showUserResults && userSearchResults.length > 0 && (
+                                <div className="absolute z-10 w-full bg-white shadow-xl max-h-60 overflow-y-auto rounded-b-lg border border-gray-200 mt-1">
+                                    {userSearchResults.map(u => (
+                                        <div
+                                            key={u.id}
+                                            className="p-3 hover:bg-indigo-50 cursor-pointer border-b border-gray-100 last:border-0"
+                                            onClick={() => handleSelectUser(u)}
+                                        >
+                                            <div className="font-bold text-gray-800">{u.name}</div>
+                                            <div className="text-xs text-gray-500 flex gap-2">
+                                                <span>ID: {u.employeeId}</span>
+                                                <span>•</span>
+                                                <span>{u.department}</span>
+                                                <span>•</span>
+                                                <span>{u.position}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <div>
                         <label className="label">Ism Familya <span className="text-red-500">*</span></label>
                         <input
                             type="text"
                             name="handoverName"
-                            className={`input ${errors.handoverName ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                            className={`input ${errors.handoverName ? 'border-red-500 ring-red-500' : ''} ${readOnly || (!readOnly && formData.assignedEmployeeId) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             value={formData.handoverName}
                             onChange={handleChange}
                             placeholder="F.I.SH"
-                            disabled={readOnly}
+                            disabled={readOnly || (!readOnly && formData.assignedEmployeeId)}
                         />
                         {errors.handoverName && <p className="text-red-500 text-xs mt-1">{errors.handoverName}</p>}
                     </div>
@@ -130,11 +205,11 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                         <input
                             type="text"
                             name="handoverPosition"
-                            className={`input ${errors.handoverPosition ? 'border-red-500 ring-red-500' : ''} ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                            className={`input ${errors.handoverPosition ? 'border-red-500 ring-red-500' : ''} ${readOnly || (!readOnly && formData.assignedEmployeeId) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             value={formData.handoverPosition}
                             onChange={handleChange}
                             placeholder="Masalan: Bog'bon"
-                            disabled={readOnly}
+                            disabled={readOnly || (!readOnly && formData.assignedEmployeeId)}
                         />
                         {errors.handoverPosition && <p className="text-red-500 text-xs mt-1">{errors.handoverPosition}</p>}
                     </div>
@@ -217,7 +292,7 @@ const HandoverModal = ({ isOpen, onClose, onSave, item, readOnly = false }) => {
                         {errors.handoverImage && <p className="text-red-500 text-xs mt-1 text-center">{errors.handoverImage}</p>}
                     </div>
 
-                    <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">
+                    <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6 flex-shrink-0">
                         <button type="button" onClick={onClose} className="btn btn-outline">{readOnly ? "Yopish" : "Bekor qilish"}</button>
                         {!readOnly && (
                             <button type="submit" className="btn btn-primary bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200">
