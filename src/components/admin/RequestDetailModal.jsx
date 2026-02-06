@@ -2,12 +2,12 @@ import React from 'react';
 import { RiCloseLine, RiTimeLine, RiUserLine, RiMapPinLine, RiFileList3Line, RiShieldCheckLine, RiBox3Line, RiUser3Line } from 'react-icons/ri';
 import { useLanguage } from '../../context/LanguageContext';
 import { toast } from 'react-hot-toast';
-import { BASE_URL } from '../../api/axios';
+import { BASE_URL, getImageUrl } from '../../api/axios';
 
 const UserAvatar = ({ user, size = "w-10 h-10" }) => {
     if (!user) return <div className={`${size} rounded-full bg-gray-100 flex items-center justify-center text-gray-300 border border-dashed border-gray-200`}><RiUser3Line size={size.includes('10') ? 20 : 16} /></div>;
 
-    const imageUrl = user.image ? (user.image.startsWith('http') ? user.image : `${BASE_URL.replace('/api', '')}${user.image}`) : null;
+    const imageUrl = getImageUrl(user.image);
 
     return (
         <div className={`${size} rounded-full overflow-hidden bg-white flex items-center justify-center border border-gray-100 flex-shrink-0 shadow-sm ring-2 ring-white`}>
@@ -62,9 +62,9 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                         <div className="flex gap-4">
                             {/* Item Image */}
                             {item?.image ? (
-                                <div className="w-24 h-24 rounded-lg overflow-hidden border border-blue-200 bg-white flex-shrink-0 cursor-pointer" onClick={() => window.open(item.image.startsWith('http') ? item.image : `${BASE_URL.replace('/api', '')}${item.image}`, '_blank')}>
+                                <div className="w-24 h-24 rounded-lg overflow-hidden border border-blue-200 bg-white flex-shrink-0 cursor-pointer" onClick={() => window.open(getImageUrl(item.image), '_blank')}>
                                     <img
-                                        src={item.image.startsWith('http') ? item.image : `${BASE_URL.replace('/api', '')}${item.image}`}
+                                        src={getImageUrl(item.image)}
                                         alt={item.name}
                                         className="w-full h-full object-cover"
                                     />
@@ -116,7 +116,7 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                                 <RiFileList3Line /> Biriktirilgan Hujjat (Nakladnoy)
                             </h4>
                             <a
-                                href={`${BASE_URL.replace('/api', '')}${request.accountantDocument}`}
+                                href={getImageUrl(request.accountantDocument)}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="flex items-center gap-3 p-3 bg-white rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors group"
