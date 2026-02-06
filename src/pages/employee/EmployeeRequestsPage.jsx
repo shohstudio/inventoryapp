@@ -44,6 +44,30 @@ const EmployeeRequestsPage = () => {
         setConfirmModal(prev => ({ ...prev, isOpen: false }));
     };
 
+    // Detail Modal State
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [selectedRequestForDetail, setSelectedRequestForDetail] = useState(null);
+
+    const openDetailModal = (req) => {
+        setSelectedRequestForDetail(req);
+        setIsDetailModalOpen(true);
+    };
+
+    const closeDetailModal = () => {
+        setIsDetailModalOpen(false);
+        setSelectedRequestForDetail(null);
+    };
+
+    const handleApproveFromModal = (id, status, file = null) => {
+        processAction(id, status, null); // Employee approval doesn't need file usually, but we keep signature consistent
+        closeDetailModal();
+    };
+
+    const handleRejectFromModal = (id) => {
+        closeDetailModal();
+        handleAction(id, 'rejected');
+    };
+
     const fetchRequests = async () => {
         setLoading(true);
         try {
@@ -300,6 +324,17 @@ const EmployeeRequestsPage = () => {
                     </div>
                 </div>
             )}
+
+            {/* Detail Modal */}
+            <RequestDetailModal
+                isOpen={isDetailModalOpen}
+                onClose={closeDetailModal}
+                request={selectedRequestForDetail}
+                onApprove={handleApproveFromModal}
+                onReject={handleRejectFromModal}
+                isProcessing={isProcessing}
+                userRole={user?.role}
+            />
 
             {/* Confirmation Modal */}
             <ConfirmationModal
