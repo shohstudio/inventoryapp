@@ -394,38 +394,58 @@ const TMJPage = () => {
             </div>
 
             {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 mt-4">
                 <StatsCard
                     title="Jami maxsullotlar"
                     value={tmjStats.totalItems}
                     icon={<RiBox3Line size={24} />}
-                    color="blue"
-                    trendLabel="Jami"
+                    variant="featured"
                     trend={0}
+                    trendLabel="O'sish"
                 />
                 <StatsCard
-                    title="Topshiriilgan maxsulotlar"
+                    title="Topshirilganlar"
                     value={tmjStats.handedOverCount}
                     icon={<RiUserReceived2Line size={24} />}
+                    variant="featured"
                     color="green"
-                    trendLabel="Topshirilgan"
                     trend={0}
+                    trendLabel="Berilgan"
+                />
+                <StatsCard
+                    title="Omboridagilar"
+                    value={tmjStats.stockCount || 0}
+                    icon={<RiStore2Line size={24} />}
+                    variant="featured"
+                    color="orange"
+                    trend={0}
+                    trendLabel="Zaxira"
                 />
                 <StatsCard
                     title="Umumiy qiymat"
-                    value={formatValue(tmjStats.totalValue) + " so'm"}
+                    value={`${formatValue(tmjStats.totalValue)} so'm`}
                     icon={<RiMoneyDollarCircleLine size={24} />}
-                    color="purple"
-                    trendLabel="Barchasi"
+                    variant="featured"
                     trend={0}
+                    trendLabel="Barchasi"
                 />
                 <StatsCard
-                    title="Topshirish qiymati"
-                    value={formatValue(tmjStats.handedOverValue) + " so'm"}
+                    title="Topshirilganlar qiymati"
+                    value={`${formatValue(tmjStats.handedOverValue)} so'm`}
                     icon={<RiCheckboxCircleLine size={24} />}
-                    color="orange"
-                    trendLabel="Chiqib ketgan"
+                    variant="featured"
+                    color="green"
                     trend={0}
+                    trendLabel="Chiqim"
+                />
+                <StatsCard
+                    title="Ombor qiymati"
+                    value={`${formatValue(tmjStats.stockValue || 0)} so'm`}
+                    icon={<RiMoneyDollarCircleLine size={24} />}
+                    variant="featured"
+                    color="orange"
+                    trend={0}
+                    trendLabel="Zaxira"
                 />
             </div>
 

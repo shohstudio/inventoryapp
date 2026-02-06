@@ -177,7 +177,7 @@ const getTMJStats = async (req, res) => {
 
         allTmjItems.forEach(item => {
             const price = parseFloat(item.price?.toString() || 0);
-            const qty = parseInt(item.quantity || 0);
+            const qty = parseFloat(item.quantity || 0); // Use parseFloat for decimal support
             const isHandedOver = !!(item.assignedUserId || (item.initialOwner && item.initialOwner !== ""));
 
             totalProducts += qty;
@@ -192,8 +192,10 @@ const getTMJStats = async (req, res) => {
         res.json({
             totalItems: totalProducts,
             handedOverCount: handedOverProducts,
+            stockCount: totalProducts - handedOverProducts,
             totalValue,
-            handedOverValue
+            handedOverValue,
+            stockValue: totalValue - handedOverValue
         });
     } catch (error) {
         console.error("Get TMJ Stats Error:", error);
