@@ -67,9 +67,9 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
         if (!formData.price.toString().trim()) newErrors.price = "Narx kiritilishi shart";
         if (!formData.quantity) newErrors.quantity = "Soni kiritilishi shart";
 
-        // Strict image validation
-        if (formData.images.length === 0) {
-            newErrors.images = "Kamida 1 ta rasm yuklash shart";
+        // Check for PDF
+        if (!formData.pdf) {
+            newErrors.pdf = "Shartnoma (PDF) yuklash shart";
         }
 
         setErrors(newErrors);
@@ -259,9 +259,9 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
 
                     {/* PDF Upload Section */}
                     <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                        <label className="label flex items-center gap-2">
-                            <RiFilePdfLine className="text-blue-600" />
-                            Shartnoma (PDF)
+                        <label className={`label flex items-center gap-2 ${errors.pdf ? 'text-red-500' : ''}`}>
+                            <RiFilePdfLine className={errors.pdf ? 'text-red-500' : 'text-blue-600'} />
+                            Shartnoma (PDF) <span className="text-red-500">*</span>
                         </label>
                         <div className="flex items-center gap-3">
                             <input
@@ -296,6 +296,7 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 </div>
                             ))}
                         </div>
+                        {errors.pdf && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.pdf}</p>}
                     </div>
 
                     {/* Image Upload Section */}

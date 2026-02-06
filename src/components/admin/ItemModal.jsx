@@ -166,10 +166,14 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
         if (!formData.assignedRole.trim()) newErrors.assignedRole = "Shu joyni to'ldirish majburiy";
         // if (!formData.assignedEmployeeId.trim()) newErrors.assignedEmployeeId = "Shu joyni to'ldirish majburiy";
 
-        // Image Validation
         if (formData.images.length < 4) {
             newErrors.images = "Kamida 4 ta rasm yuklash majburiy";
             toast.error("Kamida 4 ta rasm yuklashingiz kerak");
+        }
+
+        // PDF Validation
+        if (!formData.pdf) {
+            newErrors.pdf = "Shartnoma (PDF) yuklash majburiy";
         }
 
         setErrors(newErrors);
@@ -572,6 +576,62 @@ const ItemModal = ({ isOpen, onClose, onSave, item, initialData }) => {
                                 />
                                 {errors.assignedRole && <span className="text-red-500 text-xs mt-1 block">{errors.assignedRole}</span>}
                             </div>
+                        </div>
+                    </div>
+
+                    {/* PDF Upload Section */}
+                    <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6">
+                        <label className={`label flex items-center gap-2 ${errors.pdf ? 'text-red-500' : ''}`}>
+                            <RiFilePdfLine className={errors.pdf ? 'text-red-500' : 'text-blue-600'} />
+                            Shartnoma (PDF) <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="file"
+                                    accept="application/pdf"
+                                    onChange={(e) => {
+                                        if (e.target.files[0]) {
+                                            setFormData(prev => ({ ...prev, pdf: e.target.files[0] }));
+                                            if (errors.pdf) setErrors(prev => ({ ...prev, pdf: "" }));
+                                        }
+                                    }}
+                                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 text-sm text-gray-500"
+                                />
+                            </div>
+                            {formData.pdf && (
+                                <div className="mt-2 p-3 bg-white rounded-lg border border-blue-200 flex items-center justify-between shadow-sm">
+                                    <span className="text-sm text-gray-700 flex items-center gap-2 font-medium">
+                                        <RiFilePdfLine className="text-red-500 text-lg" />
+                                        {typeof formData.pdf === 'string'
+                                            ? "Joriy shartnoma fayli"
+                                            : formData.pdf.name}
+                                    </span>
+                                    {typeof formData.pdf === 'string' ? (
+                                        <a
+                                            href={getImageUrl(formData.pdf)}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors"
+                                        >
+                                            Ko'rish
+                                        </a>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <a
+                                                href={URL.createObjectURL(formData.pdf)}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="px-3 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium hover:bg-green-100 transition-colors"
+                                            >
+                                                Ko'rish
+                                            </a>
+                                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-1 rounded uppercase">Yangi</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            {errors.pdf && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.pdf}</p>}
                         </div>
                     </div>
 
