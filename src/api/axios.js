@@ -3,9 +3,6 @@ import axios from 'axios';
 // Create an instance of axios
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL || '/api', // Uses VITE_API_URL or defaults to proxy
-    headers: {
-        'Content-Type': 'application/json',
-    },
     timeout: 15000, // 15 seconds timeout
 });
 
