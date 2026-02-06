@@ -222,12 +222,12 @@ const createItem = async (req, res) => {
 
         const itemData = {
             name,
-            model,
-            serialNumber,
-            inn,
-            orderNumber,
-            category,
-            subCategory,
+            model: model || null,
+            serialNumber: (serialNumber === "" || !serialNumber) ? null : serialNumber,
+            inn: (inn === "" || !inn) ? null : inn,
+            orderNumber: (orderNumber === "" || !orderNumber) ? null : orderNumber,
+            category: category || null,
+            subCategory: subCategory || null,
             price: (price && !isNaN(parseFloat(price))) ? parseFloat(price) : 0,
             quantity: (quantity && !isNaN(parseInt(quantity))) ? parseInt(quantity) : 1,
             initialQuantity: (quantity && !isNaN(parseInt(quantity))) ? parseInt(quantity) : 1, // Set initial batch size
@@ -312,7 +312,11 @@ const updateItem = async (req, res) => {
         }
 
         const dataToUpdate = {
-            name, model, serialNumber, inn, orderNumber, category, subCategory,
+            name, model,
+            serialNumber: (serialNumber === "" || serialNumber === null) ? null : serialNumber,
+            inn: (inn === "" || inn === null) ? null : inn,
+            orderNumber: (orderNumber === "" || orderNumber === null) ? null : orderNumber,
+            category, subCategory,
             price: (price !== undefined && price !== "") ? (isNaN(parseFloat(price)) ? 0 : parseFloat(price)) : undefined,
             quantity: (quantity !== undefined && quantity !== "") ? (isNaN(parseInt(quantity)) ? 1 : parseInt(quantity)) : undefined,
             purchaseDate, status, condition,
@@ -389,7 +393,7 @@ const updateItem = async (req, res) => {
                 dataToUpdate.assignedUserId = targetUser.id;
                 dataToUpdate.assignedDate = new Date();
                 // Clear initial fields if assigned to real user
-                dataToUpdate.initialPinfl = null;
+                dataToUpdate.initialEmployeeId = null;
                 dataToUpdate.initialOwner = null;
                 dataToUpdate.initialRole = null;
 
