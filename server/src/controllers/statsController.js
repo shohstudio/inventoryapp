@@ -22,47 +22,62 @@ const getDashboardStats = async (req, res) => {
         });
         const userTrend = calculateTrend(userCount, lastMonthUserCount);
 
-        // 2. Item Stats & Trends
-        const totalItems = await prisma.item.count({ where: { status: { not: 'written-off' } } }); // Exclude written-off from total active? Or keep all? Usually Total is all. Let's keep all for count, but Value specific.
-        // Actually "Jami jihozlar" usually implies everything on books.
-        // Let's stick to simple total count.
-        const totalItemsAll = await prisma.item.count();
+        // 2. Item Stats & Trends (Warehouse Only)
+        // Exclude TMJ from main dashboard counts
+        const warehouseFilter = { inventoryType: { not: 'tmj' } };
+
+        const totalItems = await prisma.item.count({
+            where: {
+                ...warehouseFilter,
+                status: { not: 'written-off' }
+            }
+        });
+
+        const totalItemsAll = await prisma.item.count({ where: warehouseFilter });
 
         const lastMonthTotalItems = await prisma.item.count({
-            where: { createdAt: { lt: firstDayCurrentMonth } }
+            where: {
+                ...warehouseFilter,
+                createdAt: { lt: firstDayCurrentMonth }
+            }
         });
         const itemTrend = calculateTrend(totalItemsAll, lastMonthTotalItems);
 
-        const repairItems = await prisma.item.count({ where: { status: 'repair' } });
-        // Trend for repair: Hard to track "when it went to repair" without history table. 
-        // Approximation: Created recently? No. 
-        // We need a history log/audit. Since we don't have robust history query here easily, 
-        // we might return 0 or leave static. 
-        // OR: comparing to 0 is fine.
-        // Let's try to see if we can use 'updatedAt' for repair? No, unreliable.
-        // For now, let's keep repair trend static or 0 if we can't calculate accurate MoM without logs.
-        // user asks for "real working", maybe just comparing current snapshot to 0 is weird.
-        // Let's check Logs! We have prisma.log.
-        // Count logs with action 'update' and details containing 'repair' in last month? 
-        // Too complex for quick fix. Let's return 0 trend for status-based counts unless we have history.
-        // Actually, let's just return 0 for difficult ones or calculate based on creation date for others.
+        const repairItems = await prisma.item.count({
+            where: {
+                ...warehouseFilter,
+                status: 'repair'
+            }
+        });
 
-        const writtenOffItems = await prisma.item.count({ where: { status: 'written-off' } });
+        const writtenOffItems = await prisma.item.count({
+            where: {
+                ...warehouseFilter,
+                status: 'written-off'
+            }
+        });
 
-        // 3. Total Value Trend
+        // 3. Total Value Trend (Warehouse Only & ONLY IN STOCK)
+        // User requested: "TMZ dagi maxsulot topshiirilganda umumiy qiymatdan pulni olib tashla"
+        // Interpretation: Substract price if assignedUserId OR initialOwner is NOT null (handed over)
+        const inStockFilter = {
+            ...warehouseFilter,
+            status: { not: 'written-off' },
+            assignedUserId: null,
+            initialOwner: null
+        };
+
         const currentItemsValue = await prisma.item.findMany({
-            where: { status: { not: 'written-off' } },
+            where: inStockFilter,
             select: { price: true, quantity: true }
         });
         const totalValue = currentItemsValue.reduce((acc, item) => acc + (Number(item.price || 0) * (item.quantity || 1)), 0);
 
-        // Value last month: This is hard without snapshot. 
-        // Approximate: Total Value - Value of items created this month?
-        // Assuming price didn't change much.
+        // Value last month (Approximate)
         const newItemsThisMonth = await prisma.item.findMany({
             where: {
-                createdAt: { gte: firstDayCurrentMonth },
-                status: { not: 'written-off' }
+                ...inStockFilter,
+                createdAt: { gte: firstDayCurrentMonth }
             },
             select: { price: true, quantity: true }
         });
@@ -87,8 +102,9 @@ const getDashboardStats = async (req, res) => {
         // Verified Trend = Percentage of total items verified
         const verifiedTrend = totalItemsAll > 0 ? Number(((totalVerifiedItems / totalItemsAll) * 100).toFixed(1)) : 0;
 
-        // 5. Recent Items
+        // 5. Recent Items (Warehouse Only)
         const recentItems = await prisma.item.findMany({
+            where: warehouseFilter,
             take: 5,
             orderBy: { createdAt: 'desc' },
             include: { assignedTo: { select: { name: true } } }
