@@ -8,6 +8,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import api, { BASE_URL, getImageUrl } from "../../api/axios";
 import { toast } from "react-hot-toast";
+import StatsCard from "../../components/admin/StatsCard";
+import { RiBox3Line, RiMoneyDollarCircleLine, RiCheckboxCircleLine, RiStore2Line } from "react-icons/ri";
 
 const TMJPage = () => {
     const { t } = useLanguage();
@@ -28,6 +30,12 @@ const TMJPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
+    const [tmjStats, setTmjStats] = useState({
+        totalItems: 0,
+        handedOverCount: 0,
+        inStockValue: 0,
+        handedOverValue: 0
+    });
 
     // Bulk Actions
     const [selectedItems, setSelectedItems] = useState(new Set());
@@ -36,38 +44,25 @@ const TMJPage = () => {
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
-    const fetchItems = async () => {
-        setLoading(true);
+    const fetchStats = async () => {
         try {
-            const params = {
-                page: currentPage,
-                limit: 10,
-                search: searchQuery,
-                inventoryType: 'tmj', // Always TMJ
-            };
-
-            // Mapping tabs to API filters
-            if (activeTab === 'stock') params.isAssigned = 'unassigned';
-            if (activeTab === 'assigned') params.isAssigned = 'assigned';
-            // 'all' sends no 'isAssigned' param, hammasi fetch bo'ladi
-
-            const { data } = await api.get('/items', { params });
-
-            if (data.items) {
-                setItems(data.items);
-                setTotalPages(data.metadata.totalPages);
-                setTotalItems(data.metadata.total);
-            }
+            const { data } = await api.get('/stats/tmj');
+            setTmjStats(data);
         } catch (error) {
-            toast.error("Ma'lumotlarni yuklashda xatolik");
-        } finally {
-            setLoading(false);
+            console.error("Failed to fetch TMJ stats", error);
         }
     };
 
     useEffect(() => {
         fetchItems();
+        fetchStats();
     }, [currentPage, searchQuery, activeTab]);
+
+    const formatValue = (num) => {
+        if (num >= 1000000000) return (num / 1000000000).toFixed(1) + " mlrd";
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + " mln";
+        return Number(num).toLocaleString();
+    };
 
     // Bbirdan o'chirish
     const toggleSelectAll = () => {
@@ -183,6 +178,7 @@ const TMJPage = () => {
             fetchItems();
             setIsModalOpen(false);
             fetchItems();
+            fetchStats();
             setIsModalOpen(false);
         } catch (error) {
             console.error(error);
@@ -210,6 +206,7 @@ const TMJPage = () => {
 
             toast.success("Topshirish muvaffaqiyatli saqlandi");
             fetchItems();
+            fetchStats();
             setIsHandoverModalOpen(false);
             setSelectedHandoverItem(null);
         } catch (error) {
@@ -320,7 +317,41 @@ const TMJPage = () => {
                 </div>
             </div>
 
-
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-4">
+                <StatsCard
+                    title="Jami maxsullotlar"
+                    value={tmjStats.totalItems}
+                    icon={<RiBox3Line size={24} />}
+                    color="blue"
+                    trendLabel="Jami"
+                    trend={0}
+                />
+                <StatsCard
+                    title="Topshiriilgan maxsulotlar"
+                    value={tmjStats.handedOverCount}
+                    icon={<RiUserReceived2Line size={24} />}
+                    color="green"
+                    trendLabel="Topshirilgan"
+                    trend={0}
+                />
+                <StatsCard
+                    title="Umumiy qiymat"
+                    value={formatValue(tmjStats.inStockValue) + " so'm"}
+                    icon={<RiMoneyDollarCircleLine size={24} />}
+                    color="purple"
+                    trendLabel="Omborda"
+                    trend={0}
+                />
+                <StatsCard
+                    title="Topshirish qiymati"
+                    value={formatValue(tmjStats.handedOverValue) + " so'm"}
+                    icon={<RiCheckboxCircleLine size={24} />}
+                    color="orange"
+                    trendLabel="Chiqib ketgan"
+                    trend={0}
+                />
+            </div>
 
             {/* Tabs */}
             <div className="flex gap-4 mb-6 border-b border-gray-200 dark:border-slate-700">
