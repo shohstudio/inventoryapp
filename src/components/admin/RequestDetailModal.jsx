@@ -107,6 +107,30 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                                 </div>
                             </div>
                         </div>
+
+                        {/* Accountant Document (Nakladnoy) - Inside Item Card for better visibility */}
+                        {request.accountantDocument && (
+                            <div className="mt-4 pt-4 border-t border-blue-200 flex flex-col gap-2">
+                                <h4 className="text-sm font-bold text-orange-800 flex items-center gap-2">
+                                    <RiFileList3Line /> Biriktirilgan Hujjat (Nakladnoy)
+                                </h4>
+                                <a
+                                    href={getImageUrl(request.accountantDocument)}
+                                    // Make sure we have a full URL
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="flex items-center gap-3 p-3 bg-white rounded-lg border border-orange-200 hover:bg-orange-50 transition-colors group"
+                                >
+                                    <div className="p-2 bg-red-100 text-red-600 rounded-lg group-hover:bg-red-200 transition-colors">
+                                        {request.accountantDocument.endsWith('.pdf') ? <RiFileList3Line size={24} /> : <RiBox3Line size={24} />}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium text-gray-800 text-sm">Hujjatni ko'rish</p>
+                                        <p className="text-xs text-gray-500">Hisobchi tomonidan yuklangan</p>
+                                    </div>
+                                </a>
+                            </div>
+                        )}
                     </div>
 
 
