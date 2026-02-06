@@ -214,7 +214,7 @@ const createItem = async (req, res) => {
 
         // Check if User exists by Employee ID or assignedUserId
         let targetUser = null;
-        if (assignedUserId) {
+        if (assignedUserId && !isNaN(parseInt(assignedUserId))) {
             targetUser = await prisma.user.findUnique({ where: { id: parseInt(assignedUserId) } });
         } else if (assignedEmployeeId) {
             targetUser = await prisma.user.findUnique({ where: { employeeId: assignedEmployeeId } });
