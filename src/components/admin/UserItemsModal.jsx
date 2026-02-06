@@ -148,8 +148,8 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
 
                 {/* Tabs */}
                 {(() => {
-                    const inventoryItems = items.filter(i => !i.isTMJ);
-                    const tmjItems = items.filter(i => i.isTMJ);
+                    const inventoryItems = items.filter(i => i.inventoryType !== 'tmj');
+                    const tmjItems = items.filter(i => i.inventoryType === 'tmj');
 
                     return (
                         <>
