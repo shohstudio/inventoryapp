@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiFilePaper2Line, RiDeleteBinLine, RiCloseLine, RiFilePdfLine, RiUserReceived2Line, RiFileExcel2Line, RiDownloadLine } from "react-icons/ri";
+import { RiAddLine, RiSearchLine, RiFilter3Line, RiMore2Fill, RiImage2Line, RiFilePaper2Line, RiDeleteBinLine, RiCloseLine, RiFilePdfLine, RiUserReceived2Line, RiFileExcel2Line, RiDownloadLine, RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import * as XLSX from 'xlsx';
 import TMJItemModal from "../../components/admin/TMJItemModal";
 import HandoverModal from "../../components/admin/HandoverModal";
@@ -19,7 +19,8 @@ const TMJPage = () => {
     const [isHandoverModalOpen, setIsHandoverModalOpen] = useState(false);
     const [selectedHandoverItem, setSelectedHandoverItem] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
-    const [previewImage, setPreviewImage] = useState(null);
+    const [previewData, setPreviewData] = useState(null); // { images: [], index: 0 }
+
     const [activeTab, setActiveTab] = useState('all'); // 'all' (Barchasi), 'stock' (Omborga kelgan), 'assigned' (Berilgan)
 
     // Data State
@@ -87,7 +88,48 @@ const TMJPage = () => {
         fetchStats();
     }, [currentPage, searchQuery, activeTab]);
 
+    const handleImagePreview = (item, initialUrl) => {
+        let allImages = [];
+
+        // 1. Primary/Main image
+        if (item.image) allImages.push(getImageUrl(item.image));
+
+        // 2. Extra images from JSON array
+        if (item.images) {
+            try {
+                const extra = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
+                if (Array.isArray(extra)) {
+                    extra.forEach(img => {
+                        const url = getImageUrl(img);
+                        if (!allImages.includes(url)) allImages.push(url);
+                    });
+                }
+            } catch (e) { }
+        }
+
+        // 3. Handover image
+        if (item.handoverImage) {
+            const url = getImageUrl(item.handoverImage);
+            if (!allImages.includes(url)) allImages.push(url);
+        }
+
+        const index = allImages.indexOf(initialUrl);
+        setPreviewData({ images: allImages, index: index >= 0 ? index : 0 });
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!previewData) return;
+            if (e.key === 'ArrowRight') setPreviewData(prev => ({ ...prev, index: (prev.index + 1) % prev.images.length }));
+            if (e.key === 'ArrowLeft') setPreviewData(prev => ({ ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length }));
+            if (e.key === 'Escape') setPreviewData(null);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [previewData]);
+
     const formatValue = (num) => {
+
         if (num >= 1000000000) return (num / 1000000000).toFixed(1) + " mlrd";
         if (num >= 1000000) return (num / 1000000).toFixed(1) + " mln";
         return Number(num).toLocaleString();
@@ -526,7 +568,7 @@ const TMJPage = () => {
                                                         className="h-10 w-10 rounded-lg overflow-hidden border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all shadow-sm"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setPreviewImage(imgSrc);
+                                                            handleImagePreview(item, imgSrc);
                                                         }}
                                                     >
                                                         <img src={imgSrc} alt="Item" className="w-full h-full object-cover" />
@@ -621,25 +663,62 @@ const TMJPage = () => {
                 </div>
             )}
 
-            {/* Image Preview Modal */}
-            {previewImage && (
+            {/* Image Preview Carousel Modal */}
+            {previewData && (
                 <div
                     className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"
-                    onClick={() => setPreviewImage(null)}
+                    onClick={() => setPreviewData(null)}
                 >
-                    <div className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center">
+                    <div className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center group">
+
+                        {/* Close Button */}
                         <button
-                            onClick={() => setPreviewImage(null)}
-                            className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md"
+                            onClick={() => setPreviewData(null)}
+                            className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md z-10"
                         >
                             <RiCloseLine size={24} />
                         </button>
+
+                        {/* Prev Button */}
+                        {previewData.images.length > 1 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPreviewData(prev => ({ ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length }));
+                                }}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all bg-white/5 hover:bg-white/10 p-4 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 z-10"
+                            >
+                                <RiArrowLeftSLine size={32} />
+                            </button>
+                        )}
+
+                        {/* Image */}
                         <img
-                            src={previewImage}
-                            alt="Preview"
-                            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                            src={previewData.images[previewData.index]}
+                            alt={`Preview ${previewData.index + 1}`}
+                            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transition-all duration-300 transform scale-100"
                             onClick={(e) => e.stopPropagation()}
                         />
+
+                        {/* Next Button */}
+                        {previewData.images.length > 1 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPreviewData(prev => ({ ...prev, index: (prev.index + 1) % prev.images.length }));
+                                }}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all bg-white/5 hover:bg-white/10 p-4 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 z-10"
+                            >
+                                <RiArrowRightSLine size={32} />
+                            </button>
+                        )}
+
+                        {/* Counter */}
+                        {previewData.images.length > 1 && (
+                            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/60 text-sm font-medium tracking-wider bg-black/20 px-3 py-1 rounded-full">
+                                {previewData.index + 1} / {previewData.images.length}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
