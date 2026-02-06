@@ -180,7 +180,10 @@ const RequestDetailModal = ({ isOpen, onClose, request, onApprove, onReject, isP
                                     status === 'rejected' ? 'bg-red-100 text-red-700 border-red-200' :
                                         'bg-yellow-100 text-yellow-700 border-yellow-200'
                                     }`}>
-                                    {status}
+                                    {status === 'pending_employee' ? 'Kutilmoqda' :
+                                        status === 'pending_accountant' ? 'Hisobchi tasdiqlashi' :
+                                            status === 'completed' ? 'Qabul qilingan' :
+                                                status === 'rejected' ? 'Rad etilgan' : status}
                                 </span>
                             </span>
                         </div>
