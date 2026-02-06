@@ -18,7 +18,7 @@ const MyItemsPage = () => {
         setLoading(true);
         try {
             // 1. Fetch Items Assigned to ME (Optimized Backend Filter)
-            const itemsRes = await api.get(`/items?assignedUserId=${user.id}`);
+            const itemsRes = await api.get(`/items?assignedUserId=${user.id}&limit=1000`);
             const itemsData = itemsRes.data.items || itemsRes.data;
             const itemsList = Array.isArray(itemsData) ? itemsData : [];
 
@@ -72,11 +72,22 @@ const MyItemsPage = () => {
     // Pagination Logic
     const [activeTab, setActiveTab] = useState('inventory'); // 'inventory' or 'tmj'
 
+    const filteredInventoryItems = myItems.filter(item =>
+        !item.inventoryType || item.inventoryType.toLowerCase().trim() !== 'tmj'
+    );
+    const filteredTMJItems = myItems.filter(item =>
+        item.inventoryType && item.inventoryType.toLowerCase().trim() === 'tmj'
+    );
+
+    // Auto-switch to TMJ tab if inventory is empty but TMJ has items
+    useEffect(() => {
+        if (filteredInventoryItems.length === 0 && filteredTMJItems.length > 0 && activeTab === 'inventory') {
+            setActiveTab('tmj');
+        }
+    }, [filteredInventoryItems.length, filteredTMJItems.length]);
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-    const filteredInventoryItems = myItems.filter(item => item.inventoryType !== 'tmj');
-    const filteredTMJItems = myItems.filter(item => item.inventoryType === 'tmj');
 
     const displayItems = activeTab === 'inventory' ? filteredInventoryItems : filteredTMJItems;
     const currentItems = displayItems.slice(indexOfFirstItem, indexOfLastItem);
