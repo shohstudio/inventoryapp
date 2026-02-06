@@ -161,4 +161,63 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
-module.exports = { getDashboardStats };
+const getTMJStats = async (req, res) => {
+    try {
+        const tmjFilter = { inventoryType: 'tmj' };
+
+        // 1. Total TMJ Items
+        const totalItemsCount = await prisma.item.count({
+            where: {
+                ...tmjFilter,
+                status: { not: 'written-off' }
+            }
+        });
+
+        // 2. Handed-over Count
+        // Item is handed over if assignedUserId is NOT null OR initialOwner is NOT null/empty
+        const handedOverFilter = {
+            ...tmjFilter,
+            OR: [
+                { assignedUserId: { not: null } },
+                { initialOwner: { not: null, not: '' } }
+            ]
+        };
+        const handedOverCount = await prisma.item.count({ where: handedOverFilter });
+
+        // 3. Values
+        const allTmjItems = await prisma.item.findMany({
+            where: {
+                ...tmjFilter,
+                status: { not: 'written-off' }
+            },
+            select: { price: true, quantity: true, assignedUserId: true, initialOwner: true }
+        });
+
+        let inStockValue = 0;
+        let handedOverValue = 0;
+
+        allTmjItems.forEach(item => {
+            const price = parseFloat(item.price?.toString() || 0);
+            const quantity = parseInt(item.quantity || 1);
+            const isHandedOver = item.assignedUserId || (item.initialOwner && item.initialOwner !== "");
+
+            if (isHandedOver) {
+                handedOverValue += (price * quantity);
+            } else {
+                inStockValue += (price * quantity);
+            }
+        });
+
+        res.json({
+            totalItems: totalItemsCount,
+            handedOverCount,
+            inStockValue,
+            handedOverValue
+        });
+    } catch (error) {
+        console.error("Get TMJ Stats Error:", error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { getDashboardStats, getTMJStats };
