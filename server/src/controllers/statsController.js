@@ -62,8 +62,19 @@ const getDashboardStats = async (req, res) => {
         const inStockFilter = {
             ...warehouseFilter,
             status: { not: 'written-off' },
-            assignedUserId: null,
-            initialOwner: null
+            // Robust check for unassigned items: handle both null and empty strings
+            OR: [
+                { assignedUserId: null },
+                { assignedUserId: 0 } // Just in case 0 is used for unassigned
+            ],
+            AND: [
+                {
+                    OR: [
+                        { initialOwner: null },
+                        { initialOwner: '' }
+                    ]
+                }
+            ]
         };
 
         const currentItemsValue = await prisma.item.findMany({
