@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { read, utils, writeFile } from 'xlsx';
-import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line, RiFileExcel2Line, RiCloseLine } from "react-icons/ri";
+import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line, RiFileExcel2Line, RiCloseLine, RiArrowLeftSLine, RiArrowRightSLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
@@ -12,7 +12,8 @@ const MyItemsPage = () => {
     const [myItems, setMyItems] = useState([]);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [previewImage, setPreviewImage] = useState(null);
+    const [previewData, setPreviewData] = useState(null); // { images: [], index: 0 }
+
 
 
     const fetchData = async () => {
@@ -123,6 +124,39 @@ const MyItemsPage = () => {
         utils.book_append_sheet(wb, ws, type === 'inventory' ? "Asosiy Jihozlar" : "TMJ Jihozlari");
         writeFile(wb, type === 'inventory' ? "Mening_Jihozlarim.xlsx" : "Mening_TMJ_Jihozlarim.xlsx");
     };
+
+    const handleImagePreview = (item, initialUrl) => {
+        let allImages = [];
+        if (item.image) allImages.push(getImageUrl(item.image));
+        if (item.images) {
+            try {
+                const extra = typeof item.images === 'string' ? JSON.parse(item.images) : item.images;
+                if (Array.isArray(extra)) {
+                    extra.forEach(img => {
+                        const url = getImageUrl(img);
+                        if (!allImages.includes(url)) allImages.push(url);
+                    });
+                }
+            } catch (e) { }
+        }
+        if (item.handoverImage) {
+            const url = getImageUrl(item.handoverImage);
+            if (!allImages.includes(url)) allImages.push(url);
+        }
+        const index = allImages.findIndex(url => url === initialUrl);
+        setPreviewData({ images: allImages, index: index >= 0 ? index : 0 });
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!previewData) return;
+            if (e.key === 'ArrowRight') setPreviewData(prev => ({ ...prev, index: (prev.index + 1) % prev.images.length }));
+            if (e.key === 'ArrowLeft') setPreviewData(prev => ({ ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length }));
+            if (e.key === 'Escape') setPreviewData(null);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [previewData]);
 
     if (loading) return <div className="p-10 text-center text-gray-500">Yuklanmoqda...</div>;
 
@@ -273,7 +307,7 @@ const MyItemsPage = () => {
                                                 <div className="flex items-center gap-2">
                                                     {item.image && (
                                                         <div
-                                                            onClick={() => setPreviewImage(getImageUrl(item.image))}
+                                                            onClick={() => handleImagePreview(item, getImageUrl(item.image))}
                                                             className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-orange-200 transition-all cursor-pointer"
                                                         >
                                                             <img src={getImageUrl(item.image)} alt="item" className="w-full h-full object-cover" />
@@ -281,7 +315,7 @@ const MyItemsPage = () => {
                                                     )}
                                                     {item.handoverImage && (
                                                         <div
-                                                            onClick={() => setPreviewImage(getImageUrl(item.handoverImage))}
+                                                            onClick={() => handleImagePreview(item, getImageUrl(item.handoverImage))}
                                                             className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-green-200 transition-all cursor-pointer"
                                                         >
                                                             <img src={getImageUrl(item.handoverImage)} alt="handover" className="w-full h-full object-cover" />
@@ -339,25 +373,63 @@ const MyItemsPage = () => {
                 )}
             </section>
 
-            {/* Image Preview Modal */}
-            {previewImage && (
+            {/* Image Preview Carousel Modal */}
+            {previewData && (
                 <div
                     className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"
-                    onClick={() => setPreviewImage(null)}
+                    onClick={() => setPreviewData(null)}
                 >
-                    <div className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center">
+                    {/* Navigation Container */}
+                    <div className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center group">
+
+                        {/* Close Button */}
                         <button
-                            onClick={() => setPreviewImage(null)}
-                            className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md"
+                            onClick={() => setPreviewData(null)}
+                            className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md z-10"
                         >
                             <RiCloseLine size={24} />
                         </button>
+
+                        {/* Prev Button */}
+                        {previewData.images.length > 1 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPreviewData(prev => ({ ...prev, index: (prev.index - 1 + prev.images.length) % prev.images.length }));
+                                }}
+                                className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all bg-white/5 hover:bg-white/10 p-4 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 z-10"
+                            >
+                                <RiArrowLeftSLine size={32} />
+                            </button>
+                        )}
+
+                        {/* Image */}
                         <img
-                            src={previewImage}
-                            alt="Preview"
-                            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                            src={previewData.images[previewData.index]}
+                            alt={`Preview ${previewData.index + 1}`}
+                            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl transition-all duration-300 transform scale-100"
                             onClick={(e) => e.stopPropagation()}
                         />
+
+                        {/* Next Button */}
+                        {previewData.images.length > 1 && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setPreviewData(prev => ({ ...prev, index: (prev.index + 1) % prev.images.length }));
+                                }}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-all bg-white/5 hover:bg-white/10 p-4 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 z-10"
+                            >
+                                <RiArrowRightSLine size={32} />
+                            </button>
+                        )}
+
+                        {/* Counter */}
+                        {previewData.images.length > 1 && (
+                            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-white/60 text-sm font-medium tracking-wider bg-black/20 px-3 py-1 rounded-full">
+                                {previewData.index + 1} / {previewData.images.length}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
