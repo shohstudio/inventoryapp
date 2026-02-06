@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { read, utils, writeFile } from 'xlsx';
-import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line, RiFileExcel2Line } from "react-icons/ri";
+import { RiComputerLine, RiCheckDoubleLine, RiAlertLine, RiFileList3Line, RiFileExcel2Line, RiCloseLine } from "react-icons/ri";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../api/axios";
 import { toast } from "react-hot-toast";
@@ -12,6 +12,8 @@ const MyItemsPage = () => {
     const [myItems, setMyItems] = useState([]);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [previewImage, setPreviewImage] = useState(null);
+
 
     const fetchData = async () => {
         if (!user) return;
@@ -270,14 +272,20 @@ const MyItemsPage = () => {
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
                                                     {item.image && (
-                                                        <a href={getImageUrl(item.image)} target="_blank" rel="noreferrer" className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-orange-200 transition-all">
+                                                        <div
+                                                            onClick={() => setPreviewImage(getImageUrl(item.image))}
+                                                            className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-orange-200 transition-all cursor-pointer"
+                                                        >
                                                             <img src={getImageUrl(item.image)} alt="item" className="w-full h-full object-cover" />
-                                                        </a>
+                                                        </div>
                                                     )}
                                                     {item.handoverImage && (
-                                                        <a href={getImageUrl(item.handoverImage)} target="_blank" rel="noreferrer" className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-green-200 transition-all">
+                                                        <div
+                                                            onClick={() => setPreviewImage(getImageUrl(item.handoverImage))}
+                                                            className="w-8 h-8 rounded border border-gray-100 overflow-hidden hover:ring-2 hover:ring-green-200 transition-all cursor-pointer"
+                                                        >
                                                             <img src={getImageUrl(item.handoverImage)} alt="handover" className="w-full h-full object-cover" />
-                                                        </a>
+                                                        </div>
                                                     )}
                                                 </div>
                                             </td>
@@ -330,6 +338,29 @@ const MyItemsPage = () => {
                     </div>
                 )}
             </section>
+
+            {/* Image Preview Modal */}
+            {previewImage && (
+                <div
+                    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in p-4"
+                    onClick={() => setPreviewImage(null)}
+                >
+                    <div className="relative max-w-5xl w-full max-h-[90vh] flex items-center justify-center">
+                        <button
+                            onClick={() => setPreviewImage(null)}
+                            className="absolute -top-12 right-0 text-white/80 hover:text-white transition-colors bg-white/10 p-2 rounded-full backdrop-blur-md"
+                        >
+                            <RiCloseLine size={24} />
+                        </button>
+                        <img
+                            src={previewImage}
+                            alt="Preview"
+                            className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
