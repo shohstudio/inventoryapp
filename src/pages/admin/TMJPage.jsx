@@ -541,13 +541,13 @@ const TMJPage = () => {
                                             <>
                                                 <button
                                                     onClick={() => { setSelectedHandoverItem(item); setIsHandoverModalOpen(true); }}
-                                                    className={`p-2 rounded-lg flex items-center gap-1 border transition-colors ${item.initialOwner
+                                                    className={`p-2 rounded-lg flex items-center gap-1 border transition-colors ${(item.initialOwner || item.assignedTo)
                                                         ? 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30 border-green-100 dark:border-green-800 bg-green-50/50 dark:bg-green-900/20'
                                                         : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 border-blue-100 dark:border-blue-800'}`}
-                                                    title="Topshirish"
+                                                    title={(item.initialOwner || item.assignedTo) ? t('tmj_handed_over') : t('tmj_handover')}
                                                 >
                                                     <RiUserReceived2Line size={18} />
-                                                    <span className="text-xs font-medium">{item.initialOwner ? t('tmj_handed_over') : t('tmj_handover')}</span>
+                                                    <span className="text-xs font-medium">{(item.initialOwner || item.assignedTo) ? t('tmj_handed_over') : t('tmj_handover')}</span>
                                                 </button>
                                                 <button onClick={() => { setSelectedItem(item); setIsModalOpen(true); }} className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg">
                                                     <RiMore2Fill size={18} />
