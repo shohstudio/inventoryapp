@@ -275,11 +275,25 @@ const WarehouseItemModal = ({ isOpen, onClose, onSave, item }) => {
                                 className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 text-sm text-gray-500"
                             />
                             {formData.pdf && (typeof formData.pdf === 'string' ? (
-                                <a href={formData.pdf} target="_blank" rel="noreferrer" className="text-xs text-blue-600 underline">
-                                    Joriy fayl
+                                <a
+                                    href={getImageUrl(formData.pdf)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors"
+                                >
+                                    Ko'rish
                                 </a>
                             ) : (
-                                <span className="text-xs text-green-600 font-medium">Tanlandi</span>
+                                <div className="flex items-center gap-2">
+                                    <a
+                                        href={URL.createObjectURL(formData.pdf)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="px-3 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium hover:bg-green-100 transition-colors"
+                                    >
+                                        Ko'rish
+                                    </a>
+                                </div>
                             ))}
                         </div>
                     </div>

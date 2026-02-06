@@ -294,7 +294,7 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                                     </span>
                                     {typeof formData.pdf === 'string' ? (
                                         <a
-                                            href={BASE_URL.replace('/api', '') + formData.pdf}
+                                            href={getImageUrl(formData.pdf)}
                                             target="_blank"
                                             rel="noreferrer"
                                             className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 transition-colors"
@@ -302,7 +302,17 @@ const TMJItemModal = ({ isOpen, onClose, onSave, item }) => {
                                             Ko'rish
                                         </a>
                                     ) : (
-                                        <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded">Yuklashga tayyor</span>
+                                        <div className="flex items-center gap-2">
+                                            <a
+                                                href={URL.createObjectURL(formData.pdf)}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="px-3 py-1 bg-green-50 text-green-600 rounded-md text-xs font-medium hover:bg-green-100 transition-colors"
+                                            >
+                                                Ko'rish
+                                            </a>
+                                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-1 rounded uppercase">Yangi</span>
+                                        </div>
                                     )}
                                 </div>
                             )}

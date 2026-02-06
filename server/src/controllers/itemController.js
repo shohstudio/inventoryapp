@@ -476,6 +476,8 @@ const updateItem = async (req, res) => {
                 quantity: splitQty, // The handed over amount
                 initialQuantity: validInitialQty, // Preserve the valid original batch size
                 purchaseDate: item.purchaseDate,
+                contractPdf: item.contractPdf, // Copy PDF
+                image: item.image, // Copy main image
                 status: item.status,
                 condition: item.condition,
                 inventoryType: item.inventoryType, // Fix: Copy inventoryType (e.g. 'tmj') matching original
