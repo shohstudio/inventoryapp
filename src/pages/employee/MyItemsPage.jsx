@@ -69,9 +69,6 @@ const MyItemsPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
-    // Pagination Logic
-    const [activeTab, setActiveTab] = useState('inventory'); // 'inventory' or 'tmj'
-
     const filteredInventoryItems = myItems.filter(item =>
         !item.inventoryType || item.inventoryType.toLowerCase().trim() !== 'tmj'
     );
@@ -79,22 +76,9 @@ const MyItemsPage = () => {
         item.inventoryType && item.inventoryType.toLowerCase().trim() === 'tmj'
     );
 
-    // Auto-switch to TMJ tab if inventory is empty but TMJ has items
-    useEffect(() => {
-        if (filteredInventoryItems.length === 0 && filteredTMJItems.length > 0 && activeTab === 'inventory') {
-            setActiveTab('tmj');
-        }
-    }, [filteredInventoryItems.length, filteredTMJItems.length]);
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-    const displayItems = activeTab === 'inventory' ? filteredInventoryItems : filteredTMJItems;
-    const currentItems = displayItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(displayItems.length / itemsPerPage);
-
-    const handleExportExcel = () => {
-        const exportData = displayItems.map((item, index) => ({
+    const handleExportExcel = (type) => {
+        const items = type === 'inventory' ? filteredInventoryItems : filteredTMJItems;
+        const exportData = items.map((item, index) => ({
             "№": index + 1,
             "Jihoz Nomi": item.name,
             "Model": item.model || "-",
@@ -106,56 +90,27 @@ const MyItemsPage = () => {
         }));
 
         const ws = utils.json_to_sheet(exportData);
-        // Auto-width for columns
         const wscols = [
-            { wch: 5 },  // #
-            { wch: 25 }, // Name
-            { wch: 15 }, // Model
-            { wch: 20 }, // Serial
-            { wch: 15 }, // Category
-            { wch: 10 }, // Status
-            { wch: 15 }, // Date
-            { wch: 15 }  // PINFL
+            { wch: 5 }, { wch: 25 }, { wch: 15 }, { wch: 20 },
+            { wch: 15 }, { wch: 10 }, { wch: 15 }, { wch: 15 }
         ];
         ws['!cols'] = wscols;
 
         const wb = utils.book_new();
-        utils.book_append_sheet(wb, ws, activeTab === 'inventory' ? "Asosiy Jihozlar" : "TMJ Jihozlari");
-        writeFile(wb, activeTab === 'inventory' ? "Mening_Jihozlarim.xlsx" : "Mening_TMJ_Jihozlarim.xlsx");
+        utils.book_append_sheet(wb, ws, type === 'inventory' ? "Asosiy Jihozlar" : "TMJ Jihozlari");
+        writeFile(wb, type === 'inventory' ? "Mening_Jihozlarim.xlsx" : "Mening_TMJ_Jihozlarim.xlsx");
     };
 
     if (loading) return <div className="p-10 text-center text-gray-500">Yuklanmoqda...</div>;
 
-    if (myItems.length === 0 && requests.length === 0) {
-        return (
-            <div className="text-center py-20">
-                <div className="w-20 h-20 bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <RiComputerLine size={40} />
-                </div>
-                <h2 className="text-xl font-bold text-gray-800 dark:text-white">Sizga biriktirilgan jihozlar yo'q</h2>
-                <p className="text-gray-500 dark:text-gray-400 mt-2">Hozircha sizning nomingizga hech qanday inventar rasmiylashtirilmagan.</p>
-            </div>
-        );
-    }
-
     return (
-        <div className="animate-in fade-in duration-500 pb-20">
+        <div className="animate-in fade-in duration-500 pb-20 space-y-12">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Mening Jihozlarim</h1>
-
-                {displayItems.length > 0 && (
-                    <button
-                        onClick={handleExportExcel}
-                        className="btn bg-green-600 hover:bg-green-700 text-white shadow-green-200 shadow-lg flex items-center gap-2"
-                    >
-                        <RiFileExcel2Line size={20} />
-                        Excelga yuklash ({activeTab === 'inventory' ? 'Inventory' : 'TMJ'})
-                    </button>
-                )}
             </div>
 
             {requests.length > 0 && (
-                <div className="mb-8 animate-in slide-in-from-top duration-500">
+                <div className="animate-in slide-in-from-top duration-500">
                     <h2 className="text-xl font-bold text-orange-600 dark:text-orange-400 mb-4 flex items-center gap-2">
                         <RiAlertLine /> Tasdiqlash kutilmoqda
                     </h2>
@@ -183,67 +138,113 @@ const MyItemsPage = () => {
                 </div>
             )}
 
-            {/* Tabs */}
-            <div className="flex gap-4 mb-6 border-b border-gray-100 dark:border-slate-700">
-                <button
-                    onClick={() => { setActiveTab('inventory'); setCurrentPage(1); }}
-                    className={`pb-4 px-2 text-sm font-semibold transition-all relative ${activeTab === 'inventory' ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    Asosiy jihozlar ({filteredInventoryItems.length})
-                    {activeTab === 'inventory' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-600 rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
-                </button>
-                <button
-                    onClick={() => { setActiveTab('tmj'); setCurrentPage(1); }}
-                    className={`pb-4 px-2 text-sm font-semibold transition-all relative ${activeTab === 'tmj' ? 'text-orange-600' : 'text-gray-400 hover:text-gray-600'}`}
-                >
-                    TMJ jihozlari ({filteredTMJItems.length})
-                    {activeTab === 'tmj' && <div className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-600 rounded-full animate-in fade-in slide-in-from-bottom-1"></div>}
-                </button>
-            </div>
+            {/* SECTION 1: INVENTAR JIHOZLAR */}
+            <section>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                        <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
+                        Inventar jihozlar ({filteredInventoryItems.length})
+                    </h2>
+                    {filteredInventoryItems.length > 0 && (
+                        <button onClick={() => handleExportExcel('inventory')} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                            <RiFileExcel2Line /> Excelga yuklash
+                        </button>
+                    )}
+                </div>
 
-            <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
-                        <thead>
-                            <tr className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
-                                <th className="p-4 font-semibold">#</th>
-                                <th className="p-4 font-semibold">Jihoz Nomi</th>
-                                {activeTab === 'inventory' ? (
-                                    <>
+                {filteredInventoryItems.length === 0 ? (
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-2xl p-10 text-center border border-dashed border-gray-200 dark:border-slate-700">
+                        <RiComputerLine className="mx-auto text-gray-300 mb-2" size={32} />
+                        <p className="text-gray-500 text-sm">Inventar jihozlar mavjud emas</p>
+                    </div>
+                ) : (
+                    <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
+                                        <th className="p-4 font-semibold">#</th>
+                                        <th className="p-4 font-semibold">Jihoz Nomi</th>
                                         <th className="p-4 font-semibold">Seriya Raqami</th>
                                         <th className="p-4 font-semibold">Kategoriya</th>
-                                    </>
-                                ) : (
-                                    <>
-                                        <th className="p-4 font-semibold">Soni</th>
-                                        <th className="p-4 font-semibold">Rasm</th>
-                                    </>
-                                )}
-                                <th className="p-4 font-semibold">Holat</th>
-                                <th className="p-4 font-semibold">Biriktirilgan Sana</th>
-                                <th className="p-4 font-semibold text-right">Hujjat</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
-                            {currentItems.map((item, index) => (
-                                <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors text-sm">
-                                    <td className="p-4 text-gray-400 dark:text-gray-500 font-mono">{indexOfFirstItem + index + 1}</td>
-                                    <td className="p-4">
-                                        <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
-                                        {activeTab === 'tmj' && <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{item.model} • {item.category}</div>}
-                                    </td>
-
-                                    {activeTab === 'inventory' ? (
-                                        <>
+                                        <th className="p-4 font-semibold">Holat</th>
+                                        <th className="p-4 font-semibold text-right">Hujjat</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
+                                    {filteredInventoryItems.map((item, index) => (
+                                        <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors text-sm">
+                                            <td className="p-4 text-gray-400 dark:text-gray-500 font-mono">{index + 1}</td>
+                                            <td className="p-4 font-medium text-gray-900 dark:text-gray-100">{item.name}</td>
                                             <td className="p-4 font-mono text-gray-600 dark:text-gray-400">{item.serialNumber || "-"}</td>
                                             <td className="p-4">
                                                 <span className="bg-gray-100 dark:bg-slate-900 text-gray-600 dark:text-gray-400 px-2 py-1 rounded text-xs border border-transparent dark:border-slate-700">
                                                     {item.category || "-"}
                                                 </span>
                                             </td>
-                                        </>
-                                    ) : (
-                                        <>
+                                            <td className="p-4">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${item.status === 'working' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800'}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'working' ? 'bg-green-500' : 'bg-orange-500'}`}></span>
+                                                    {item.status === 'working' ? 'Faol' : 'Ta\'mirda'}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-right">
+                                                {item.assignedDocument ? (
+                                                    <a href={getImageUrl(item.assignedDocument)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium text-xs">
+                                                        <RiFileList3Line size={16} /> Asos (PDF)
+                                                    </a>
+                                                ) : <span className="text-gray-300">-</span>}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </section>
+
+            {/* SECTION 2: TMJ JIHOZLAR */}
+            <section>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                        <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div>
+                        TMJ jihozlar ({filteredTMJItems.length})
+                    </h2>
+                    {filteredTMJItems.length > 0 && (
+                        <button onClick={() => handleExportExcel('tmj')} className="text-xs text-orange-600 hover:underline flex items-center gap-1">
+                            <RiFileExcel2Line /> Excelga yuklash
+                        </button>
+                    )}
+                </div>
+
+                {filteredTMJItems.length === 0 ? (
+                    <div className="bg-gray-50 dark:bg-slate-900/50 rounded-2xl p-10 text-center border border-dashed border-gray-200 dark:border-slate-700">
+                        <RiComputerLine className="mx-auto text-gray-300 mb-2" size={32} />
+                        <p className="text-gray-500 text-sm">TMJ jihozlar mavjud emas</p>
+                    </div>
+                ) : (
+                    <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-gray-50 dark:bg-slate-900 text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider border-b border-gray-100 dark:border-slate-700">
+                                        <th className="p-4 font-semibold">#</th>
+                                        <th className="p-4 font-semibold">Jihoz Nomi</th>
+                                        <th className="p-4 font-semibold">Soni</th>
+                                        <th className="p-4 font-semibold">Rasm</th>
+                                        <th className="p-4 font-semibold">Holat</th>
+                                        <th className="p-4 font-semibold text-right">Hujjat</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-50 dark:divide-slate-700/50">
+                                    {filteredTMJItems.map((item, index) => (
+                                        <tr key={item.id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors text-sm">
+                                            <td className="p-4 text-gray-400 dark:text-gray-500 font-mono">{index + 1}</td>
+                                            <td className="p-4">
+                                                <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
+                                                <div className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5">{item.model} • {item.category}</div>
+                                            </td>
                                             <td className="p-4 font-mono text-gray-900 dark:text-gray-100 font-bold">{item.quantity} ta</td>
                                             <td className="p-4">
                                                 <div className="flex items-center gap-2">
@@ -259,57 +260,35 @@ const MyItemsPage = () => {
                                                     )}
                                                 </div>
                                             </td>
-                                        </>
-                                    )}
-
-                                    <td className="p-4">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${item.status === 'working' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800'
-                                            }`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'working' ? 'bg-green-500' : 'bg-orange-500'
-                                                }`}></span>
-                                            {item.status === 'working' ? 'Faol' : 'Ta\'mirda'}
-                                        </span>
-                                    </td>
-                                    <td className="p-4 text-gray-600 dark:text-gray-400">{item.dateAssigned}</td>
-                                    <td className="p-4 text-right">
-                                        <div className="flex flex-col items-end gap-1">
-                                            {item.assignedDocument && (
-                                                <a
-                                                    href={getImageUrl(item.assignedDocument)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium text-xs transition-colors"
-                                                >
-                                                    <RiFileList3Line size={16} /> Asos (PDF)
-                                                </a>
-                                            )}
-                                            {item.contractPdf && (
-                                                <a
-                                                    href={getImageUrl(item.contractPdf)}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-800 hover:underline font-medium text-xs transition-colors"
-                                                >
-                                                    <RiFileList3Line size={16} /> Shartnoma (PDF)
-                                                </a>
-                                            )}
-                                            {!item.assignedDocument && !item.contractPdf && <span className="text-gray-300">-</span>}
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div className="mt-6 flex justify-center">
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
-            </div>
+                                            <td className="p-4">
+                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${item.status === 'working' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800'}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${item.status === 'working' ? 'bg-green-500' : 'bg-orange-500'}`}></span>
+                                                    {item.status === 'working' ? 'Faol' : 'Ta\'mirda'}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-right">
+                                                <div className="flex flex-col items-end gap-1">
+                                                    {item.assignedDocument && (
+                                                        <a href={getImageUrl(item.assignedDocument)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline font-medium text-xs">
+                                                            <RiFileList3Line size={16} /> Asos (PDF)
+                                                        </a>
+                                                    )}
+                                                    {item.contractPdf && (
+                                                        <a href={getImageUrl(item.contractPdf)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-orange-600 hover:text-orange-800 hover:underline font-medium text-xs">
+                                                            <RiFileList3Line size={16} /> Shartnoma (PDF)
+                                                        </a>
+                                                    )}
+                                                    {!item.assignedDocument && !item.contractPdf && <span className="text-gray-300">-</span>}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </section>
         </div>
     );
 };
