@@ -275,7 +275,7 @@ const EmployeeRequestsPage = () => {
                                                         <RiCloseCircleLine /> Rad etish
                                                     </button>
                                                     <button
-                                                        onClick={() => handleAction(req.id, 'completed')}
+                                                        onClick={() => openDetailModal(req)}
                                                         className="btn btn-sm bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200"
                                                         disabled={isProcessing}
                                                     >
