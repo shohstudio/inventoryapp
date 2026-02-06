@@ -44,6 +44,35 @@ const TMJPage = () => {
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [isExporting, setIsExporting] = useState(false);
 
+    const fetchItems = async () => {
+        setLoading(true);
+        try {
+            const params = {
+                page: currentPage,
+                limit: 10,
+                search: searchQuery,
+                inventoryType: 'tmj', // Always TMJ
+            };
+
+            // Mapping tabs to API filters
+            if (activeTab === 'stock') params.isAssigned = 'unassigned';
+            if (activeTab === 'assigned') params.isAssigned = 'assigned';
+            // 'all' sends no 'isAssigned' param, hammasi fetch bo'ladi
+
+            const { data } = await api.get('/items', { params });
+
+            if (data.items) {
+                setItems(data.items);
+                setTotalPages(data.metadata.totalPages);
+                setTotalItems(data.metadata.total);
+            }
+        } catch (error) {
+            toast.error("Ma'lumotlarni yuklashda xatolik");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const fetchStats = async () => {
         try {
             const { data } = await api.get('/stats/tmj');
