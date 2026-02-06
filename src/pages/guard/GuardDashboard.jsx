@@ -238,7 +238,7 @@ const GuardDashboard = () => {
                                                     <span className="font-medium text-gray-800 dark:text-gray-100">{req.requester?.name || '---'}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-4 text-gray-600 dark:text-gray-400">{req.item?.name || '---'} <span className="text-xs text-gray-400 dark:text-gray-500">({req.item?.serialNumber || 'SN yo\'q'})</span></td>
+                                            <td className="p-4 text-gray-600 dark:text-gray-400">{req.item?.name || '---'}</td>
                                             <td className="p-4">
                                                 {req.status === 'pending_accountant' && <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 px-2 py-1 rounded text-xs border border-orange-200 dark:border-orange-800">Hisobchi kutilmoqda</span>}
                                                 {req.status === 'approved' && <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded text-xs border border-green-200 dark:border-green-800">Ruxsat Berilgan</span>}
@@ -351,7 +351,7 @@ const GuardDashboard = () => {
                         {!scannedItem ? (
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Seriya Raqami / QR Kod</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">QR Kod / Qidiruv</label>
                                     <div className="flex gap-2">
                                         <input
                                             type="text"
@@ -393,7 +393,6 @@ const GuardDashboard = () => {
                                             className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded px-2 py-1 mt-1 text-gray-800 dark:text-white font-medium focus:ring-2 focus:ring-blue-500 outline-none"
                                         />
                                     </div>
-                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">S/N: {scannedItem.serialNumber}</p>
                                 </div>
 
                                 <div className="flex justify-end gap-3 mt-4">
@@ -459,7 +458,7 @@ const GuardDashboard = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tavsif / Seriya raqami</label>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tavsif</label>
                                 <textarea
                                     className="w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 rounded-lg px-3 py-2 text-gray-800 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                                     placeholder="Rangi, holati, seriya raqami..."
