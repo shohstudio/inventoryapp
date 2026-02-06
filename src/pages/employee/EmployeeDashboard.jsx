@@ -229,7 +229,7 @@ const EmployeeDashboard = () => {
                         )}
                     </div>
 
-                    <Link to="/employee/report" className="btn btn-primary w-full justify-center shadow-lg shadow-indigo-200 mt-4">
+                    <Link to="/employee/report" className="btn bg-red-600 hover:bg-red-700 text-white w-full justify-center shadow-lg shadow-red-200 mt-4 border-none">
                         <RiAlertLine size={18} />
                         Muammo xabar berish
                     </Link>

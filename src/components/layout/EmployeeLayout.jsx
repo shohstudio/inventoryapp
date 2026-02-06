@@ -34,8 +34,8 @@ const EmployeeLayout = () => {
                             className={clsx(
                                 "flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 font-medium",
                                 pathname === link.path
-                                    ? "bg-white/10 text-white shadow-inner backdrop-blur-sm border border-white/5"
-                                    : "text-indigo-300/80 hover:bg-white/5 hover:text-white"
+                                    ? (link.name === "Muammo xabar berish" ? "bg-red-500/20 text-red-400 shadow-inner border border-red-500/20" : "bg-white/10 text-white shadow-inner backdrop-blur-sm border border-white/5")
+                                    : (link.name === "Muammo xabar berish" ? "text-red-400/80 hover:bg-red-500/10 hover:text-red-400" : "text-indigo-300/80 hover:bg-white/5 hover:text-white")
                             )}
                         >
                             <span className={clsx("transition-transform duration-200", pathname === link.path ? "scale-110" : "")}>
@@ -68,8 +68,10 @@ const EmployeeLayout = () => {
                         key={link.path}
                         to={link.path}
                         className={clsx(
-                            "flex flex-col items-center gap-1 text-xs font-medium",
-                            pathname === link.path ? "text-indigo-600" : "text-gray-400"
+                            "flex flex-col items-center gap-1 text-xs font-medium transition-colors",
+                            pathname === link.path
+                                ? (link.name === "Muammo xabar berish" ? "text-red-500" : "text-indigo-600")
+                                : (link.name === "Muammo xabar berish" ? "text-red-400/70" : "text-gray-400")
                         )}
                     >
                         {link.icon}
