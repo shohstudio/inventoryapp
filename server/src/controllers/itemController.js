@@ -228,9 +228,9 @@ const createItem = async (req, res) => {
             orderNumber,
             category,
             subCategory,
-            price: price ? parseFloat(price) : 0,
-            quantity: quantity ? parseInt(quantity) : 1,
-            initialQuantity: quantity ? parseInt(quantity) : 1, // Set initial batch size
+            price: (price && !isNaN(parseFloat(price))) ? parseFloat(price) : 0,
+            quantity: (quantity && !isNaN(parseInt(quantity))) ? parseInt(quantity) : 1,
+            initialQuantity: (quantity && !isNaN(parseInt(quantity))) ? parseInt(quantity) : 1, // Set initial batch size
             purchaseDate,
             status,
             condition,
@@ -273,8 +273,7 @@ const createItem = async (req, res) => {
                     itemId: item.id,
                     requesterId: req.user.id,
                     targetUserId: targetUser.id,
-                    targetUserId: targetUser.id,
-                    description: `Yangi jihoz yaratildi va biriktirildi. (ID: ${targetUser.employeeId})`
+                    description: `Yangi jihoz yaratildi va biriktirildi. (ID: ${targetUser.employeeId || targetUser.id})`
                 }
             });
             // We can return a specific message saying request created
@@ -314,8 +313,8 @@ const updateItem = async (req, res) => {
 
         const dataToUpdate = {
             name, model, serialNumber, inn, orderNumber, category, subCategory,
-            price: price ? parseFloat(price) : undefined,
-            quantity: quantity ? parseInt(quantity) : undefined,
+            price: (price !== undefined && price !== "") ? (isNaN(parseFloat(price)) ? 0 : parseFloat(price)) : undefined,
+            quantity: (quantity !== undefined && quantity !== "") ? (isNaN(parseInt(quantity)) ? 1 : parseInt(quantity)) : undefined,
             purchaseDate, status, condition,
             building, location, department,
             ...(inventoryType && { inventoryType }) // Only update if provided
@@ -464,7 +463,7 @@ const updateItem = async (req, res) => {
             const newItemData = {
                 name: item.name,
                 model: item.model,
-                serialNumber: item.serialNumber, // Note: Serial number duplicate? Maybe append -1? But usually serials are unique. Assuming they split batch.
+                serialNumber: item.serialNumber ? `${item.serialNumber}-split-${Date.now()}` : null, // Ensure uniqueness when splitting batch
                 inn: item.inn,
                 orderNumber: item.orderNumber,
                 category: item.category,
