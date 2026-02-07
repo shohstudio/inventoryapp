@@ -335,13 +335,20 @@ const updateItem = async (req, res) => {
 
         // 2. Add NEW files
         if (req.files && req.files.length > 0) {
-            const imageFiles = req.files.filter(f => f.mimetype.startsWith('image/'));
-            const pdfFiles = req.files.filter(f => f.mimetype === 'application/pdf');
+            // Filter generic images (excluding specific named fields if needed, but usually images are just 'image' or 'images')
+            const imageFiles = req.files.filter(f => f.mimetype.startsWith('image/') && f.fieldname !== 'handoverImage');
+
+            // Filter generic PDFs (Contract) - EXCLUDE employeeReport
+            const pdfFiles = req.files.filter(f => f.mimetype === 'application/pdf' && f.fieldname !== 'employeeReport');
 
             const newImagePaths = imageFiles.map(file => `/uploads/${file.filename}`);
             finalImages = [...finalImages, ...newImagePaths];
 
             if (pdfFiles.length > 0) {
+                // Only update contractPdf if a generic PDF (not report) is uploaded
+                // Or if we have a specific 'contract' field name? Current frontend sends everything in 'file' or 'files' for generic updates?
+                // Actually UserItemsModal etc don't seem to upload contract separately yet?
+                // But if they did, we want to be safe.
                 dataToUpdate.contractPdf = `/uploads/${pdfFiles[0].filename}`;
             }
         }
