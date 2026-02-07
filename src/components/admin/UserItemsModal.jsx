@@ -274,6 +274,7 @@ const UserItemsModal = ({ isOpen, onClose, user }) => {
                                                                 </td>
                                                                 <td className="p-3 text-right">
                                                                     <div className="flex flex-col items-end gap-1">
+                                                                        {console.log("Item Docs Debug:", item.id, item.contractPdf, item.employeeReport)}
                                                                         {item.assignedDocument && (
                                                                             <a href={getImageUrl(item.assignedDocument)} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-[10px] flex items-center gap-0.5">
                                                                                 <RiFileList3Line size={12} /> Asos

@@ -341,6 +341,11 @@ const updateItem = async (req, res) => {
             // Filter generic PDFs (Contract) - EXCLUDE employeeReport
             const pdfFiles = req.files.filter(f => f.mimetype === 'application/pdf' && f.fieldname !== 'employeeReport');
 
+            console.log("DEBUG UPDATE ITEM:", {
+                files: req.files.map(f => ({ field: f.fieldname, mime: f.mimetype, name: f.filename })),
+                pdfFilesCount: pdfFiles.length
+            });
+
             const newImagePaths = imageFiles.map(file => `/uploads/${file.filename}`);
             finalImages = [...finalImages, ...newImagePaths];
 
@@ -349,6 +354,7 @@ const updateItem = async (req, res) => {
                 // Or if we have a specific 'contract' field name? Current frontend sends everything in 'file' or 'files' for generic updates?
                 // Actually UserItemsModal etc don't seem to upload contract separately yet?
                 // But if they did, we want to be safe.
+                console.log("Updating Contract PDF to:", pdfFiles[0].filename);
                 dataToUpdate.contractPdf = `/uploads/${pdfFiles[0].filename}`;
             }
         }
